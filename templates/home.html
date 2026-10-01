@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}
+Shop · PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <h1>Find your next favourite book</h1>
+    <p>
+        Fiction, technology, self-help, science, and history
+        delivered to your door.
+    </p>
+</section>
+
+<section class="toolbar">
+    <div class="categories">
+        <a
+            class="pill {% if active_category == 'All' %}active{% endif %}"
+            href="{{ url_for('home') }}"
+        >
+            All
+        </a>
+
+        {% for category in categories %}
+            <a
+                class="pill
+                {% if active_category == category['category'] %}
+                    active
+                {% endif %}"
+                href="{{ url_for(
+                    'home',
+                    category=category['category']
+                ) }}"
+            >
+                {{ category['category'] }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <input
+        id="liveSearch"
+        class="search-input"
+        type="search"
+        placeholder="Search title or author..."
+    >
+</section>
+
+<div class="section-heading">
+    <h2>
+        {% if active_category == "All" %}
+            All books
+        {% else %}
+            {{ active_category }} books
+        {% endif %}
+    </h2>
+
+    <span id="bookCount">
+        {{ books|length }} books
+    </span>
+</div>
+
+<section class="book-grid" id="bookGrid">
+
+    {% for book in books %}
+        <article
+            class="book-card"
+            data-title="{{ book['title']|lower }}"
+            data-author="{{ book['author']|lower }}"
+        >
+            <a
+                class="cover"
+                style="--cover: {{ book['cover_color'] }}"
+                href="{{ url_for(
+                    'book_detail',
+                    book_id=book['id']
+                ) }}"
+            >
+                <span>{{ book['title'] }}</span>
+                <small>{{ book['author'] }}</small>
+            </a>
+
+            <div class="book-info">
+                <span class="tag">
+                    {{ book['category'] }}
+                </span>
+
+                <h3>
+                    <a href="{{ url_for(
+                        'book_detail',
+                        book_id=book['id']
+                    ) }}">
+                        {{ book['title'] }}
+                    </a>
+                </h3>
+
+                <p>{{ book['author'] }}</p>
+
+                <div class="card-bottom">
+                    <strong>
+                        ₹{{ "%.0f"|format(book['price']) }}
+                    </strong>
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'add_to_cart',
+                            book_id=book['id']
+                        ) }}"
+                    >
+                        <button
+                            {% if book['stock'] == 0 %}
+                                disabled
+                            {% endif %}
+                        >
+                            {% if book['stock'] == 0 %}
+                                Out of stock
+                            {% else %}
+                                Add to cart
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    {% endfor %}
+
+</section>
+
+<p id="noResults" class="empty hidden">
+    No matching books found.
+</p>
+
+{% endblock %}

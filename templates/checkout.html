@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}
+Checkout · PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<section class="checkout-layout">
+
+    <form
+        id="checkoutForm"
+        class="form-card"
+        method="post"
+        novalidate
+    >
+        <h1>Checkout</h1>
+
+        <p>
+            Cash on delivery. Enter your delivery details.
+        </p>
+
+        <label>
+            Full name *
+
+            <input
+                name="customer_name"
+                required
+                placeholder="e.g. Asha Reddy"
+            >
+        </label>
+
+        <label>
+            Phone - 10 digits *
+
+            <input
+                id="phone"
+                name="phone"
+                required
+                inputmode="numeric"
+                maxlength="10"
+                placeholder="e.g. 9876543210"
+            >
+
+            <small
+                id="phoneError"
+                class="form-error"
+            ></small>
+        </label>
+
+        <label>
+            Delivery address *
+
+            <textarea
+                name="address"
+                required
+                placeholder="House number, street, city, PIN"
+            ></textarea>
+        </label>
+
+        <div class="actions">
+            <a
+                class="secondary"
+                href="{{ url_for('cart_page') }}"
+            >
+                Back to cart
+            </a>
+
+            <button
+                class="primary"
+                type="submit"
+            >
+                Place order
+            </button>
+        </div>
+    </form>
+
+    <aside class="summary-card">
+        <h2>Order summary</h2>
+
+        {% for item in items %}
+            <div class="summary-line">
+                <span>
+                    {{ item['book']['title'] }}
+                    × {{ item['quantity'] }}
+                </span>
+
+                <strong>
+                    ₹{{ "%.0f"|format(item['subtotal']) }}
+                </strong>
+            </div>
+        {% endfor %}
+
+        <div class="summary-total">
+            <span>Total</span>
+            <strong>
+                ₹{{ "%.0f"|format(total) }}
+            </strong>
+        </div>
+    </aside>
+
+</section>
+
+{% endblock %}
