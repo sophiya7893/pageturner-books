@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Admin | PageTurner Books{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="page-container">
+
+        <div class="page-heading admin-heading">
+
+            <div>
+                <span class="section-label">
+                    ADMIN PANEL
+                </span>
+
+                <h1>Book Management</h1>
+
+                <p>
+                    Manage your PageTurner Books collection.
+                </p>
+            </div>
+
+            <div class="admin-actions">
+
+                <a
+                    href="{{ url_for('admin_add_book') }}"
+                    class="primary-button">
+                    + Add Book
+                </a>
+
+                <a
+                    href="{{ url_for('report') }}"
+                    class="secondary-button">
+                    View Report
+                </a>
+
+                <a
+                    href="{{ url_for('admin_logout') }}"
+                    class="text-link">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="admin-stats">
+
+            <div class="stat-card">
+                <span>BOOKS</span>
+                <strong>{{ total_books }}</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>STOCK</span>
+                <strong>{{ total_stock }}</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>ORDERS</span>
+                <strong>{{ total_orders }}</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>REVENUE</span>
+                <strong>
+                    ₹{{ "%.2f"|format(total_revenue) }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="admin-books">
+
+            <div class="section-title-row">
+
+                <div>
+                    <span class="section-label">
+                        INVENTORY
+                    </span>
+
+                    <h2>All Books</h2>
+                </div>
+
+                <span>
+                    {{ total_books }} books
+                </span>
+
+            </div>
+
+
+            <div class="admin-table">
+
+                {% for book in books %}
+
+                <div class="admin-book-row">
+
+                    <div class="admin-book-cover">
+
+                        {% if book['cover_image'] %}
+
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename='images/books/' ~
+                                book['cover_image']
+                            ) }}"
+                            alt="{{ book['title'] }}">
+
+                        {% else %}
+
+                        <div
+                            class="cover-placeholder"
+                            style="background: {{
+                                book['cover_color']
+                            }};">
+                            {{ book['title'] }}
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="admin-book-info">
+
+                        <span class="book-category">
+                            {{ book['category'] }}
+                        </span>
+
+                        <h3>
+                            {{ book['title'] }}
+                        </h3>
+
+                        <p>
+                            {{ book['author'] }}
+                        </p>
+
+                    </div>
+
+
+                    <div class="admin-price">
+
+                        <small>PRICE</small>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(book['price']) }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="admin-stock">
+
+                        <small>STOCK</small>
+
+                        {% if book['stock'] == 0 %}
+
+                        <strong class="out-stock">
+                            Out of stock
+                        </strong>
+
+                        {% elif book['stock'] <= 2 %}
+
+                        <strong class="low-stock">
+                            {{ book['stock'] }} left
+                        </strong>
+
+                        {% else %}
+
+                        <strong>
+                            {{ book['stock'] }}
+                        </strong>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="admin-row-actions">
+
+                        <a
+                            href="{{ url_for(
+                                'admin_edit_book',
+                                book_id=book['id']
+                            ) }}"
+                            class="secondary-button small-button">
+                            Edit
+                        </a>
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'admin_delete_book',
+                                book_id=book['id']
+                            ) }}"
+                            onsubmit="return confirm(
+                                'Delete this book?'
+                            );">
+
+                            <button
+                                type="submit"
+                                class="danger-button">
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

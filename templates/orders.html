@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}
+Find My Order | PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="page-container narrow">
+
+        <div class="page-heading centered">
+
+            <span class="section-label">
+                ORDER HISTORY
+            </span>
+
+            <h1>
+                Find My Order
+            </h1>
+
+            <p>
+                Enter the phone number used when placing your order.
+            </p>
+
+        </div>
+
+
+        <!-- Search Form -->
+        <form
+            method="POST"
+            action="{{ url_for('orders') }}"
+            class="order-search-form"
+        >
+
+            <input
+                type="tel"
+                name="phone"
+                value="{{ phone or '' }}"
+                placeholder="Enter your phone number"
+                autocomplete="tel"
+                required
+            >
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Find Orders
+            </button>
+
+        </form>
+
+
+        {% if searched %}
+
+            {% if orders %}
+
+                <div class="order-results">
+
+                    {% for order in orders %}
+
+                        <article class="order-card">
+
+                            <div class="order-card-header">
+
+                                <div>
+
+                                    <span class="order-number-label">
+                                        Order #{{ order['id'] }}
+                                    </span>
+
+                                    <small>
+                                        {{ order['created_at'] }}
+                                    </small>
+
+                                </div>
+
+                                <strong class="order-total">
+                                    ₹{{ "%.2f"|format(order['total']) }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="order-card-body">
+
+                                <div>
+                                    <small>
+                                        Phone
+                                    </small>
+
+                                    <strong>
+                                        {{ order['phone'] }}
+                                    </strong>
+                                </div>
+
+
+                                <div>
+                                    <small>
+                                        Items
+                                    </small>
+
+                                    <strong>
+                                        {{ order['item_count'] }}
+                                    </strong>
+                                </div>
+
+
+                                {% if order['address'] %}
+
+                                    <div>
+                                        <small>
+                                            Delivery Address
+                                        </small>
+
+                                        <strong>
+                                            {{ order['address'] }}
+                                        </strong>
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="empty-state small">
+
+                    <div class="empty-icon">
+                        🔎
+                    </div>
+
+                    <h3>
+                        No orders found
+                    </h3>
+
+                    <p>
+                        We couldn't find an order for
+                        <strong>{{ phone }}</strong>.
+                    </p>
+
+                    <a
+                        href="{{ url_for('home') }}"
+                        class="secondary-button"
+                    >
+                        Continue Shopping
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

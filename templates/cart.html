@@ -1,135 +1,206 @@
 {% extends "base.html" %}
 
-{% block title %}
-Your Cart · PageTurner Books
-{% endblock %}
+{% block title %}Cart | PageTurner Books{% endblock %}
 
 {% block content %}
 
-<div class="page-title">
-    <h1>Your Cart</h1>
-    <p>Review your books before checkout.</p>
-</div>
+<section class="page-section">
 
-{% if items %}
+    <div class="page-container">
 
-<section class="cart-card">
+        <div class="page-heading">
+            <span class="section-label">YOUR CART</span>
+            <h1>Shopping Cart</h1>
+            <p>Review your books before checkout.</p>
+        </div>
 
-    <div class="cart-header">
-        <span>Book</span>
-        <span>Price</span>
-        <span>Quantity</span>
-        <span>Subtotal</span>
-        <span></span>
-    </div>
+        {% if items %}
 
-    {% for item in items %}
-        <div class="cart-row">
+        <div class="cart-layout">
 
-            <div class="cart-book">
-                <span
-                    class="mini-cover"
-                    style="--cover:
-                    {{ item['book']['cover_color'] }}"
-                ></span>
+            <div>
 
-                <span>
-                    <strong>
-                        {{ item['book']['title'] }}
-                    </strong>
+                <form method="POST"
+                      action="{{ url_for('update_cart') }}">
 
-                    <small>
-                        {{ item['book']['author'] }}
-                    </small>
-                </span>
+                    {% for item in items %}
+
+                    <article class="cart-card">
+
+                        <div class="cart-cover">
+
+                            {% if item.book['cover_image'] %}
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='images/books/' ~
+                                    item.book['cover_image']
+                                ) }}"
+                                alt="{{ item.book['title'] }}">
+
+                            {% else %}
+
+                            <div
+                                class="cover-placeholder"
+                                style="background: {{
+                                    item.book['cover_color']
+                                }};">
+                                {{ item.book['title'] }}
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <div class="cart-info">
+
+                            <span class="book-category">
+                                {{ item.book['category'] }}
+                            </span>
+
+                            <h2>
+                                {{ item.book['title'] }}
+                            </h2>
+
+                            <p>
+                                {{ item.book['author'] }}
+                            </p>
+
+                            <strong>
+                                ₹{{ "%.2f"|format(
+                                    item.book['price']
+                                ) }}
+                            </strong>
+
+                            <small>
+                                {{ item.book['stock'] }}
+                                available
+                            </small>
+
+                        </div>
+
+                        <div class="cart-quantity">
+
+                            <label>
+                                Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                name="quantity_{{ item.book['id'] }}"
+                                value="{{ item.quantity }}"
+                                min="0"
+                                max="{{ item.book['stock'] }}">
+
+                        </div>
+
+                        <div class="cart-subtotal">
+
+                            <span>Subtotal</span>
+
+                            <strong>
+                                ₹{{ "%.2f"|format(
+                                    item.subtotal
+                                ) }}
+                            </strong>
+
+                            <button
+                                type="submit"
+                                formaction="{{
+                                    url_for(
+                                        'remove_from_cart',
+                                        book_id=item.book['id']
+                                    )
+                                }}"
+                                class="remove-button">
+                                Remove
+                            </button>
+
+                        </div>
+
+                    </article>
+
+                    {% endfor %}
+
+                    <div class="cart-actions">
+
+                        <button
+                            type="submit"
+                            class="secondary-button">
+                            Update Cart
+                        </button>
+
+                        <a
+                            href="{{ url_for('home') }}"
+                            class="text-link">
+                            ← Continue Shopping
+                        </a>
+
+                    </div>
+
+                </form>
+
             </div>
 
-            <span>
-                ₹{{ "%.0f"|format(item['book']['price']) }}
+            <aside class="cart-summary">
+
+                <span class="section-label">
+                    ORDER SUMMARY
+                </span>
+
+                <h2>Summary</h2>
+
+                <div class="summary-line">
+                    <span>Items</span>
+                    <strong>{{ cart_count }}</strong>
+                </div>
+
+                <div class="summary-line total-line">
+                    <span>Total</span>
+                    <strong>
+                        ₹{{ "%.2f"|format(total) }}
+                    </strong>
+                </div>
+
+                <a
+                    href="{{ url_for('checkout') }}"
+                    class="primary-button full-button">
+                    Checkout
+                </a>
+
+            </aside>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">🛒</div>
+
+            <span class="section-label">
+                CART EMPTY
             </span>
 
-            <form
-                class="quantity-form"
-                method="post"
-                action="{{ url_for(
-                    'update_cart',
-                    book_id=item['book']['id']
-                ) }}"
-            >
-                <input
-                    type="number"
-                    name="quantity"
-                    value="{{ item['quantity'] }}"
-                    min="0"
-                    max="{{ item['book']['stock'] }}"
-                >
+            <h2>Your cart is empty</h2>
 
-                <button type="submit">
-                    Update
-                </button>
-            </form>
+            <p>
+                Find something you love and add it to your cart.
+            </p>
 
-            <strong>
-                ₹{{ "%.0f"|format(item['subtotal']) }}
-            </strong>
+            <a
+                href="{{ url_for('home') }}"
+                class="primary-button">
+                Browse Books
+            </a>
 
-            <form
-                class="remove-form"
-                method="post"
-                action="{{ url_for(
-                    'remove_from_cart',
-                    book_id=item['book']['id']
-                ) }}"
-            >
-                <button
-                    class="remove"
-                    type="submit"
-                >
-                    Remove
-                </button>
-            </form>
         </div>
-    {% endfor %}
 
-    <div class="cart-total">
-        <span>Total</span>
-        <strong>
-            ₹{{ "%.0f"|format(total) }}
-        </strong>
+        {% endif %}
+
     </div>
 
 </section>
-
-<div class="actions">
-    <a
-        class="secondary"
-        href="{{ url_for('home') }}"
-    >
-        Continue shopping
-    </a>
-
-    <a
-        class="primary button-link"
-        href="{{ url_for('checkout') }}"
-    >
-        Proceed to checkout →
-    </a>
-</div>
-
-{% else %}
-
-<div class="empty">
-    <h2>Your cart is empty</h2>
-    <p>Add a book to begin.</p>
-
-    <a
-        class="primary button-link"
-        href="{{ url_for('home') }}"
-    >
-        Browse books
-    </a>
-</div>
-
-{% endif %}
 
 {% endblock %}

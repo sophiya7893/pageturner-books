@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}
+Order Confirmed | PageTurner Books
+{% endblock %}
+
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="confirmation-container">
+
+        <!-- Success Icon -->
+        <div class="success-icon">
+            ✓
+        </div>
+
+
+        <!-- Heading -->
+        <span class="section-label">
+            ORDER COMPLETE
+        </span>
+
+        <h1>
+            Thank you for your order!
+        </h1>
+
+        <p class="confirmation-message">
+            Your order has been placed successfully.
+            Your books are on their way to you.
+        </p>
+
+
+        <!-- Order Number -->
+        <div class="order-number">
+            Order #{{ order['id'] }}
+        </div>
+
+
+        <!-- Confirmation Card -->
+        <div class="confirmation-card">
+
+            <!-- Order Information -->
+            <div class="confirmation-info">
+
+                <div>
+
+                    <small>
+                        Phone
+                    </small>
+
+                    <strong>
+                        {{ order['phone'] }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <small>
+                        Total
+                    </small>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(order['total']) }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <small>
+                        Order Date
+                    </small>
+
+                    <strong>
+                        {{ order['created_at'] }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- Ordered Books -->
+            <h3>
+                Ordered Books
+            </h3>
+
+
+            {% if items %}
+
+                <div class="confirmation-items">
+
+                    {% for item in items %}
+
+                        <div class="confirmation-item">
+
+                            <div>
+
+                                <strong>
+                                    {{ item['title'] }}
+                                </strong>
+
+                                <small>
+                                    Quantity: {{ item['quantity'] }}
+                                </small>
+
+                            </div>
+
+                            <strong>
+                                ₹{{ "%.2f"|format(
+                                    item['price'] * item['quantity']
+                                ) }}
+                            </strong>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-order-items">
+
+                    No books found for this order.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Buttons -->
+        <div class="confirmation-actions">
+
+            <a
+                href="{{ url_for('home') }}"
+                class="primary-button"
+            >
+                Continue Shopping
+            </a>
+
+            <a
+                href="{{ url_for('orders') }}"
+                class="secondary-button"
+            >
+                Find My Orders
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

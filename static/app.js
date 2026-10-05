@@ -1,113 +1,101 @@
-document.addEventListener("DOMContentLoaded", () => {
-    /*
-     * Live search by title or author.
-     */
-    const searchInput = document.querySelector("#liveSearch");
-    const cards = [
-        ...document.querySelectorAll(".book-card")
-    ];
-
-    const noResults = document.querySelector("#noResults");
-    const bookCount = document.querySelector("#bookCount");
-
-    if (searchInput) {
-        searchInput.addEventListener("input", () => {
-            const searchText = searchInput.value
-                .trim()
-                .toLowerCase();
-
-            let visibleBooks = 0;
-
-            cards.forEach((card) => {
-                const title = card.dataset.title;
-                const author = card.dataset.author;
-
-                const matches =
-                    title.includes(searchText) ||
-                    author.includes(searchText);
-
-                card.classList.toggle(
-                    "hidden",
-                    !matches
-                );
-
-                if (matches) {
-                    visibleBooks++;
-                }
-            });
-
-            if (noResults) {
-                noResults.classList.toggle(
-                    "hidden",
-                    visibleBooks !== 0
-                );
-            }
-
-            if (bookCount) {
-                bookCount.textContent =
-                    `${visibleBooks} books`;
-            }
-        });
-    }
+document.addEventListener("DOMContentLoaded", function () {
 
     /*
-     * Ask for confirmation before removing a book.
+     * Automatically hide flash messages.
      */
-    document.querySelectorAll(".remove-form")
-        .forEach((form) => {
-            form.addEventListener("submit", (event) => {
-                const confirmed = window.confirm(
-                    "Remove this book?"
-                );
+    const flashes = document.querySelectorAll(".flash");
 
-                if (!confirmed) {
-                    event.preventDefault();
-                }
-            });
-        });
+    flashes.forEach(function (flash) {
+
+        setTimeout(function () {
+
+            flash.style.transition = "opacity 0.4s";
+            flash.style.opacity = "0";
+
+            setTimeout(function () {
+                flash.remove();
+            }, 400);
+
+        }, 4500);
+
+    });
+
 
     /*
-     * Validate exactly 10 phone digits.
+     * Confirm admin deletion.
      */
-    const checkoutForm =
-        document.querySelector("#checkoutForm");
+    window.confirmDelete = function () {
 
-    const phoneInput =
-        document.querySelector("#phone");
+        return confirm(
+            "Are you sure you want to delete this book?"
+        );
 
-    const phoneError =
-        document.querySelector("#phoneError");
+    };
 
-    if (checkoutForm && phoneInput) {
-        checkoutForm.addEventListener(
-            "submit",
-            (event) => {
-                const validPhone =
-                    /^\d{10}$/.test(
-                        phoneInput.value.trim()
+
+    /*
+     * Prevent quantities larger than the stock
+     * on the book detail page.
+     */
+    const quantityInput =
+        document.getElementById("quantity");
+
+    if (quantityInput) {
+
+        quantityInput.addEventListener(
+            "input",
+            function () {
+
+                const max =
+                    parseInt(
+                        quantityInput.max
                     );
 
-                if (!validPhone) {
-                    event.preventDefault();
+                const value =
+                    parseInt(
+                        quantityInput.value
+                    );
 
-                    phoneError.textContent =
-                        "Phone must contain exactly 10 digits.";
-
-                    phoneInput.focus();
-                } else {
-                    phoneError.textContent = "";
+                if (value > max) {
+                    quantityInput.value = max;
                 }
+
+                if (value < 1) {
+                    quantityInput.value = 1;
+                }
+
             }
         );
+
     }
 
+
     /*
-     * Hide flash messages after 3 seconds.
+     * Simple keyboard shortcut:
+     * "/" focuses the search box.
      */
-    document.querySelectorAll(".flash")
-        .forEach((message) => {
-            setTimeout(() => {
-                message.classList.add("hide");
-            }, 3000);
-        });
+    const searchInput =
+        document.getElementById("liveSearch");
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "/" &&
+                document.activeElement.tagName !== "INPUT" &&
+                document.activeElement.tagName !== "TEXTAREA"
+            ) {
+
+                event.preventDefault();
+
+                if (searchInput) {
+                    searchInput.focus();
+                }
+
+            }
+
+        }
+    );
+
 });

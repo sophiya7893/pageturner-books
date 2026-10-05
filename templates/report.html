@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Reports | PageTurner Books
+{% endblock %}
+
+
+{% block content %}
+
+<section class="admin-section">
+
+    <div class="admin-container">
+
+        <div class="admin-header">
+
+            <div>
+
+                <span class="section-label">
+                    STORE ANALYTICS
+                </span>
+
+                <h1>
+                    Sales Report
+                </h1>
+
+            </div>
+
+            <a
+                href="{{ url_for('admin_page') }}"
+                class="secondary-button"
+            >
+                ← Dashboard
+            </a>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <span>
+                    🛍️
+                </span>
+
+                <small>
+                    Total Orders
+                </small>
+
+                <strong>
+                    {{ total_orders }}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    ₹
+                </span>
+
+                <small>
+                    Total Revenue
+                </small>
+
+                <strong>
+                    ₹{{ "%.2f"|format(total_revenue) }}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    📚
+                </span>
+
+                <small>
+                    Books Sold
+                </small>
+
+                <strong>
+                    {{ total_items_sold }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="report-grid">
+
+            <div class="admin-table-card">
+
+                <div class="table-header">
+
+                    <h2>
+                        Best-Selling Books
+                    </h2>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Book</th>
+                                <th>Units</th>
+                                <th>Revenue</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for book in best_sellers %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ book['title'] }}
+                                    </td>
+
+                                    <td>
+                                        {{ book['quantity_sold'] }}
+                                    </td>
+
+                                    <td>
+                                        ₹{{ "%.2f"|format(
+                                            book['revenue']
+                                        ) }}
+                                    </td>
+
+                                </tr>
+
+                            {% else %}
+
+                                <tr>
+                                    <td colspan="3">
+                                        No sales yet.
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-table-card">
+
+                <div class="table-header">
+
+                    <h2>
+                        Sales by Category
+                    </h2>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Category</th>
+                                <th>Orders</th>
+                                <th>Items</th>
+                                <th>Revenue</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for category in category_report %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ category['category'] }}
+                                    </td>
+
+                                    <td>
+                                        {{ category['orders_count'] }}
+                                    </td>
+
+                                    <td>
+                                        {{ category['items_sold'] }}
+                                    </td>
+
+                                    <td>
+                                        ₹{{ "%.2f"|format(
+                                            category['revenue']
+                                        ) }}
+                                    </td>
+
+                                </tr>
+
+                            {% else %}
+
+                                <tr>
+                                    <td colspan="4">
+                                        No sales yet.
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="admin-table-card">
+
+            <div class="table-header">
+
+                <h2>
+                    Recent Orders
+                </h2>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for order in recent_orders %}
+
+                            <tr>
+
+                                <td>
+                                    #{{ order['id'] }}
+                                </td>
+
+                                <td>
+                                    {{ order['name'] }}
+                                </td>
+
+                                <td>
+                                    {{ order['phone'] }}
+                                </td>
+
+                                <td>
+                                    ₹{{ "%.2f"|format(order['total']) }}
+                                </td>
+
+                                <td>
+                                    {{ order['created_at'] }}
+                                </td>
+
+                            </tr>
+
+                        {% else %}
+
+                            <tr>
+                                <td colspan="5">
+                                    No orders yet.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

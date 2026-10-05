@@ -1,72 +1,363 @@
 {% extends "base.html" %}
 
 {% block title %}
-{{ book['title'] }} · PageTurner Books
+{{ book['title'] }} | PageTurner Books
 {% endblock %}
+
 
 {% block content %}
 
-<div class="back-link">
-    <a href="{{ url_for('home') }}">
-        ← Back to shop
-    </a>
-</div>
+<section class="detail-section">
 
-<section class="detail-card">
+    <div class="detail-container">
 
-    <div
-        class="detail-cover cover"
-        style="--cover: {{ book['cover_color'] }}"
-    >
-        <span>{{ book['title'] }}</span>
-        <small>{{ book['author'] }}</small>
-    </div>
+        <div
+            class="detail-cover"
+            {% if not book['cover_image'] %}
+            style="background: {{ book['cover_color'] }}"
+            {% endif %}
+        >
 
-    <div class="detail-info">
-        <span class="tag">
-            {{ book['category'] }}
-        </span>
+            {% if book['cover_image'] %}
 
-        <h1>{{ book['title'] }}</h1>
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='images/books/' + book['cover_image']
+                    ) }}"
+                    alt="{{ book['title'] }}"
+                >
 
-        <p class="author">
-            by {{ book['author'] }}
-        </p>
+            {% else %}
 
-        <p>
-            {{ book['description'] }}
-        </p>
+                <div class="large-cover-placeholder">
+                    <span>📖</span>
+                    <strong>{{ book['title'] }}</strong>
+                    <small>{{ book['author'] }}</small>
+                </div>
 
-        {% if book['stock'] > 0 %}
-            <p class="stock">
-                ● In stock: {{ book['stock'] }} available
-            </p>
-        {% else %}
-            <p class="stock out-of-stock">
-                ● Out of stock
-            </p>
-        {% endif %}
+            {% endif %}
 
-        <div class="detail-price">
-            ₹{{ "%.0f"|format(book['price']) }}
         </div>
 
-        <form
-            method="post"
-            action="{{ url_for(
-                'add_to_cart',
-                book_id=book['id']
-            ) }}"
-        >
-            <button
-                class="primary"
-                {% if book['stock'] == 0 %}
-                    disabled
+
+        <div class="detail-content">
+
+            <span class="book-category">
+                {{ book['category'] }}
+            </span>
+
+            <h1>
+                {{ book['title'] }}
+            </h1>
+
+            <p class="detail-author">
+                by {{ book['author'] }}
+            </p>
+
+
+            <div class="large-rating">
+
+                {% if book['review_count'] > 0 %}
+
+                    <span>
+                        ★
+                    </span>
+
+                    <strong>
+                        {{ book['average_rating'] }}
+                    </strong>
+
+                    <small>
+                        / 5
+                        ·
+                        {{ book['review_count'] }} reviews
+                    </small>
+
+                {% else %}
+
+                    <small>
+                        No reviews yet
+                    </small>
+
                 {% endif %}
-            >
-                🛒 Add to cart
-            </button>
-        </form>
+
+            </div>
+
+
+            <p class="detail-description">
+                {{ book['description'] }}
+            </p>
+
+
+            <div class="detail-purchase">
+
+                <strong class="detail-price">
+                    ₹{{ "%.2f"|format(book['price']) }}
+                </strong>
+
+
+                {% if book['stock'] > 0 %}
+
+                    <span class="stock-text">
+                        ✓ {{ book['stock'] }} available
+                    </span>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'add_to_cart',
+                            book_id=book['id']
+                        ) }}"
+                        class="detail-cart-form"
+                    >
+
+                        <div class="quantity-box">
+
+                            <label for="quantity">
+                                Quantity
+                            </label>
+
+                            <input
+                                id="quantity"
+                                type="number"
+                                name="quantity"
+                                min="1"
+                                max="{{ book['stock'] }}"
+                                value="1"
+                            >
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+                            Add to Cart
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <span class="out-of-stock-large">
+                        Out of stock
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="reviews-section">
+
+    <div class="reviews-container">
+
+        <div class="reviews-heading">
+
+            <div>
+                <span class="section-label">
+                    CUSTOMER FEEDBACK
+                </span>
+
+                <h2>
+                    Reviews
+                </h2>
+            </div>
+
+            {% if book['review_count'] > 0 %}
+
+                <div class="review-summary">
+
+                    <strong>
+                        {{ book['average_rating'] }}
+                    </strong>
+
+                    <span>
+                        ★
+                    </span>
+
+                    <small>
+                        Average rating
+                    </small>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="review-layout">
+
+            <div class="review-list">
+
+                {% if reviews %}
+
+                    {% for review in reviews %}
+
+                        <article class="review-card">
+
+                            <div class="review-header">
+
+                                <div class="review-avatar">
+                                    {{ review['name'][0]|upper }}
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ review['name'] }}
+                                    </strong>
+
+                                    <small>
+                                        {{ review['created_at'] }}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="review-stars">
+
+                                {% for number in range(1, 6) %}
+
+                                    {% if number <= review['rating'] %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <p>
+                                {{ review['comment'] }}
+                            </p>
+
+                        </article>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-review">
+                        <span>💬</span>
+
+                        <h3>
+                            No reviews yet
+                        </h3>
+
+                        <p>
+                            Be the first person to review this book.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="review-form-card">
+
+                <span class="section-label">
+                    SHARE YOUR THOUGHTS
+                </span>
+
+                <h3>
+                    Write a Review
+                </h3>
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'add_review',
+                        book_id=book['id']
+                    ) }}"
+                >
+
+                    <label>
+                        Your name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Enter your name"
+                        required
+                    >
+
+
+                    <label>
+                        Rating
+                    </label>
+
+                    <select
+                        name="rating"
+                        required
+                    >
+
+                        <option value="">
+                            Select rating
+                        </option>
+
+                        <option value="5">
+                            ★★★★★ — 5
+                        </option>
+
+                        <option value="4">
+                            ★★★★☆ — 4
+                        </option>
+
+                        <option value="3">
+                            ★★★☆☆ — 3
+                        </option>
+
+                        <option value="2">
+                            ★★☆☆☆ — 2
+                        </option>
+
+                        <option value="1">
+                            ★☆☆☆☆ — 1
+                        </option>
+
+                    </select>
+
+
+                    <label>
+                        Comment
+                    </label>
+
+                    <textarea
+                        name="comment"
+                        rows="5"
+                        placeholder="What did you think about this book?"
+                        required
+                    ></textarea>
+
+
+                    <button
+                        type="submit"
+                        class="primary-button full-button"
+                    >
+                        Submit Review
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
     </div>
 
 </section>

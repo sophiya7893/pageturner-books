@@ -1,103 +1,140 @@
 {% extends "base.html" %}
 
 {% block title %}
-Checkout · PageTurner Books
+Checkout | PageTurner Books
 {% endblock %}
+
 
 {% block content %}
 
-<section class="checkout-layout">
+<section class="page-section">
 
-    <form
-        id="checkoutForm"
-        class="form-card"
-        method="post"
-        novalidate
-    >
-        <h1>Checkout</h1>
+    <div class="page-container">
 
-        <p>
-            Cash on delivery. Enter your delivery details.
-        </p>
+        <div class="page-heading">
 
-        <label>
-            Full name *
+            <span class="section-label">
+                COMPLETE YOUR ORDER
+            </span>
 
-            <input
-                name="customer_name"
-                required
-                placeholder="e.g. Asha Reddy"
-            >
-        </label>
+            <h1>
+                Checkout
+            </h1>
 
-        <label>
-            Phone - 10 digits *
-
-            <input
-                id="phone"
-                name="phone"
-                required
-                inputmode="numeric"
-                maxlength="10"
-                placeholder="e.g. 9876543210"
-            >
-
-            <small
-                id="phoneError"
-                class="form-error"
-            ></small>
-        </label>
-
-        <label>
-            Delivery address *
-
-            <textarea
-                name="address"
-                required
-                placeholder="House number, street, city, PIN"
-            ></textarea>
-        </label>
-
-        <div class="actions">
-            <a
-                class="secondary"
-                href="{{ url_for('cart_page') }}"
-            >
-                Back to cart
-            </a>
-
-            <button
-                class="primary"
-                type="submit"
-            >
-                Place order
-            </button>
         </div>
-    </form>
 
-    <aside class="summary-card">
-        <h2>Order summary</h2>
 
-        {% for item in items %}
-            <div class="summary-line">
-                <span>
-                    {{ item['book']['title'] }}
-                    × {{ item['quantity'] }}
-                </span>
+        <div class="checkout-layout">
 
-                <strong>
-                    ₹{{ "%.0f"|format(item['subtotal']) }}
-                </strong>
-            </div>
-        {% endfor %}
+            <form
+                method="POST"
+                class="checkout-form"
+            >
 
-        <div class="summary-total">
-            <span>Total</span>
-            <strong>
-                ₹{{ "%.0f"|format(total) }}
-            </strong>
+                <h2>
+                    Customer Details
+                </h2>
+
+                <label>
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Your full name"
+                    required
+                >
+
+
+                <label>
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Your phone number"
+                    required
+                >
+
+
+                <label>
+                    Delivery Address
+                </label>
+
+                <textarea
+                    name="address"
+                    rows="6"
+                    placeholder="Enter your complete delivery address"
+                    required
+                ></textarea>
+
+
+                <button
+                    type="submit"
+                    class="primary-button full-button"
+                >
+                    Place Order
+                </button>
+
+            </form>
+
+
+            <aside class="checkout-summary">
+
+                <h2>
+                    Your Order
+                </h2>
+
+
+                {% for item in items %}
+
+                    <div class="checkout-item">
+
+                        <div>
+
+                            <strong>
+                                {{ item.book['title'] }}
+                            </strong>
+
+                            <small>
+                                {{ item.quantity }}
+                                ×
+                                ₹{{ "%.2f"|format(item.book['price']) }}
+                            </small>
+
+                        </div>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(item.subtotal) }}
+                        </strong>
+
+                    </div>
+
+                {% endfor %}
+
+
+                <div class="summary-divider"></div>
+
+
+                <div class="summary-total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(total) }}
+                    </strong>
+
+                </div>
+
+            </aside>
+
         </div>
-    </aside>
+
+    </div>
 
 </section>
 
