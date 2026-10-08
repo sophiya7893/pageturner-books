@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Manage Orders - PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<div class="manage-orders-page">
+
+    <div class="manage-orders-container">
+
+        <!-- Page Header -->
+
+        <div class="manage-orders-header">
+
+            <div>
+                <span class="manage-orders-label">
+                    📦 Order Management
+                </span>
+
+                <h1>
+                    Manage Orders
+                </h1>
+
+                <p>
+                    View customer orders and update their current status.
+                </p>
+            </div>
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="manage-dashboard-button"
+            >
+                ← Dashboard
+            </a>
+
+        </div>
+
+
+        {% if orders %}
+
+        <!-- Orders Summary -->
+
+        <div class="manage-orders-summary">
+
+            <div class="orders-summary-card">
+
+                <span class="orders-summary-icon">
+                    📋
+                </span>
+
+                <div>
+                    <strong>
+                        {{ orders|length }}
+                    </strong>
+
+                    <span>
+                        Order{% if orders|length != 1 %}s{% endif %}
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Orders -->
+
+        <div class="manage-orders-list">
+
+            {% for order in orders %}
+
+            <div class="manage-order-card">
+
+                <!-- Order Header -->
+
+                <div class="manage-order-header">
+
+                    <div>
+
+                        <span class="manage-order-number">
+                            Order #{{ order["id"] }}
+                        </span>
+
+                        <p class="manage-order-date">
+                            {{ order["created_at"] }}
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        class="manage-order-status
+                        {% if order['status'] == 'Placed' %}
+                            manage-status-placed
+                        {% elif order['status'] == 'Packed' %}
+                            manage-status-packed
+                        {% elif order['status'] == 'Delivered' %}
+                            manage-status-delivered
+                        {% endif %}"
+                    >
+                        {{ order["status"] }}
+                    </span>
+
+                </div>
+
+
+                <!-- Customer Information -->
+
+                <div class="manage-order-info">
+
+                    <div class="manage-info-item">
+
+                        <span class="manage-info-label">
+                            Customer
+                        </span>
+
+                        <strong>
+                            {{ order["customer_name"] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="manage-info-item">
+
+                        <span class="manage-info-label">
+                            Email
+                        </span>
+
+                        <strong>
+                            {{ order["email"] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="manage-info-item">
+
+                        <span class="manage-info-label">
+                            Order Total
+                        </span>
+
+                        <strong class="manage-order-price">
+                            ₹{{ "%.2f"|format(order["total_amount"]) }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Coupon -->
+
+                {% if order["coupon_code"] %}
+
+                <div class="manage-order-coupon">
+
+                    <span>
+                        Coupon
+                    </span>
+
+                    <strong>
+                        {{ order["coupon_code"] }}
+                    </strong>
+
+                    <span>
+                        · Discount ₹{{ "%.2f"|format(order["discount_amount"] or 0) }}
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- Status Update -->
+
+                <div class="manage-order-update">
+
+                    <div>
+
+                        <h3>
+                            Update Order Status
+                        </h3>
+
+                        <p>
+                            Change the status shown to the customer.
+                        </p>
+
+                    </div>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'admin_update_order_status',
+                            order_id=order['id']
+                        ) }}"
+                        class="manage-status-form"
+                    >
+
+                        <select
+                            name="status"
+                            class="manage-status-select"
+                        >
+
+                            <option
+                                value="Placed"
+                                {% if order["status"] == "Placed" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Placed
+                            </option>
+
+                            <option
+                                value="Packed"
+                                {% if order["status"] == "Packed" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Packed
+                            </option>
+
+                            <option
+                                value="Delivered"
+                                {% if order["status"] == "Delivered" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Delivered
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            type="submit"
+                            class="manage-update-button"
+                        >
+                            Update Status
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <!-- Empty State -->
+
+        <div class="manage-orders-empty">
+
+            <div class="manage-empty-icon">
+                📦
+            </div>
+
+            <h2>
+                No Orders Yet
+            </h2>
+
+            <p>
+                There are no customer orders to manage at the moment.
+            </p>
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="manage-dashboard-button"
+            >
+                Back to Dashboard
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

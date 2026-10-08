@@ -1,157 +1,336 @@
 {% extends "base.html" %}
 
 {% block title %}
-Order Confirmed | PageTurner Books
+Order #{{ order["id"] }} - PageTurner Books
 {% endblock %}
-
 
 {% block content %}
 
-<section class="page-section">
+<section class="order-confirmation-page">
 
-    <div class="confirmation-container">
+    <div class="order-confirmation-container">
 
-        <!-- Success Icon -->
-        <div class="success-icon">
-            ✓
+        <!-- SUCCESS HEADER -->
+        <div class="order-success-card">
+
+            <div class="order-success-icon">
+                ✓
+            </div>
+
+            <span class="order-success-label">
+                ORDER PLACED SUCCESSFULLY
+            </span>
+
+            <h1>
+                Thank You for Your Order!
+            </h1>
+
+            <p>
+                Your books are on their way to becoming part of your
+                reading collection.
+            </p>
+
+            <div class="order-number">
+                Order #{{ order["id"] }}
+            </div>
+
         </div>
 
 
-        <!-- Heading -->
-        <span class="section-label">
-            ORDER COMPLETE
-        </span>
+        <!-- ORDER DETAILS -->
+        <div class="order-detail-card">
 
-        <h1>
-            Thank you for your order!
-        </h1>
-
-        <p class="confirmation-message">
-            Your order has been placed successfully.
-            Your books are on their way to you.
-        </p>
-
-
-        <!-- Order Number -->
-        <div class="order-number">
-            Order #{{ order['id'] }}
-        </div>
-
-
-        <!-- Confirmation Card -->
-        <div class="confirmation-card">
-
-            <!-- Order Information -->
-            <div class="confirmation-info">
+            <!-- HEADER -->
+            <div class="order-detail-header">
 
                 <div>
 
-                    <small>
-                        Phone
-                    </small>
+                    <span class="order-section-label">
+                        ORDER DETAILS
+                    </span>
 
-                    <strong>
-                        {{ order['phone'] }}
-                    </strong>
+                    <h2>
+                        Order #{{ order["id"] }}
+                    </h2>
+
+                    <p>
+                        Placed on {{ order["created_at"] }}
+                    </p>
 
                 </div>
 
 
-                <div>
+                <!-- STATUS -->
+                <span
+                    class="order-status
+                    {% if order['status'] == 'Placed' %}
+                        order-status-placed
+                    {% elif order['status'] == 'Packed' %}
+                        order-status-packed
+                    {% elif order['status'] == 'Delivered' %}
+                        order-status-delivered
+                    {% endif %}"
+                >
+                    {{ order["status"] }}
+                </span>
 
-                    <small>
-                        Total
-                    </small>
-
-                    <strong>
-                        ₹{{ "%.2f"|format(order['total']) }}
-                    </strong>
-
-                </div>
+            </div>
 
 
-                <div>
+            <!-- CUSTOMER INFORMATION -->
+            <div class="order-customer-section">
 
-                    <small>
-                        Order Date
-                    </small>
+                <h3>
+                    Delivery Information
+                </h3>
 
-                    <strong>
-                        {{ order['created_at'] }}
-                    </strong>
+                <div class="order-customer-grid">
+
+                    <div class="order-info-box">
+
+                        <span>
+                            Customer
+                        </span>
+
+                        <strong>
+                            {{ order["customer_name"] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-info-box">
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong>
+                            {{ order["email"] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-info-box">
+
+                        <span>
+                            Phone
+                        </span>
+
+                        <strong>
+                            {{ order["phone"] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-info-box order-address-box">
+
+                        <span>
+                            Delivery Address
+                        </span>
+
+                        <strong>
+                            {{ order["address"] }}
+                        </strong>
+
+                    </div>
 
                 </div>
 
             </div>
 
 
-            <!-- Ordered Books -->
-            <h3>
-                Ordered Books
-            </h3>
+            <!-- ORDERED BOOKS -->
+            <div class="ordered-books-section">
+
+                <div class="ordered-books-header">
+
+                    <div>
+                        <span class="order-section-label">
+                            YOUR BOOKS
+                        </span>
+
+                        <h3>
+                            Ordered Books
+                        </h3>
+                    </div>
+
+                    <span class="ordered-books-count">
+                        {{ items|length }}
+                        {% if items|length == 1 %}
+                            book
+                        {% else %}
+                            books
+                        {% endif %}
+                    </span>
+
+                </div>
 
 
-            {% if items %}
-
-                <div class="confirmation-items">
+                <div class="ordered-books-list">
 
                     {% for item in items %}
 
-                        <div class="confirmation-item">
+                    <div class="ordered-book-item">
 
-                            <div>
+                        <div class="ordered-book-number">
+                            {{ loop.index }}
+                        </div>
 
-                                <strong>
-                                    {{ item['title'] }}
-                                </strong>
 
-                                <small>
-                                    Quantity: {{ item['quantity'] }}
-                                </small>
-
-                            </div>
+                        <div class="ordered-book-info">
 
                             <strong>
-                                ₹{{ "%.2f"|format(
-                                    item['price'] * item['quantity']
-                                ) }}
+                                {{ item["title"] }}
                             </strong>
 
+                            <span>
+                                {{ item["author"] }}
+                            </span>
+
                         </div>
+
+
+                        <div class="ordered-book-quantity">
+                            × {{ item["quantity"] }}
+                        </div>
+
+
+                        <div class="ordered-book-price">
+
+                            ₹{{ "%.2f"|format(
+                                item["price"] * item["quantity"]
+                            ) }}
+
+                        </div>
+
+                    </div>
 
                     {% endfor %}
 
                 </div>
 
-            {% else %}
+            </div>
 
-                <div class="empty-order-items">
 
-                    No books found for this order.
+            <!-- PAYMENT SUMMARY -->
+            <div class="order-summary-section">
+
+                <div class="order-summary-row">
+
+                    <span>
+                        Subtotal
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(
+                            order["total_amount"] +
+                            order["discount_amount"]
+                        ) }}
+                    </strong>
 
                 </div>
 
-            {% endif %}
+
+                {% if order["coupon_code"] %}
+
+                <div class="order-summary-row order-coupon-row">
+
+                    <span>
+                        Coupon
+                    </span>
+
+                    <strong>
+                        {{ order["coupon_code"] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="order-summary-row order-discount-row">
+
+                    <span>
+                        Discount
+                    </span>
+
+                    <strong>
+                        -₹{{ "%.2f"|format(
+                            order["discount_amount"]
+                        ) }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="order-final-total">
+
+                    <span>
+                        Total Paid
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(
+                            order["total_amount"]
+                        ) }}
+                    </strong>
+
+                </div>
+
+            </div>
 
         </div>
 
 
-        <!-- Buttons -->
-        <div class="confirmation-actions">
+        <!-- NEXT STEPS -->
+        <div class="order-next-section">
 
-            <a
-                href="{{ url_for('home') }}"
-                class="primary-button"
-            >
-                Continue Shopping
-            </a>
+            <div class="order-next-message">
 
-            <a
-                href="{{ url_for('orders') }}"
-                class="secondary-button"
-            >
-                Find My Orders
-            </a>
+                <span class="order-next-icon">
+                    📚
+                </span>
+
+                <div>
+                    <strong>
+                        What's next?
+                    </strong>
+
+                    <p>
+                        We'll prepare your books for delivery.
+                        You can track your order status from My Orders.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="order-actions">
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="order-primary-button"
+                >
+                    Continue Shopping
+                    <span>→</span>
+                </a>
+
+
+                {% if session.get("user_id") %}
+
+                <a
+                    href="{{ url_for('order_history') }}"
+                    class="order-secondary-button"
+                >
+                    View My Orders
+                </a>
+
+                {% endif %}
+
+            </div>
 
         </div>
 

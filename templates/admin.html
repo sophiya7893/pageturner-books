@@ -1,227 +1,326 @@
 {% extends "base.html" %}
 
-{% block title %}Admin | PageTurner Books{% endblock %}
+{% block title %}Admin Dashboard - PageTurner Books{% endblock %}
 
 {% block content %}
 
-<section class="page-section">
+<div class="admin-dashboard">
 
-    <div class="page-container">
+    <div class="admin-dashboard-container">
 
-        <div class="page-heading admin-heading">
+        <!-- Dashboard Header -->
+        <div class="admin-dashboard-header">
 
             <div>
-                <span class="section-label">
-                    ADMIN PANEL
-                </span>
+                <span class="admin-eyebrow">PAGE TURNER ADMIN</span>
 
-                <h1>Book Management</h1>
+                <h1>Dashboard</h1>
 
                 <p>
-                    Manage your PageTurner Books collection.
+                    Manage your bookstore, inventory and orders.
                 </p>
             </div>
 
-            <div class="admin-actions">
-
-                <a
-                    href="{{ url_for('admin_add_book') }}"
-                    class="primary-button">
-                    + Add Book
-                </a>
-
-                <a
-                    href="{{ url_for('report') }}"
-                    class="secondary-button">
-                    View Report
-                </a>
-
-                <a
-                    href="{{ url_for('admin_logout') }}"
-                    class="text-link">
-                    Logout
-                </a>
-
-            </div>
+            <a
+                href="{{ url_for('admin_logout') }}"
+                class="admin-logout-btn"
+            >
+                Logout
+            </a>
 
         </div>
 
 
-        <div class="admin-stats">
+        <!-- Quick Actions -->
+        <div class="admin-quick-actions">
 
-            <div class="stat-card">
-                <span>BOOKS</span>
-                <strong>{{ total_books }}</strong>
-            </div>
-
-            <div class="stat-card">
-                <span>STOCK</span>
-                <strong>{{ total_stock }}</strong>
-            </div>
-
-            <div class="stat-card">
-                <span>ORDERS</span>
-                <strong>{{ total_orders }}</strong>
-            </div>
-
-            <div class="stat-card">
-                <span>REVENUE</span>
-                <strong>
-                    ₹{{ "%.2f"|format(total_revenue) }}
-                </strong>
-            </div>
-
-        </div>
-
-
-        <div class="admin-books">
-
-            <div class="section-title-row">
-
-                <div>
-                    <span class="section-label">
-                        INVENTORY
-                    </span>
-
-                    <h2>All Books</h2>
-                </div>
+            <a
+                href="{{ url_for('admin_add_book') }}"
+                class="admin-action primary"
+            >
+                <span class="admin-action-icon">＋</span>
 
                 <span>
-                    {{ total_books }} books
+                    <strong>Add Book</strong>
+                    <small>Add a new book</small>
+                </span>
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_orders') }}"
+                class="admin-action"
+            >
+                <span class="admin-action-icon">▣</span>
+
+                <span>
+                    <strong>Manage Orders</strong>
+                    <small>View customer orders</small>
+                </span>
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_report') }}"
+                class="admin-action"
+            >
+                <span class="admin-action-icon">◔</span>
+
+                <span>
+                    <strong>Sales Report</strong>
+                    <small>View store performance</small>
+                </span>
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_export') }}"
+                class="admin-action"
+            >
+                <span class="admin-action-icon">↓</span>
+
+                <span>
+                    <strong>Export CSV</strong>
+                    <small>Download store data</small>
+                </span>
+            </a>
+
+        </div>
+
+
+        <!-- Inventory Section -->
+        <div class="admin-section-heading">
+
+            <div>
+                <span class="admin-section-label">
+                    INVENTORY
                 </span>
 
+                <h2>Book Catalogue</h2>
+
+                <p>
+                    Manage your available books and stock levels.
+                </p>
             </div>
 
+            {% if books %}
+            <span class="admin-book-count">
+                {{ books|length }} Books
+            </span>
+            {% endif %}
 
-            <div class="admin-table">
-
-                {% for book in books %}
-
-                <div class="admin-book-row">
-
-                    <div class="admin-book-cover">
-
-                        {% if book['cover_image'] %}
-
-                        <img
-                            src="{{ url_for(
-                                'static',
-                                filename='images/books/' ~
-                                book['cover_image']
-                            ) }}"
-                            alt="{{ book['title'] }}">
-
-                        {% else %}
-
-                        <div
-                            class="cover-placeholder"
-                            style="background: {{
-                                book['cover_color']
-                            }};">
-                            {{ book['title'] }}
-                        </div>
-
-                        {% endif %}
-
-                    </div>
+        </div>
 
 
-                    <div class="admin-book-info">
+        {% if books %}
 
-                        <span class="book-category">
-                            {{ book['category'] }}
-                        </span>
+        <div class="admin-inventory-card">
 
-                        <h3>
-                            {{ book['title'] }}
-                        </h3>
+            <div class="admin-table-scroll">
 
-                        <p>
-                            {{ book['author'] }}
-                        </p>
+                <table class="admin-modern-table">
 
-                    </div>
+                    <thead>
 
+                        <tr>
 
-                    <div class="admin-price">
+                            <th>Book</th>
 
-                        <small>PRICE</small>
+                            <th>Author</th>
 
-                        <strong>
-                            ₹{{ "%.2f"|format(book['price']) }}
-                        </strong>
+                            <th>Category</th>
 
-                    </div>
+                            <th>Price</th>
 
+                            <th>Stock</th>
 
-                    <div class="admin-stock">
+                            <th>Actions</th>
 
-                        <small>STOCK</small>
+                        </tr>
 
-                        {% if book['stock'] == 0 %}
-
-                        <strong class="out-stock">
-                            Out of stock
-                        </strong>
-
-                        {% elif book['stock'] <= 2 %}
-
-                        <strong class="low-stock">
-                            {{ book['stock'] }} left
-                        </strong>
-
-                        {% else %}
-
-                        <strong>
-                            {{ book['stock'] }}
-                        </strong>
-
-                        {% endif %}
-
-                    </div>
+                    </thead>
 
 
-                    <div class="admin-row-actions">
+                    <tbody>
 
-                        <a
-                            href="{{ url_for(
-                                'admin_edit_book',
-                                book_id=book['id']
-                            ) }}"
-                            class="secondary-button small-button">
-                            Edit
-                        </a>
+                        {% for book in books %}
 
-                        <form
-                            method="POST"
-                            action="{{ url_for(
-                                'admin_delete_book',
-                                book_id=book['id']
-                            ) }}"
-                            onsubmit="return confirm(
-                                'Delete this book?'
-                            );">
+                        <tr>
 
-                            <button
-                                type="submit"
-                                class="danger-button">
-                                Delete
-                            </button>
+                            <!-- Book -->
+                            <td>
 
-                        </form>
+                                <div class="admin-book-info">
 
-                    </div>
+                                    {% if book["cover_image"] %}
 
-                </div>
+                                    <img
+                                        src="{{ url_for(
+                                            'static',
+                                            filename='images/' + book['cover_image']
+                                        ) }}"
+                                        alt="{{ book['title'] }}"
+                                    >
 
-                {% endfor %}
+                                    {% else %}
+
+                                    <div class="admin-book-placeholder">
+                                        📖
+                                    </div>
+
+                                    {% endif %}
+
+                                    <div>
+
+                                        <strong>
+                                            {{ book["title"] }}
+                                        </strong>
+
+                                        <span>
+                                            #{{ book["id"] }}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- Author -->
+                            <td>
+                                <span class="admin-author">
+                                    {{ book["author"] }}
+                                </span>
+                            </td>
+
+
+                            <!-- Category -->
+                            <td>
+
+                                <span class="admin-category">
+                                    {{ book["category"] }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- Price -->
+                            <td>
+
+                                <strong class="admin-price">
+                                    ₹{{ "%.2f"|format(book["price"]) }}
+                                </strong>
+
+                            </td>
+
+
+                            <!-- Stock -->
+                            <td>
+
+                                {% if book["stock"] == 0 %}
+
+                                <span class="stock-badge out">
+                                    Out of stock
+                                </span>
+
+                                {% elif book["stock"] <= 5 %}
+
+                                <span class="stock-badge low">
+                                    {{ book["stock"] }} left
+                                </span>
+
+                                {% else %}
+
+                                <span class="stock-badge good">
+                                    {{ book["stock"] }} in stock
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Actions -->
+                            <td>
+
+                                <div class="admin-table-actions">
+
+                                    <a
+                                        href="{{ url_for(
+                                            'admin_edit_book',
+                                            book_id=book['id']
+                                        ) }}"
+                                        class="admin-edit-btn"
+                                    >
+                                        Edit
+                                    </a>
+
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'admin_delete_book',
+                                            book_id=book['id']
+                                        ) }}"
+                                        onsubmit="return confirm(
+                                            'Delete this book?'
+                                        );"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="admin-delete-btn"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
 
             </div>
 
         </div>
+
+        {% else %}
+
+        <div class="admin-empty">
+
+            <div class="admin-empty-icon">
+                📚
+            </div>
+
+            <h2>No books yet</h2>
+
+            <p>
+                Your bookstore catalogue is empty.
+                Add your first book to get started.
+            </p>
+
+            <a
+                href="{{ url_for('admin_add_book') }}"
+                class="admin-add-first-btn"
+            >
+                + Add First Book
+            </a>
+
+        </div>
+
+        {% endif %}
 
     </div>
 
-</section>
+</div>
 
 {% endblock %}

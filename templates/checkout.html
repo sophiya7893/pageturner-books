@@ -1,133 +1,304 @@
 {% extends "base.html" %}
 
-{% block title %}
-Checkout | PageTurner Books
-{% endblock %}
-
+{% block title %}Checkout - PageTurner Books{% endblock %}
 
 {% block content %}
 
-<section class="page-section">
+<section class="checkout-page">
 
-    <div class="page-container">
+    <div class="checkout-page-container">
 
-        <div class="page-heading">
+        <!-- PAGE HEADER -->
+        <div class="checkout-page-header">
 
-            <span class="section-label">
-                COMPLETE YOUR ORDER
-            </span>
+            <div>
+                <span class="checkout-label">
+                    SECURE CHECKOUT
+                </span>
 
-            <h1>
-                Checkout
-            </h1>
+                <h1>
+                    Complete Your Order
+                </h1>
+
+                <p>
+                    Enter your delivery details and review your order before placing it.
+                </p>
+            </div>
 
         </div>
 
 
         <div class="checkout-layout">
 
-            <form
-                method="POST"
-                class="checkout-form"
-            >
+            <!-- CUSTOMER DETAILS -->
+            <section class="checkout-form-card">
 
-                <h2>
-                    Customer Details
-                </h2>
+                <div class="checkout-card-header">
 
-                <label>
-                    Full Name
-                </label>
+                    <span class="checkout-step">
+                        STEP 1
+                    </span>
 
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Your full name"
-                    required
+                    <h2>
+                        Delivery Details
+                    </h2>
+
+                    <p>
+                        Where should we deliver your books?
+                    </p>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for('checkout') }}"
+                    class="checkout-form"
                 >
 
+                    <!-- NAME -->
+                    <div class="checkout-form-group">
 
-                <label>
-                    Phone Number
-                </label>
+                        <label for="name">
+                            Full Name
+                        </label>
 
-                <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Your phone number"
-                    required
-                >
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ request.form.get('name', '') }}"
+                            placeholder="Enter your full name"
+                            required
+                        >
 
-
-                <label>
-                    Delivery Address
-                </label>
-
-                <textarea
-                    name="address"
-                    rows="6"
-                    placeholder="Enter your complete delivery address"
-                    required
-                ></textarea>
+                    </div>
 
 
-                <button
-                    type="submit"
-                    class="primary-button full-button"
-                >
-                    Place Order
-                </button>
+                    <!-- EMAIL -->
+                    <div class="checkout-form-group">
 
-            </form>
+                        <label for="email">
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="{{ request.form.get(
+                                'email',
+                                session.get('user_email', '')
+                            ) }}"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
 
 
-            <aside class="checkout-summary">
+                    <!-- PHONE -->
+                    <div class="checkout-form-group">
 
-                <h2>
-                    Your Order
-                </h2>
+                        <label for="phone">
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="phone"
+                            name="phone"
+                            value="{{ request.form.get('phone', '') }}"
+                            placeholder="Enter your phone number"
+                            required
+                        >
+
+                    </div>
 
 
-                {% for item in items %}
+                    <!-- ADDRESS -->
+                    <div class="checkout-form-group">
+
+                        <label for="address">
+                            Delivery Address
+                        </label>
+
+                        <textarea
+                            id="address"
+                            name="address"
+                            rows="5"
+                            placeholder="Enter your complete delivery address"
+                            required
+                        >{{ request.form.get('address', '') }}</textarea>
+
+                    </div>
+
+
+                    <!-- PLACE ORDER -->
+                    <button
+                        type="submit"
+                        class="place-order-button"
+                    >
+                        <span>
+                            Place Order
+                        </span>
+
+                        <span>
+                            →
+                        </span>
+                    </button>
+
+                    <p class="checkout-security-note">
+                        🔒 Your order information is securely processed.
+                    </p>
+
+                </form>
+
+            </section>
+
+
+            <!-- ORDER SUMMARY -->
+            <aside class="checkout-summary-card">
+
+                <div class="checkout-summary-header">
+
+                    <span class="checkout-step">
+                        STEP 2
+                    </span>
+
+                    <h2>
+                        Order Summary
+                    </h2>
+
+                </div>
+
+
+                <!-- ITEMS -->
+                <div class="checkout-items">
+
+                    {% for item in items %}
 
                     <div class="checkout-item">
 
-                        <div>
+                        <div class="checkout-item-image">
+
+                            {% if item["cover_image"] %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='images/' + item['cover_image']
+                                    ) }}"
+                                    alt="{{ item['title'] }}"
+                                >
+
+                            {% else %}
+
+                                <div class="checkout-placeholder">
+                                    📚
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="checkout-item-info">
 
                             <strong>
-                                {{ item.book['title'] }}
+                                {{ item["title"] }}
                             </strong>
 
+                            <span>
+                                {{ item["author"] }}
+                            </span>
+
                             <small>
-                                {{ item.quantity }}
-                                ×
-                                ₹{{ "%.2f"|format(item.book['price']) }}
+                                Qty: {{ item["quantity"] }}
                             </small>
 
                         </div>
 
-                        <strong>
-                            ₹{{ "%.2f"|format(item.subtotal) }}
+
+                        <strong class="checkout-item-price">
+                            ₹{{ "%.2f"|format(item["subtotal"]) }}
                         </strong>
 
                     </div>
 
-                {% endfor %}
+                    {% endfor %}
+
+                </div>
 
 
-                <div class="summary-divider"></div>
+                <!-- PRICE SUMMARY -->
+                <div class="checkout-price-summary">
+
+                    <div class="checkout-summary-row">
+
+                        <span>
+                            Subtotal
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(total) }}
+                        </strong>
+
+                    </div>
 
 
-                <div class="summary-total">
+                    {% if discount > 0 %}
 
-                    <span>
-                        Total
-                    </span>
+                    <div class="checkout-summary-row checkout-discount">
 
-                    <strong>
-                        ₹{{ "%.2f"|format(total) }}
-                    </strong>
+                        <span>
+                            Discount
+                        </span>
 
+                        <strong>
+                            -₹{{ "%.2f"|format(discount) }}
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if coupon_code %}
+
+                    <div class="checkout-coupon">
+
+                        <span>
+                            Coupon
+                        </span>
+
+                        <strong>
+                            {{ coupon_code }}
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <div class="checkout-total-row">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(final_total) }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="checkout-summary-note">
+                    <span>✓</span>
+                    Free delivery on your order
                 </div>
 
             </aside>

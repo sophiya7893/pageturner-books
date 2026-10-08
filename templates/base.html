@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,170 +11,238 @@
     >
 
     <title>
-        {% block title %}PageTurner Books{% endblock %}
+        {% block title %}
+            PageTurner Books
+        {% endblock %}
     </title>
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='style.css') }}"
     >
+
 </head>
+
 
 <body>
 
-<header class="site-header">
-    <nav class="navbar">
 
-        <a href="{{ url_for('home') }}" class="brand">
-            <span class="brand-icon">📖</span>
-            <span>PageTurner Books</span>
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="site-header">
+
+    <div class="container nav-container">
+
+        <!-- LOGO -->
+
+        <a
+            href="{{ url_for('home') }}"
+            class="logo"
+        >
+            📚 PageTurner Books
         </a>
 
-        <ul class="nav-links">
 
-            <li>
-                <a href="{{ url_for('home') }}">
-                    Home
+        <!-- NAVIGATION -->
+
+        <nav class="main-nav">
+
+            <!-- HOME -->
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+
+            <!-- CUSTOMER NAVIGATION -->
+
+            {% if session.get("user_id") %}
+
+                <a href="{{ url_for('wishlist') }}">
+                    ❤️ Wishlist
                 </a>
-            </li>
 
-            <li>
-                <a href="{{ url_for('home') }}">
-                    Books
+
+                <a href="{{ url_for('order_history') }}">
+                    My Orders
                 </a>
-            </li>
 
-            <li>
-                <a href="{{ url_for('orders') }}">
-                    Find Order
+
+                <a href="{{ url_for('logout') }}">
+                    Logout
                 </a>
-            </li>
 
-            <li>
-                <a href="{{ url_for('cart_page') }}" class="cart-link">
-                    🛒 Cart
+            {% else %}
 
-                    {% if cart_count > 0 %}
-                        <span class="cart-count">
-                            {{ cart_count }}
-                        </span>
-                    {% endif %}
+                <a href="{{ url_for('login') }}">
+                    Login
                 </a>
-            </li>
 
-            <li>
-                <a href="{{ url_for('admin_login') }}">
-                    Admin
+
+                <a href="{{ url_for('register') }}">
+                    Register
                 </a>
-            </li>
 
-        </ul>
+            {% endif %}
 
-    </nav>
+
+            <!-- ADMIN LOGIN -->
+
+            <a href="{{ url_for('admin_login') }}">
+                🔐 Admin
+            </a>
+
+
+            <!-- CART -->
+
+            <a
+                href="{{ url_for('cart') }}"
+                class="cart-link"
+            >
+
+                🛒 Cart
+
+                <span
+                    id="cart-count"
+                    class="cart-count"
+                >
+                    {{ session.get("cart", {})|length }}
+                </span>
+
+            </a>
+
+        </nav>
+
+    </div>
+
 </header>
 
 
-{% with messages = get_flashed_messages() %}
+
+<!-- =========================================================
+     FLASH MESSAGES
+========================================================= -->
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
     {% if messages %}
 
-        <div class="flash-container">
+        <div class="container flash-container">
 
-            {% for message in messages %}
-                <div class="flash">
+            {% for category, message in messages %}
+
+                <div class="flash-message flash-{{ category }}">
+
                     {{ message }}
+
                 </div>
+
             {% endfor %}
 
         </div>
 
     {% endif %}
+
 {% endwith %}
 
 
-<main class="page-wrapper">
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+
+<main>
 
     {% block content %}
+
     {% endblock %}
 
 </main>
 
 
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
 <footer class="site-footer">
 
-    <div class="footer-main">
+    <div class="footer-container">
 
-        <div>
+        <div class="footer-top">
+
             <div class="footer-brand">
-                📖 PageTurner Books
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="footer-logo"
+                >
+                    📚 <span>PageTurner</span>
+                </a>
+
+                <p>
+                    Discover books you'll love,
+                    one page at a time.
+                </p>
+
             </div>
 
-            <p class="footer-description">
-                A carefully selected collection of stories,
-                ideas and adventures for every kind of reader.
-            </p>
+
+            <div class="footer-links">
+
+                <a href="{{ url_for('home') }}">
+                    Home
+                </a>
+
+                <a href="{{ url_for('cart') }}">
+                    Cart
+                </a>
+
+                {% if session.get("user_id") %}
+
+                    <a href="{{ url_for('wishlist') }}">
+                        Wishlist
+                    </a>
+
+                    <a href="{{ url_for('order_history') }}">
+                        My Orders
+                    </a>
+
+                {% else %}
+
+                    <a href="{{ url_for('login') }}">
+                        Login
+                    </a>
+
+                    <a href="{{ url_for('register') }}">
+                        Register
+                    </a>
+
+                {% endif %}
+
+                <a href="{{ url_for('admin_login') }}">
+                    Admin
+                </a>
+
+            </div>
+
         </div>
 
 
-        <div class="footer-column">
-
-            <h3>Explore</h3>
-
-            <ul class="footer-links">
-                <li>
-                    <a href="{{ url_for('home') }}">
-                        Home
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ url_for('home') }}">
-                        Books
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ url_for('orders') }}">
-                        Find Order
-                    </a>
-                </li>
-            </ul>
-
-        </div>
+        <div class="footer-line"></div>
 
 
-        <div class="footer-column">
-
-            <h3>Account</h3>
-
-            <ul class="footer-links">
-                <li>
-                    <a href="{{ url_for('cart_page') }}">
-                        Cart
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ url_for('admin_login') }}">
-                        Admin
-                    </a>
-                </li>
-            </ul>
-
-        </div>
-
-    </div>
-
-
-    <div class="footer-bottom">
-
-        <div class="footer-bottom-inner">
+        <div class="footer-bottom">
 
             <span>
-                © 2026 PageTurner Books
+                © {{ current_year|default(2026) }}
+                PageTurner Books
             </span>
 
             <span>
-                Read more. Discover more.
+                Made for book lovers 📖
             </span>
 
         </div>
@@ -182,5 +252,20 @@
 </footer>
 
 
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script
+    src="{{ url_for('static', filename='app.js') }}"
+></script>
+
+
+{% block scripts %}
+
+{% endblock %}
+
+
 </body>
+
 </html>

@@ -1,129 +1,92 @@
--- ============================================================
--- 1. FIND BOOKS BY CATEGORY
--- ============================================================
+-- =====================================================
+-- PAGETURNER SQL QUERIES
+-- 12 REQUIRED QUERIES
+-- =====================================================
 
-SELECT
-    id,
-    title,
-    author,
-    category,
-    price,
-    stock
+
+-- 1. Display all books
+SELECT *
+FROM books
+ORDER BY title;
+
+
+-- 2. Search books by title or author
+SELECT *
+FROM books
+WHERE title LIKE ?
+   OR author LIKE ?
+ORDER BY title;
+
+
+-- 3. Filter books by category
+SELECT *
 FROM books
 WHERE category = ?
 ORDER BY title;
 
 
--- ============================================================
--- 2. SEARCH BOOKS
--- ============================================================
-
-SELECT
-    id,
-    title,
-    author,
-    category,
-    price,
-    stock
+-- 4. Find books cheaper than a given price
+SELECT *
 FROM books
-WHERE title LIKE ?
-   OR author LIKE ?
-   OR category LIKE ?
-ORDER BY title;
+WHERE price <= ?
+ORDER BY price ASC;
 
 
--- ============================================================
--- 3. AVERAGE RATING FOR A BOOK
--- ============================================================
+-- 5. SAFE STOCK UPDATE
+-- Used during checkout.
+-- The stock is reduced only when enough stock exists.
 
-SELECT
-    book_id,
-    ROUND(AVG(rating), 1) AS average_rating,
-    COUNT(*) AS review_count
-FROM reviews
-WHERE book_id = ?
-GROUP BY book_id;
+UPDATE books
+SET stock = stock - ?
+WHERE id = ?
+  AND stock >= ?;
 
 
--- ============================================================
--- 4. FIND CUSTOMER ORDERS
--- ============================================================
-
-SELECT
-    o.id,
-    o.name,
-    o.phone,
-    o.total,
-    o.created_at,
-    COUNT(oi.id) AS item_count
-FROM orders AS o
-LEFT JOIN order_items AS oi
-    ON oi.order_id = o.id
-WHERE o.phone = ?
-GROUP BY
-    o.id,
-    o.name,
-    o.phone,
-    o.total,
-    o.created_at
-ORDER BY o.created_at DESC;
-
-
--- ============================================================
--- 5. TOTAL ORDERS FROM A GIVEN DATE
--- ============================================================
-
-SELECT
-    COUNT(*) AS total_orders
+-- 6. Get a customer's orders
+SELECT *
 FROM orders
-WHERE created_at >= ?;
+WHERE user_id = ?
+ORDER BY created_at DESC;
 
 
--- ============================================================
--- 6. TOTAL REVENUE FROM A GIVEN DATE
--- ============================================================
-
+-- 7. Get order items
 SELECT
-    COALESCE(SUM(total), 0) AS total_revenue
-FROM orders
-WHERE created_at >= ?;
-
-
--- ============================================================
--- 7. BEST-SELLING BOOKS
--- ============================================================
-
-SELECT
-    book_id,
-    title,
-    SUM(quantity) AS quantity_sold,
-    SUM(price * quantity) AS revenue
+    order_items.*,
+    books.title
 FROM order_items
-WHERE order_id IN (
-    SELECT id
-    FROM orders
-    WHERE created_at >= ?
-)
-GROUP BY
-    book_id,
-    title
-ORDER BY quantity_sold DESC;
+JOIN books
+    ON books.id = order_items.book_id
+WHERE order_items.order_id = ?;
 
 
--- ============================================================
--- 8. ORDERS / SALES BY CATEGORY
--- ============================================================
+-- 8. Find a wishlist item
+SELECT *
+FROM wishlist
+WHERE user_id = ?
+  AND book_id = ?;
 
-SELECT
-    b.category,
-    COUNT(DISTINCT oi.order_id) AS orders_count,
-    SUM(oi.quantity) AS items_sold,
-    SUM(oi.price * oi.quantity) AS revenue
-FROM order_items AS oi
-JOIN books AS b
-    ON b.id = oi.book_id
-JOIN orders AS o
-    ON o.id = oi.order_id
-WHERE o.created_at >= ?
-GROUP BY b.category
-ORDER BY revenue DESC;
+
+-- 9. Add a book to wishlist
+INSERT OR IGNORE INTO wishlist
+(user_id, book_id)
+VALUES (?, ?);
+
+
+-- 10. Find an active coupon
+SELECT *
+FROM coupons
+WHERE code = ?
+  AND active = 1;
+
+
+-- 11. Update order status
+UPDATE orders
+SET status = ?
+WHERE id = ?;
+
+
+-- 12. Check the query plan for category filtering
+EXPLAIN QUERY PLAN
+SELECT *
+FROM books
+WHERE category = ?;

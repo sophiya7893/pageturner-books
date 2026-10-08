@@ -1,490 +1,621 @@
 {% extends "base.html" %}
 
-{% block title %}
-PageTurner Books
-{% endblock %}
+{% block title %}PageTurner Books - Find Your Next Book{% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
-<section class="hero">
-    <div class="hero-inner">
+<div class="home-page">
 
-        <div class="hero-content">
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
 
-            <div class="hero-eyebrow">
-                PageTurner Books
-            </div>
+    <section class="home-hero">
 
-            <h1>
-                Find books that stay with you.
-            </h1>
+        <div class="home-container">
 
-            <p>
-                Explore stories, ideas and adventures from
-                our carefully selected collection.
-            </p>
+            <div class="home-hero-inner">
 
-            <div class="hero-actions">
+                <div class="home-hero-content">
 
-                <a
-                    href="#books"
-                    class="btn btn-primary"
-                >
-                    Explore Books
-                </a>
+                    <span class="home-hero-label">
+                        PageTurner Books
+                    </span>
 
-                <a
-                    href="{{ url_for('orders') }}"
-                    class="btn btn-secondary"
-                >
-                    Find My Order
-                </a>
+                    <h1>
+                        Stories worth reading.
+                        Books worth keeping.
+                    </h1>
 
-            </div>
-
-        </div>
-
-    </div>
-</section>
+                    <p>
+                        Discover carefully selected books across
+                        programming, fiction, science, history,
+                        productivity and more.
+                    </p>
 
 
-<!-- CATEGORIES -->
-<section class="category-section">
+                    <div class="home-hero-buttons">
 
-    <div class="container">
+                        <a
+                            href="#books"
+                            class="home-primary-btn"
+                        >
+                            Explore Collection
+                        </a>
 
-        <div class="category-title">
-            Browse Categories
-        </div>
+                        <a
+                            href="{{ url_for('order_history') }}"
+                            class="home-secondary-btn"
+                        >
+                            Find My Order
+                        </a>
 
-        <div class="category-list">
+                    </div>
 
-            <a
-                href="{{ url_for('home') }}"
-                class="{% if not selected_category %}active{% endif %}"
-            >
-                All Books
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Self Help') }}"
-                class="{% if selected_category == 'Self Help' %}active{% endif %}"
-            >
-                Self Help
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Productivity') }}"
-                class="{% if selected_category == 'Productivity' %}active{% endif %}"
-            >
-                Productivity
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Personal Development') }}"
-                class="{% if selected_category == 'Personal Development' %}active{% endif %}"
-            >
-                Personal Development
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Lifestyle') }}"
-                class="{% if selected_category == 'Lifestyle' %}active{% endif %}"
-            >
-                Lifestyle
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Programming') }}"
-                class="{% if selected_category == 'Programming' %}active{% endif %}"
-            >
-                Programming
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Science') }}"
-                class="{% if selected_category == 'Science' %}active{% endif %}"
-            >
-                Science
-            </a>
-
-            <a
-                href="{{ url_for('home', category='History') }}"
-                class="{% if selected_category == 'History' %}active{% endif %}"
-            >
-                History
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Fiction') }}"
-                class="{% if selected_category == 'Fiction' %}active{% endif %}"
-            >
-                Fiction
-            </a>
-
-            <a
-                href="{{ url_for('home', category='Finance') }}"
-                class="{% if selected_category == 'Finance' %}active{% endif %}"
-            >
-                Finance
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- BOOKS -->
-<section
-    class="books-section"
-    id="books"
->
-
-    <div class="container">
-
-        <!-- SECTION HEADER -->
-        <div class="section-heading">
-
-            <div>
-
-                <div class="section-label">
-                    Our Collection
                 </div>
 
-                <h2>
-                    Browse Books
-                </h2>
 
-            </div>
+                <!-- Decorative book display -->
 
-            <div class="book-count">
-                {{ total_books }} books
+                <div class="hero-books">
+
+                    <div class="hero-book hero-book-one">
+                        <span>READ</span>
+                    </div>
+
+                    <div class="hero-book hero-book-two">
+                        <span>DISCOVER</span>
+                    </div>
+
+                    <div class="hero-book hero-book-three">
+                        <span>GROW</span>
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
 
+    </section>
 
-        <!-- SEARCH / FILTER -->
-        <div class="book-tools">
 
-            <form
-                method="GET"
-                action="{{ url_for('home') }}"
-                class="search-form"
-            >
 
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ search or '' }}"
-                    class="search-input"
-                    placeholder="Search by title, author or category..."
+    <!-- =====================================================
+         SEARCH + FILTER
+         ===================================================== -->
+
+    <section class="home-tools">
+
+        <div class="home-container">
+
+            <div class="home-tools-inner">
+
+
+                <!-- Search -->
+
+                <form
+                    method="GET"
+                    action="{{ url_for('home') }}"
+                    class="home-search-form"
                 >
 
+                    <div class="home-search-box">
 
-                <select
-                    name="category"
-                    class="filter-select"
+                        <span class="home-search-icon">
+                            ⌕
+                        </span>
+
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ q }}"
+                            placeholder="Search by book title or author..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    {% if selected_category %}
+                    <input
+                        type="hidden"
+                        name="category"
+                        value="{{ selected_category }}"
+                    >
+                    {% endif %}
+
+
+                    <input
+                        type="hidden"
+                        name="sort"
+                        value="{{ sort }}"
+                    >
+
+
+                    <button
+                        type="submit"
+                        class="home-search-button"
+                    >
+                        Search
+                    </button>
+
+                </form>
+
+
+                <!-- Sort -->
+
+                <form
+                    method="GET"
+                    action="{{ url_for('home') }}"
+                    class="home-sort-form"
                 >
 
-                    <option value="">
-                        All Categories
-                    </option>
+                    {% if q %}
+                    <input
+                        type="hidden"
+                        name="q"
+                        value="{{ q }}"
+                    >
+                    {% endif %}
 
-                    {% for category in categories %}
+
+                    {% if selected_category %}
+                    <input
+                        type="hidden"
+                        name="category"
+                        value="{{ selected_category }}"
+                    >
+                    {% endif %}
+
+
+                    <label for="home-sort">
+                        Sort
+                    </label>
+
+                    <select
+                        id="home-sort"
+                        name="sort"
+                        onchange="this.form.submit()"
+                    >
 
                         <option
-                            value="{{ category }}"
-                            {% if selected_category == category %}
-                                selected
-                            {% endif %}
+                            value="title_asc"
+                            {% if sort == "title_asc" %}selected{% endif %}
                         >
-                            {{ category }}
+                            Title A-Z
                         </option>
 
-                    {% endfor %}
+                        <option
+                            value="title_desc"
+                            {% if sort == "title_desc" %}selected{% endif %}
+                        >
+                            Title Z-A
+                        </option>
 
-                </select>
+                        <option
+                            value="price_asc"
+                            {% if sort == "price_asc" %}selected{% endif %}
+                        >
+                            Price Low to High
+                        </option>
 
+                        <option
+                            value="price_desc"
+                            {% if sort == "price_desc" %}selected{% endif %}
+                        >
+                            Price High to Low
+                        </option>
 
-                <select
-                    name="sort"
-                    class="filter-select"
-                >
+                    </select>
 
-                    <option
-                        value="title_asc"
-                        {% if sort == 'title_asc' %}
-                            selected
-                        {% endif %}
-                    >
-                        Title A-Z
-                    </option>
+                </form>
 
-                    <option
-                        value="title_desc"
-                        {% if sort == 'title_desc' %}
-                            selected
-                        {% endif %}
-                    >
-                        Title Z-A
-                    </option>
-
-                    <option
-                        value="price_asc"
-                        {% if sort == 'price_asc' %}
-                            selected
-                        {% endif %}
-                    >
-                        Price Low-High
-                    </option>
-
-                    <option
-                        value="price_desc"
-                        {% if sort == 'price_desc' %}
-                            selected
-                        {% endif %}
-                    >
-                        Price High-Low
-                    </option>
-
-                </select>
-
-
-                <button
-                    type="submit"
-                    class="search-button"
-                >
-                    Search
-                </button>
-
-            </form>
+            </div>
 
         </div>
 
+    </section>
 
-        <!-- BOOK GRID -->
-        {% if books %}
 
-            <div class="book-grid">
+
+    <!-- =====================================================
+         CATEGORIES
+         ===================================================== -->
+
+    <section class="home-categories">
+
+        <div class="home-container">
+
+            <div class="home-category-header">
+
+                <div>
+
+                    <span>
+                        BROWSE BY INTEREST
+                    </span>
+
+                    <h2>
+                        Find your kind of book
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="home-category-list">
+
+                <a
+                    href="{{ url_for('home', sort=sort) }}"
+                    class="category-pill {% if not selected_category %}active{% endif %}"
+                >
+                    All Books
+                </a>
+
+
+                {% for category in categories %}
+
+                <a
+                    href="{{ url_for(
+                        'home',
+                        category=category,
+                        q=q,
+                        sort=sort
+                    ) }}"
+                    class="category-pill {% if selected_category == category %}active{% endif %}"
+                >
+                    {{ category }}
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         BOOK COLLECTION
+         ===================================================== -->
+
+    <section
+        class="home-books-section"
+        id="books"
+    >
+
+        <div class="home-container">
+
+
+            <!-- Collection heading -->
+
+            <div class="home-collection-header">
+
+                <div>
+
+                    <span class="home-section-label">
+                        OUR COLLECTION
+                    </span>
+
+                    <h2>
+                        {% if q %}
+                            Search results
+                        {% elif selected_category %}
+                            {{ selected_category }} Books
+                        {% else %}
+                            Browse Books
+                        {% endif %}
+                    </h2>
+
+                    <p>
+                        {% if q %}
+                            Books matching
+                            <strong>"{{ q }}"</strong>
+                        {% elif selected_category %}
+                            Explore our {{ selected_category|lower }} collection.
+                        {% else %}
+                            Handpicked books for curious readers.
+                        {% endif %}
+                    </p>
+
+                </div>
+
+
+                <div class="home-results-count">
+
+                    <strong>
+                        {{ total_books }}
+                    </strong>
+
+                    <span>
+                        {% if total_books == 1 %}
+                            book
+                        {% else %}
+                            books
+                        {% endif %}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 BOOKS
+                 ================================================= -->
+
+            {% if books %}
+
+            <div class="books-grid">
 
                 {% for book in books %}
 
-                    <article class="book-card">
+                <article class="book-card">
 
-                        <!-- BOOK COVER -->
+
+                    <!-- Cover -->
+
+                    <div class="book-card-cover">
+
                         <a
-                            href="{{ url_for('book_detail', book_id=book['id']) }}"
+                            href="{{ url_for(
+                                'book_detail',
+                                book_id=book['id']
+                            ) }}"
                         >
 
-                            <div
-                                class="book-cover"
-                                style="background-color: {{ book['cover_color'] or '#8f624e' }};"
+                            {% if book["cover_image"] %}
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='images/' + book['cover_image']
+                                ) }}"
+                                alt="{{ book['title'] }}"
+                                loading="lazy"
                             >
 
-                                {% if book['cover_image'] %}
+                            {% else %}
 
-                                    <img
-                                        src="{{ url_for(
-                                            'static',
-                                            filename='images/' ~ book['cover_image']
-                                        ) }}"
-                                        alt="{{ book['title'] }}"
-                                    >
-
-                                {% else %}
-
-                                    <div class="book-cover-placeholder">
-                                        {{ book['title'] }}
-                                    </div>
-
-                                {% endif %}
-
-
-                                <!-- STOCK -->
-                                {% if book['stock'] == 0 %}
-
-                                    <span class="stock-badge out">
-                                        Out of Stock
-                                    </span>
-
-                                {% elif book['stock'] <= 3 %}
-
-                                    <span class="stock-badge low">
-                                        Only {{ book['stock'] }} left
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="stock-badge">
-                                        In Stock
-                                    </span>
-
-                                {% endif %}
-
+                            <div class="book-no-image">
+                                📖
                             </div>
+
+                            {% endif %}
 
                         </a>
 
 
-                        <!-- BOOK INFORMATION -->
-                        <div class="book-info">
+                        <!-- Wishlist -->
 
-                            <div class="book-category">
-                                {{ book['category'] }}
-                            </div>
+                        {% if session.get("user_id") %}
 
-                            <h3 class="book-title">
-                                {{ book['title'] }}
-                            </h3>
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'toggle_wishlist',
+                                book_id=book['id']
+                            ) }}"
+                            class="book-wishlist-form"
+                        >
 
-                            <p class="book-author">
-                                {{ book['author'] }}
-                            </p>
+                            <button
+                                type="submit"
+                                class="book-wishlist-button"
+                                title="Add to wishlist"
+                            >
+                                ♡
+                            </button>
+
+                        </form>
+
+                        {% endif %}
+
+                    </div>
 
 
-                            <div class="book-bottom">
 
-                                <span class="book-price">
-                                    ₹{{ "%.2f"|format(book['price']) }}
-                                </span>
+                    <!-- Book information -->
 
-                                <a
-                                    href="{{ url_for(
-                                        'book_detail',
-                                        book_id=book['id']
-                                    ) }}"
-                                    class="book-link"
+                    <div class="book-card-body">
+
+                        <span class="book-card-category">
+                            {{ book["category"] }}
+                        </span>
+
+
+                        <h3 class="book-card-title">
+
+                            <a
+                                href="{{ url_for(
+                                    'book_detail',
+                                    book_id=book['id']
+                                ) }}"
+                            >
+                                {{ book["title"] }}
+                            </a>
+
+                        </h3>
+
+
+                        <p class="book-card-author">
+                            {{ book["author"] }}
+                        </p>
+
+
+                        <div class="book-card-bottom">
+
+                            <strong class="book-card-price">
+                                ₹{{ "%.2f"|format(book["price"]) }}
+                            </strong>
+
+
+                            {% if book["stock"] > 0 %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'add_to_cart',
+                                    book_id=book['id']
+                                ) }}"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="book-add-button"
                                 >
-                                    View Book →
-                                </a>
+                                    Add to Cart
+                                </button>
 
-                            </div>
+                            </form>
+
+                            {% else %}
+
+                            <span class="book-sold-out">
+                                Sold Out
+                            </span>
+
+                            {% endif %}
 
                         </div>
 
-                    </article>
+                    </div>
+
+                </article>
 
                 {% endfor %}
 
             </div>
 
 
-            <!-- PAGINATION -->
+            <!-- =================================================
+                 PAGINATION
+                 ================================================= -->
+
             {% if total_pages > 1 %}
 
-                <div class="pagination">
+            <div class="home-pagination">
 
-                    {% if page > 1 %}
+                {% if page > 1 %}
 
-                        <a
-                            href="{{ url_for(
-                                'home',
-                                page=page - 1,
-                                search=search,
-                                category=selected_category,
-                                sort=sort
-                            ) }}"
-                        >
-                            ← Previous
-                        </a>
+                <a
+                    href="{{ url_for(
+                        'home',
+                        q=q,
+                        category=selected_category,
+                        sort=sort,
+                        page=page-1
+                    ) }}"
+                    class="pagination-arrow"
+                >
+                    ←
+                </a>
 
-                    {% else %}
-
-                        <span class="disabled">
-                            ← Previous
-                        </span>
-
-                    {% endif %}
+                {% endif %}
 
 
-                    {% for p in range(1, total_pages + 1) %}
+                {% for page_number in range(1, total_pages + 1) %}
 
-                        {% if p == page %}
+                    {% if
+                        page_number == 1
+                        or page_number == total_pages
+                        or page_number >= page - 1
+                        and page_number <= page + 1
+                    %}
 
-                            <span class="active">
-                                {{ p }}
-                            </span>
+                    <a
+                        href="{{ url_for(
+                            'home',
+                            q=q,
+                            category=selected_category,
+                            sort=sort,
+                            page=page_number
+                        ) }}"
+                        class="pagination-number
+                        {% if page_number == page %}
+                            active
+                        {% endif %}"
+                    >
+                        {{ page_number }}
+                    </a>
 
-                        {% else %}
+                    {% elif
+                        page_number == page - 2
+                        or page_number == page + 2
+                    %}
 
-                            <a
-                                href="{{ url_for(
-                                    'home',
-                                    page=p,
-                                    search=search,
-                                    category=selected_category,
-                                    sort=sort
-                                ) }}"
-                            >
-                                {{ p }}
-                            </a>
-
-                        {% endif %}
-
-                    {% endfor %}
-
-
-                    {% if page < total_pages %}
-
-                        <a
-                            href="{{ url_for(
-                                'home',
-                                page=page + 1,
-                                search=search,
-                                category=selected_category,
-                                sort=sort
-                            ) }}"
-                        >
-                            Next →
-                        </a>
-
-                    {% else %}
-
-                        <span class="disabled">
-                            Next →
-                        </span>
+                    <span class="pagination-dots">
+                        ...
+                    </span>
 
                     {% endif %}
 
-                </div>
+                {% endfor %}
+
+
+                {% if page < total_pages %}
+
+                <a
+                    href="{{ url_for(
+                        'home',
+                        q=q,
+                        category=selected_category,
+                        sort=sort,
+                        page=page+1
+                    ) }}"
+                    class="pagination-arrow"
+                >
+                    →
+                </a>
+
+                {% endif %}
+
+            </div>
 
             {% endif %}
 
 
-        <!-- NO BOOKS -->
-        {% else %}
+            {% else %}
 
-            <div class="empty-state">
+
+            <!-- =================================================
+                 NO RESULTS
+                 ================================================= -->
+
+            <div class="home-empty">
+
+                <div class="home-empty-icon">
+                    🔎
+                </div>
 
                 <h2>
                     No books found
                 </h2>
 
                 <p>
-                    Try another search or category.
+                    We couldn't find any books matching your search.
+                    Try another title, author or category.
                 </p>
 
-                <div style="margin-top: 20px;">
-
-                    <a
-                        href="{{ url_for('home') }}"
-                        class="btn btn-primary"
-                    >
-                        View All Books
-                    </a>
-
-                </div>
+                <a
+                    href="{{ url_for('home') }}"
+                    class="home-empty-button"
+                >
+                    View All Books
+                </a>
 
             </div>
 
-        {% endif %}
+            {% endif %}
 
-    </div>
+        </div>
 
-</section>
+    </section>
+
+</div>
 
 {% endblock %}

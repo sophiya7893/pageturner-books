@@ -1,33 +1,39 @@
 {% extends "base.html" %}
 
 {% block title %}
-Admin Reports | PageTurner Books
+    Sales Report - PageTurner Books
 {% endblock %}
-
 
 {% block content %}
 
-<section class="admin-section">
+<div class="sales-report-page">
 
-    <div class="admin-container">
+    <div class="sales-report-container">
 
-        <div class="admin-header">
+        <!-- Header -->
+
+        <div class="sales-report-header">
 
             <div>
 
-                <span class="section-label">
-                    STORE ANALYTICS
+                <span class="sales-report-label">
+                    📊 Store Analytics
                 </span>
 
                 <h1>
                     Sales Report
                 </h1>
 
+                <p>
+                    Overview of PageTurner Books sales and performance.
+                </p>
+
             </div>
 
+
             <a
-                href="{{ url_for('admin_page') }}"
-                class="secondary-button"
+                href="{{ url_for('admin_dashboard') }}"
+                class="sales-dashboard-button"
             >
                 ← Dashboard
             </a>
@@ -35,192 +41,67 @@ Admin Reports | PageTurner Books
         </div>
 
 
-        <div class="stats-grid">
+        <!-- Statistics -->
 
-            <div class="stat-card">
+        <div class="sales-stats-grid">
 
-                <span>
-                    🛍️
-                </span>
+            <div class="sales-stat-card">
 
-                <small>
-                    Total Orders
-                </small>
+                <div class="sales-stat-icon">
+                    📦
+                </div>
 
-                <strong>
-                    {{ total_orders }}
-                </strong>
+                <div class="sales-stat-content">
+
+                    <span>
+                        Total Orders
+                    </span>
+
+                    <strong>
+                        {{ total_orders|default(0) }}
+                    </strong>
+
+                </div>
 
             </div>
 
 
-            <div class="stat-card">
+            <div class="sales-stat-card">
 
-                <span>
+                <div class="sales-stat-icon">
                     ₹
-                </span>
+                </div>
 
-                <small>
-                    Total Revenue
-                </small>
+                <div class="sales-stat-content">
 
-                <strong>
-                    ₹{{ "%.2f"|format(total_revenue) }}
-                </strong>
+                    <span>
+                        Total Sales
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(total_sales|default(0)) }}
+                    </strong>
+
+                </div>
 
             </div>
 
 
-            <div class="stat-card">
+            <div class="sales-stat-card">
 
-                <span>
+                <div class="sales-stat-icon">
                     📚
-                </span>
-
-                <small>
-                    Books Sold
-                </small>
-
-                <strong>
-                    {{ total_items_sold }}
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="report-grid">
-
-            <div class="admin-table-card">
-
-                <div class="table-header">
-
-                    <h2>
-                        Best-Selling Books
-                    </h2>
-
                 </div>
 
-                <div class="table-wrapper">
+                <div class="sales-stat-content">
 
-                    <table>
+                    <span>
+                        Books Sold
+                    </span>
 
-                        <thead>
-
-                            <tr>
-                                <th>Book</th>
-                                <th>Units</th>
-                                <th>Revenue</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {% for book in best_sellers %}
-
-                                <tr>
-
-                                    <td>
-                                        {{ book['title'] }}
-                                    </td>
-
-                                    <td>
-                                        {{ book['quantity_sold'] }}
-                                    </td>
-
-                                    <td>
-                                        ₹{{ "%.2f"|format(
-                                            book['revenue']
-                                        ) }}
-                                    </td>
-
-                                </tr>
-
-                            {% else %}
-
-                                <tr>
-                                    <td colspan="3">
-                                        No sales yet.
-                                    </td>
-                                </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-
-            <div class="admin-table-card">
-
-                <div class="table-header">
-
-                    <h2>
-                        Sales by Category
-                    </h2>
-
-                </div>
-
-                <div class="table-wrapper">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-                                <th>Category</th>
-                                <th>Orders</th>
-                                <th>Items</th>
-                                <th>Revenue</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {% for category in category_report %}
-
-                                <tr>
-
-                                    <td>
-                                        {{ category['category'] }}
-                                    </td>
-
-                                    <td>
-                                        {{ category['orders_count'] }}
-                                    </td>
-
-                                    <td>
-                                        {{ category['items_sold'] }}
-                                    </td>
-
-                                    <td>
-                                        ₹{{ "%.2f"|format(
-                                            category['revenue']
-                                        ) }}
-                                    </td>
-
-                                </tr>
-
-                            {% else %}
-
-                                <tr>
-                                    <td colspan="4">
-                                        No sales yet.
-                                    </td>
-                                </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
+                    <strong>
+                        {{ books_sold|default(0) }}
+                    </strong>
 
                 </div>
 
@@ -229,67 +110,107 @@ Admin Reports | PageTurner Books
         </div>
 
 
-        <div class="admin-table-card">
+        <!-- Top Selling Books -->
 
-            <div class="table-header">
+        {% if top_books %}
 
-                <h2>
-                    Recent Orders
-                </h2>
+        <div class="sales-books-card">
+
+            <div class="sales-section-header">
+
+                <div>
+
+                    <span class="sales-section-label">
+                        Best Sellers
+                    </span>
+
+                    <h2>
+                        Top Selling Books
+                    </h2>
+
+                    <p>
+                        Books generating the highest sales volume.
+                    </p>
+
+                </div>
 
             </div>
 
-            <div class="table-wrapper">
 
-                <table>
+            <div class="sales-table-wrapper">
+
+                <table class="sales-table">
 
                     <thead>
 
                         <tr>
-                            <th>Order</th>
-                            <th>Customer</th>
-                            <th>Phone</th>
-                            <th>Total</th>
-                            <th>Date</th>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Book
+                            </th>
+
+                            <th>
+                                Author
+                            </th>
+
+                            <th>
+                                Quantity Sold
+                            </th>
+
+                            <th>
+                                Revenue
+                            </th>
+
                         </tr>
 
                     </thead>
 
+
                     <tbody>
 
-                        {% for order in recent_orders %}
+                        {% for book in top_books %}
 
-                            <tr>
+                        <tr>
 
-                                <td>
-                                    #{{ order['id'] }}
-                                </td>
+                            <td>
+                                <span class="sales-rank">
+                                    {{ loop.index }}
+                                </span>
+                            </td>
 
-                                <td>
-                                    {{ order['name'] }}
-                                </td>
+                            <td>
 
-                                <td>
-                                    {{ order['phone'] }}
-                                </td>
+                                <strong class="sales-book-title">
+                                    {{ book["title"] }}
+                                </strong>
 
-                                <td>
-                                    ₹{{ "%.2f"|format(order['total']) }}
-                                </td>
+                            </td>
 
-                                <td>
-                                    {{ order['created_at'] }}
-                                </td>
+                            <td class="sales-author">
+                                {{ book["author"] }}
+                            </td>
 
-                            </tr>
+                            <td>
 
-                        {% else %}
+                                <span class="sales-quantity">
+                                    {{ book["quantity_sold"] }}
+                                </span>
 
-                            <tr>
-                                <td colspan="5">
-                                    No orders yet.
-                                </td>
-                            </tr>
+                            </td>
+
+                            <td>
+
+                                <strong class="sales-revenue">
+                                    ₹{{ "%.2f"|format(book["revenue"]) }}
+                                </strong>
+
+                            </td>
+
+                        </tr>
 
                         {% endfor %}
 
@@ -301,8 +222,38 @@ Admin Reports | PageTurner Books
 
         </div>
 
+
+        {% else %}
+
+        <!-- Empty State -->
+
+        <div class="sales-empty-card">
+
+            <div class="sales-empty-icon">
+                📊
+            </div>
+
+            <h2>
+                No Sales Yet
+            </h2>
+
+            <p>
+                Sales information will appear here once customers place orders.
+            </p>
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="sales-dashboard-button"
+            >
+                Back to Dashboard
+            </a>
+
+        </div>
+
+        {% endif %}
+
     </div>
 
-</section>
+</div>
 
 {% endblock %}

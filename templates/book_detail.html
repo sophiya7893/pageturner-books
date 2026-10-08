@@ -4,104 +4,159 @@
 {{ book['title'] }} | PageTurner Books
 {% endblock %}
 
-
 {% block content %}
 
-<section class="detail-section">
+<section class="book-page">
 
-    <div class="detail-container">
+    <div class="book-page-container">
 
-        <div
-            class="detail-cover"
-            {% if not book['cover_image'] %}
-            style="background: {{ book['cover_color'] }}"
-            {% endif %}
-        >
-
-            {% if book['cover_image'] %}
-
-                <img
-                    src="{{ url_for(
-                        'static',
-                        filename='images/books/' + book['cover_image']
-                    ) }}"
-                    alt="{{ book['title'] }}"
-                >
-
-            {% else %}
-
-                <div class="large-cover-placeholder">
-                    <span>📖</span>
-                    <strong>{{ book['title'] }}</strong>
-                    <small>{{ book['author'] }}</small>
-                </div>
-
-            {% endif %}
-
+        <!-- Breadcrumb -->
+        <div class="book-breadcrumb">
+            <a href="{{ url_for('home') }}">Home</a>
+            <span>›</span>
+            <span>{{ book['category'] }}</span>
+            <span>›</span>
+            <strong>{{ book['title'] }}</strong>
         </div>
 
 
-        <div class="detail-content">
+        <!-- =========================
+             BOOK DETAILS
+        ========================== -->
 
-            <span class="book-category">
-                {{ book['category'] }}
-            </span>
+        <div class="book-main-card">
 
-            <h1>
-                {{ book['title'] }}
-            </h1>
+            <!-- Book Cover -->
 
-            <p class="detail-author">
-                by {{ book['author'] }}
-            </p>
+            <div class="book-cover-area">
 
+                <div class="book-cover">
 
-            <div class="large-rating">
+                    {% if book['cover_image'] %}
 
-                {% if book['review_count'] > 0 %}
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename='images/' ~ book['cover_image']
+                            ) }}"
+                            alt="{{ book['title'] }}"
+                        >
 
-                    <span>
-                        ★
-                    </span>
+                    {% else %}
 
-                    <strong>
-                        {{ book['average_rating'] }}
-                    </strong>
+                        <div class="book-placeholder">
+                            <span>📚</span>
+                            <p>{{ book['title'] }}</p>
+                        </div>
 
-                    <small>
-                        / 5
-                        ·
-                        {{ book['review_count'] }} reviews
-                    </small>
+                    {% endif %}
 
-                {% else %}
-
-                    <small>
-                        No reviews yet
-                    </small>
-
-                {% endif %}
+                </div>
 
             </div>
 
 
-            <p class="detail-description">
-                {{ book['description'] }}
-            </p>
+            <!-- Book Information -->
+
+            <div class="book-information">
+
+                <span class="book-category-badge">
+                    {{ book['category'] }}
+                </span>
 
 
-            <div class="detail-purchase">
+                <h1>
+                    {{ book['title'] }}
+                </h1>
 
-                <strong class="detail-price">
+
+                <p class="book-author">
+                    by <strong>{{ book['author'] }}</strong>
+                </p>
+
+
+                <!-- Rating -->
+
+                <div class="book-rating-row">
+
+                    {% if book['review_count'] > 0 %}
+
+                        <div class="rating-stars">
+
+                            {% for number in range(1, 6) %}
+
+                                {% if number <= book['average_rating']|round(0, 'floor') %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+
+                            {% endfor %}
+
+                        </div>
+
+                        <strong>
+                            {{ "%.1f"|format(book['average_rating']) }}
+                        </strong>
+
+                        <span>
+                            ({{ book['review_count'] }} reviews)
+                        </span>
+
+                    {% else %}
+
+                        <span class="no-rating">
+                            No reviews yet
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Price -->
+
+                <div class="book-price">
                     ₹{{ "%.2f"|format(book['price']) }}
-                </strong>
+                </div>
 
+
+                <!-- Description -->
+
+                <div class="book-description">
+
+                    <h3>
+                        About this book
+                    </h3>
+
+                    <p>
+                        {{ book['description'] }}
+                    </p>
+
+                </div>
+
+
+                <!-- Stock -->
 
                 {% if book['stock'] > 0 %}
 
-                    <span class="stock-text">
-                        ✓ {{ book['stock'] }} available
-                    </span>
+                    <div class="book-stock available">
+                        <span>✓</span>
+                        {{ book['stock'] }} copies available
+                    </div>
+
+                {% else %}
+
+                    <div class="book-stock unavailable">
+                        Out of stock
+                    </div>
+
+                {% endif %}
+
+
+                <!-- Purchase Area -->
+
+                {% if book['stock'] > 0 %}
 
                     <form
                         method="POST"
@@ -109,10 +164,10 @@
                             'add_to_cart',
                             book_id=book['id']
                         ) }}"
-                        class="detail-cart-form"
+                        class="book-purchase-form"
                     >
 
-                        <div class="quantity-box">
+                        <div class="quantity-control">
 
                             <label for="quantity">
                                 Quantity
@@ -129,20 +184,25 @@
 
                         </div>
 
+
                         <button
                             type="submit"
-                            class="primary-button"
+                            class="add-cart-button"
                         >
-                            Add to Cart
+                            🛒 Add to Cart
                         </button>
 
                     </form>
 
                 {% else %}
 
-                    <span class="out-of-stock-large">
-                        Out of stock
-                    </span>
+                    <button
+                        type="button"
+                        class="add-cart-button disabled-button"
+                        disabled
+                    >
+                        Out of Stock
+                    </button>
 
                 {% endif %}
 
@@ -150,116 +210,56 @@
 
         </div>
 
-    </div>
 
-</section>
+        <!-- =========================
+             REVIEWS
+        ========================== -->
 
+        <section class="book-reviews">
 
-<section class="reviews-section">
+            <div class="reviews-top">
 
-    <div class="reviews-container">
+                <div>
 
-        <div class="reviews-heading">
-
-            <div>
-                <span class="section-label">
-                    CUSTOMER FEEDBACK
-                </span>
-
-                <h2>
-                    Reviews
-                </h2>
-            </div>
-
-            {% if book['review_count'] > 0 %}
-
-                <div class="review-summary">
-
-                    <strong>
-                        {{ book['average_rating'] }}
-                    </strong>
-
-                    <span>
-                        ★
+                    <span class="reviews-label">
+                        CUSTOMER FEEDBACK
                     </span>
 
-                    <small>
-                        Average rating
-                    </small>
+                    <h2>
+                        Reviews & Ratings
+                    </h2>
+
+                    <p>
+                        See what other readers think about this book.
+                    </p>
 
                 </div>
 
-            {% endif %}
 
-        </div>
+                {% if book['review_count'] > 0 %}
 
+                    <div class="rating-summary">
 
-        <div class="review-layout">
+                        <div class="rating-number">
+                            {{ "%.1f"|format(book['average_rating']) }}
+                        </div>
 
-            <div class="review-list">
+                        <div class="rating-stars large">
+                            {% for number in range(1, 6) %}
 
-                {% if reviews %}
+                                {% if number <= book['average_rating']|round(0, 'floor') %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
 
-                    {% for review in reviews %}
+                            {% endfor %}
+                        </div>
 
-                        <article class="review-card">
+                        <span>
+                            {{ book['review_count'] }} reviews
+                        </span>
 
-                            <div class="review-header">
-
-                                <div class="review-avatar">
-                                    {{ review['name'][0]|upper }}
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        {{ review['name'] }}
-                                    </strong>
-
-                                    <small>
-                                        {{ review['created_at'] }}
-                                    </small>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="review-stars">
-
-                                {% for number in range(1, 6) %}
-
-                                    {% if number <= review['rating'] %}
-                                        ★
-                                    {% else %}
-                                        ☆
-                                    {% endif %}
-
-                                {% endfor %}
-
-                            </div>
-
-
-                            <p>
-                                {{ review['comment'] }}
-                            </p>
-
-                        </article>
-
-                    {% endfor %}
-
-                {% else %}
-
-                    <div class="empty-review">
-                        <span>💬</span>
-
-                        <h3>
-                            No reviews yet
-                        </h3>
-
-                        <p>
-                            Be the first person to review this book.
-                        </p>
                     </div>
 
                 {% endif %}
@@ -267,96 +267,207 @@
             </div>
 
 
-            <div class="review-form-card">
+            <div class="reviews-layout">
 
-                <span class="section-label">
-                    SHARE YOUR THOUGHTS
-                </span>
+                <!-- Review List -->
 
-                <h3>
-                    Write a Review
-                </h3>
+                <div class="review-list">
 
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'add_review',
-                        book_id=book['id']
-                    ) }}"
-                >
+                    {% if reviews %}
 
-                    <label>
-                        Your name
-                    </label>
+                        {% for review in reviews %}
 
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Enter your name"
-                        required
+                            <article class="review-card">
+
+                                <div class="review-card-header">
+
+                                    <div class="review-user">
+
+                                        <div class="review-avatar">
+                                            {{ review['name'][0]|upper }}
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                {{ review['name'] }}
+                                            </strong>
+
+                                            <small>
+                                                {{ review['created_at'] }}
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="review-stars">
+
+                                        {% for number in range(1, 6) %}
+
+                                            {% if number <= review['rating'] %}
+                                                ★
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="review-content">
+
+                                    <p>
+                                        {{ review['comment'] }}
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-reviews">
+
+                            <div class="empty-review-icon">
+                                💬
+                            </div>
+
+                            <h3>
+                                No reviews yet
+                            </h3>
+
+                            <p>
+                                Be the first reader to review this book.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Review Form -->
+
+                <div class="review-form">
+
+                    <span class="reviews-label">
+                        SHARE YOUR EXPERIENCE
+                    </span>
+
+                    <h3>
+                        Write a Review
+                    </h3>
+
+                    <p>
+                        Your feedback helps other readers choose their next book.
+                    </p>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'add_review',
+                            book_id=book['id']
+                        ) }}"
                     >
 
+                        <div class="review-form-group">
 
-                    <label>
-                        Rating
-                    </label>
+                            <label for="review-name">
+                                Your Name
+                            </label>
 
-                    <select
-                        name="rating"
-                        required
-                    >
+                            <input
+                                type="text"
+                                id="review-name"
+                                name="name"
+                                placeholder="Enter your name"
+                                required
+                            >
 
-                        <option value="">
-                            Select rating
-                        </option>
-
-                        <option value="5">
-                            ★★★★★ — 5
-                        </option>
-
-                        <option value="4">
-                            ★★★★☆ — 4
-                        </option>
-
-                        <option value="3">
-                            ★★★☆☆ — 3
-                        </option>
-
-                        <option value="2">
-                            ★★☆☆☆ — 2
-                        </option>
-
-                        <option value="1">
-                            ★☆☆☆☆ — 1
-                        </option>
-
-                    </select>
+                        </div>
 
 
-                    <label>
-                        Comment
-                    </label>
+                        <div class="review-form-group">
 
-                    <textarea
-                        name="comment"
-                        rows="5"
-                        placeholder="What did you think about this book?"
-                        required
-                    ></textarea>
+                            <label for="review-rating">
+                                Rating
+                            </label>
+
+                            <select
+                                id="review-rating"
+                                name="rating"
+                                required
+                            >
+
+                                <option value="">
+                                    Select a rating
+                                </option>
+
+                                <option value="5">
+                                    ★★★★★ — Excellent
+                                </option>
+
+                                <option value="4">
+                                    ★★★★☆ — Very Good
+                                </option>
+
+                                <option value="3">
+                                    ★★★☆☆ — Good
+                                </option>
+
+                                <option value="2">
+                                    ★★☆☆☆ — Fair
+                                </option>
+
+                                <option value="1">
+                                    ★☆☆☆☆ — Poor
+                                </option>
+
+                            </select>
+
+                        </div>
 
 
-                    <button
-                        type="submit"
-                        class="primary-button full-button"
-                    >
-                        Submit Review
-                    </button>
+                        <div class="review-form-group">
 
-                </form>
+                            <label for="review-comment">
+                                Your Review
+                            </label>
+
+                            <textarea
+                                id="review-comment"
+                                name="comment"
+                                rows="5"
+                                placeholder="What did you think about this book?"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="submit-review-button"
+                        >
+                            Submit Review
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
-        </div>
+        </section>
 
     </div>
 

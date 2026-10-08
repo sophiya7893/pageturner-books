@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - PageTurner Books{% endblock %}
+
+{% block content %}
+
+<div class="error-page">
+
+    <div class="error-card">
+
+        <div class="error-number">
+            404
+        </div>
+
+        <div class="error-icon">
+            📖
+        </div>
+
+        <span class="error-label">
+            PAGE NOT FOUND
+        </span>
+
+        <h1>
+            Looks like this page went missing.
+        </h1>
+
+        <p>
+            The page you're looking for doesn't exist,
+            may have been moved, or the link is no longer available.
+        </p>
+
+        <div class="error-actions">
+
+            <a
+                href="{{ url_for('home') }}"
+                class="error-primary-button"
+            >
+                ← Back to Home
+            </a>
+
+            <a
+                href="{{ url_for('home') }}"
+                class="error-secondary-button"
+            >
+                Browse Books
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

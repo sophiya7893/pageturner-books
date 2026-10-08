@@ -1,66 +1,67 @@
 {% extends "base.html" %}
 
-{% block title %}
-Admin Login | PageTurner Books
-{% endblock %}
-
+{% block title %}Admin Login - PageTurner Books{% endblock %}
 
 {% block content %}
 
-<section class="admin-login-section">
+<div class="container">
 
-    <div class="login-card">
-
-        <div class="admin-lock">
-            🔐
-        </div>
-
-        <span class="section-label">
-            ADMINISTRATION
-        </span>
+    <div class="auth-container card">
 
         <h1>
             Admin Login
         </h1>
 
-        <p>
-            Sign in to manage books, stock and reports.
-        </p>
+        <form
+            method="POST"
+            action="{{ url_for('admin_login') }}"
+        >
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    required
+                >
+
+            </div>
 
 
-        <form method="POST">
+            <div class="form-group">
 
-            <label>
-                Admin Password
-            </label>
+                <label for="password">
+                    Password
+                </label>
 
-            <input
-                type="password"
-                name="password"
-                placeholder="Enter admin password"
-                required
-                autofocus
-            >
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
 
             <button
                 type="submit"
-                class="primary-button full-button"
+                class="btn btn-primary btn-full"
             >
-                Sign In
+                Login
             </button>
 
         </form>
 
-
-        <a
-            href="{{ url_for('home') }}"
-            class="back-link"
-        >
-            ← Back to store
-        </a>
-
     </div>
 
-</section>
+</div>
 
 {% endblock %}

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}My Wishlist - PageTurner Books{% endblock %}
+
+{% block content %}
+
+<div class="wishlist-page">
+
+    <div class="wishlist-container">
+
+        <!-- Header -->
+
+        <div class="wishlist-header">
+
+            <div>
+                <span class="wishlist-label">MY COLLECTION</span>
+
+                <h1>My Wishlist</h1>
+
+                <p>
+                    Books you've saved for later.
+                </p>
+            </div>
+
+            <a
+                href="{{ url_for('home') }}"
+                class="wishlist-browse-button"
+            >
+                Browse Books
+            </a>
+
+        </div>
+
+
+        {% if books %}
+
+        <!-- Wishlist -->
+
+        <div class="wishlist-grid">
+
+            {% for book in books %}
+
+            <div class="wishlist-card">
+
+                <!-- Small Cover -->
+
+                <div class="wishlist-cover">
+
+                    <a
+                        href="{{ url_for(
+                            'book_detail',
+                            book_id=book['id']
+                        ) }}"
+                    >
+
+                        {% if book["cover_image"] %}
+
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename='images/' + book['cover_image']
+                            ) }}"
+                            alt="{{ book['title'] }}"
+                        >
+
+                        {% else %}
+
+                        <div class="wishlist-no-image">
+                            📖
+                        </div>
+
+                        {% endif %}
+
+                    </a>
+
+                </div>
+
+
+                <!-- Book Information -->
+
+                <div class="wishlist-info">
+
+                    <span class="wishlist-category">
+                        {{ book["category"] }}
+                    </span>
+
+                    <h2>
+                        <a
+                            href="{{ url_for(
+                                'book_detail',
+                                book_id=book['id']
+                            ) }}"
+                        >
+                            {{ book["title"] }}
+                        </a>
+                    </h2>
+
+                    <p class="wishlist-author">
+                        {{ book["author"] }}
+                    </p>
+
+
+                    <div class="wishlist-bottom">
+
+                        <strong>
+                            ₹{{ "%.2f"|format(book["price"]) }}
+                        </strong>
+
+                        {% if book["stock"] > 0 %}
+
+                        <span class="wishlist-stock">
+                            In stock
+                        </span>
+
+                        {% else %}
+
+                        <span class="wishlist-out">
+                            Sold out
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Actions -->
+
+                    <div class="wishlist-actions">
+
+                        <a
+                            href="{{ url_for(
+                                'book_detail',
+                                book_id=book['id']
+                            ) }}"
+                        >
+                            View Book
+                        </a>
+
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'toggle_wishlist',
+                                book_id=book['id']
+                            ) }}"
+                        >
+
+                            <button type="submit">
+                                Remove
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <!-- Empty Wishlist -->
+
+        <div class="wishlist-empty">
+
+            <div class="wishlist-empty-icon">
+                ♡
+            </div>
+
+            <h2>
+                Your wishlist is empty
+            </h2>
+
+            <p>
+                Save books you love and come back to them later.
+            </p>
+
+            <a
+                href="{{ url_for('home') }}"
+            >
+                Discover Books
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

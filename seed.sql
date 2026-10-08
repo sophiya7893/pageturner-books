@@ -1,74 +1,171 @@
-DELETE FROM reviews;
-DELETE FROM order_items;
-DELETE FROM orders;
-DELETE FROM books;
+-- =====================================================
+-- PAGETURNER BOOKS - SEED DATA
+-- =====================================================
 
 INSERT INTO books
-(title, author, category, price, description, stock, cover_color, cover_image)
+(title, author, category, price, stock, description, cover_image)
 VALUES
-('Atomic Habits', 'James Clear', 'Self Help', 499,
-'A practical guide to building good habits and breaking bad ones.',
-10, '#d8b08c', 'atomic-habits.jpg'),
+(
+    'Atomic Habits',
+    'James Clear',
+    'Self Help',
+    499,
+    10,
+    'A practical guide to building good habits and breaking bad ones.',
+    'atomic-habits.jpg'
+),
 
-('Deep Work', 'Cal Newport', 'Productivity', 450,
-'Rules for focused success in a distracted world.',
-8, '#6f7d8c', 'deep-work.jpg'),
+(
+    'Deep Work',
+    'Cal Newport',
+    'Productivity',
+    450,
+    8,
+    'Rules for focused success in a distracted world.',
+    'deep-work.jpg'
+),
 
-('The 7 Habits of Highly Effective People',
-'Stephen R. Covey', 'Self Help', 599,
-'A classic guide to personal effectiveness and leadership.',
-7, '#b79b72', '7-habits.jpg'),
+(
+    'The 7 Habits of Highly Effective People',
+    'Stephen R. Covey',
+    'Self Help',
+    599,
+    7,
+    'A guide to personal and professional effectiveness.',
+    '7-habits.jpg'
+),
 
-('Think and Grow Rich', 'Napoleon Hill',
-'Personal Development', 399,
-'A classic book about mindset, success and achievement.',
-9, '#c9a66b', 'think-and-grow-rich.jpg'),
+(
+    'Think and Grow Rich',
+    'Napoleon Hill',
+    'Personal Development',
+    399,
+    9,
+    'Classic principles for developing a success-oriented mindset.',
+    'think-and-grow-rich.jpg'
+),
 
-('Ikigai', 'Héctor García', 'Lifestyle', 350,
-'A guide to finding purpose, balance and meaning.',
-6, '#d98f83', 'ikigai.jpg'),
+(
+    'Ikigai',
+    'Héctor García',
+    'Lifestyle',
+    350,
+    12,
+    'A look at the Japanese concept of finding purpose and meaning.',
+    'ikigai.jpg'
+),
 
-('Clean Code', 'Robert C. Martin',
-'Programming', 699,
-'A practical guide to writing readable and maintainable code.',
-5, '#7c8fa6', 'clean-code.jpg'),
+(
+    'Clean Code',
+    'Robert C. Martin',
+    'Programming',
+    699,
+    6,
+    'A guide to writing readable, maintainable and professional code.',
+    'clean-code.jpg'
+),
 
-('Python Crash Course', 'Eric Matthes',
-'Programming', 799,
-'A hands-on introduction to Python programming.',
-8, '#5d86a8', 'python-crash-course.jpg'),
+(
+    'Python Crash Course',
+    'Eric Matthes',
+    'Programming',
+    799,
+    5,
+    'A hands-on introduction to Python programming.',
+    'python-crash-course.jpg'
+),
 
-('The Pragmatic Programmer', 'Andrew Hunt',
-'Programming', 650,
-'Practical advice for becoming a better programmer.',
-4, '#806b91', 'pragmatic-programmer.jpg'),
+(
+    'The Pragmatic Programmer',
+    'Andrew Hunt',
+    'Programming',
+    650,
+    7,
+    'Practical advice for becoming a better software developer.',
+    'pragmatic-programmer.jpg'
+),
 
-('A Brief History of Time', 'Stephen Hawking',
-'Science', 550,
-'An accessible introduction to the mysteries of the universe.',
-6, '#536b83', 'brief-history-of-time.jpg'),
+(
+    'A Brief History of Time',
+    'Stephen Hawking',
+    'Science',
+    550,
+    8,
+    'An introduction to the universe, cosmology and modern physics.',
+    'brief-history-of-time.jpg'
+),
 
-('The Selfish Gene', 'Richard Dawkins',
-'Science', 620,
-'A fascinating exploration of evolution and genetics.',
-5, '#8c7461', 'selfish-gene.jpg'),
+(
+    'The Selfish Gene',
+    'Richard Dawkins',
+    'Science',
+    620,
+    6,
+    'An exploration of evolution from the perspective of genes.',
+    'selfish-gene.jpg'
+),
 
-('Sapiens', 'Yuval Noah Harari',
-'History', 699,
-'A broad history of humankind and civilization.',
-7, '#9b8066', 'sapiens.jpg'),
+(
+    'Sapiens',
+    'Yuval Noah Harari',
+    'History',
+    699,
+    10,
+    'A broad history of humankind and the development of human societies.',
+    'sapiens.jpg'
+),
 
-('India After Gandhi', 'Ramachandra Guha',
-'History', 799,
-'A detailed history of India after independence.',
-4, '#746b5c', 'india-after-gandhi.jpg'),
+(
+    'India After Gandhi',
+    'Ramachandra Guha',
+    'History',
+    799,
+    5,
+    'A detailed history of India after independence.',
+    'india-after-gandhi.jpg'
+),
 
-('The Alchemist', 'Paulo Coelho',
-'Fiction', 399,
-'A story about dreams, courage and following your journey.',
-8, '#b98b62', 'the-alchemist.jpg'),
+(
+    'The Alchemist',
+    'Paulo Coelho',
+    'Fiction',
+    399,
+    15,
+    'A young shepherd follows his dreams and searches for his destiny.',
+    'the-alchemist.jpg'
+),
 
-('Rich Dad Poor Dad', 'Robert T. Kiyosaki',
-'Finance', 499,
-'A popular guide to financial education and money management.',
-7, '#687d72', 'rich-dad-poor-dad.jpg');
+(
+    'Rich Dad Poor Dad',
+    'Robert T. Kiyosaki',
+    'Finance',
+    499,
+    10,
+    'Lessons about money, investing and financial independence.',
+    'rich-dad-poor-dad.jpg'
+);
+
+
+-- =====================================================
+-- SAMPLE COUPONS
+-- =====================================================
+
+INSERT OR IGNORE INTO coupons
+(code, percent, expiry_date, active)
+VALUES
+(
+    'WELCOME10',
+    10,
+    '2099-12-31',
+    1
+);
+
+INSERT OR IGNORE INTO coupons
+(code, percent, expiry_date, active)
+VALUES
+(
+    'BOOK20',
+    20,
+    '2099-12-31',
+    1
+);

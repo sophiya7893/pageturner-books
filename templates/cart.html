@@ -1,197 +1,341 @@
 {% extends "base.html" %}
 
-{% block title %}Cart | PageTurner Books{% endblock %}
+{% block title %}Shopping Cart - PageTurner Books{% endblock %}
 
 {% block content %}
 
-<section class="page-section">
+<section class="cart-page">
 
-    <div class="page-container">
+    <div class="cart-page-container">
 
-        <div class="page-heading">
-            <span class="section-label">YOUR CART</span>
-            <h1>Shopping Cart</h1>
-            <p>Review your books before checkout.</p>
+        <!-- Header -->
+        <div class="cart-page-header">
+
+            <div>
+                <span class="cart-label">
+                    YOUR SHOPPING BAG
+                </span>
+
+                <h1>
+                    Shopping Cart
+                </h1>
+
+                <p>
+                    Review your selected books before checkout.
+                </p>
+            </div>
+
+            {% if items %}
+                <div class="cart-count-badge">
+                    {{ items|length }}
+                    {% if items|length == 1 %}
+                        item
+                    {% else %}
+                        items
+                    {% endif %}
+                </div>
+            {% endif %}
+
         </div>
+
 
         {% if items %}
 
         <div class="cart-layout">
 
-            <div>
+            <!-- CART ITEMS -->
+            <div class="cart-items">
 
-                <form method="POST"
-                      action="{{ url_for('update_cart') }}">
+                {% for item in items %}
 
-                    {% for item in items %}
+                <article class="cart-item-card">
 
-                    <article class="cart-card">
+                    <!-- Book Image -->
+                    <div class="cart-book-cover">
 
-                        <div class="cart-cover">
-
-                            {% if item.book['cover_image'] %}
+                        {% if item["cover_image"] %}
 
                             <img
                                 src="{{ url_for(
                                     'static',
-                                    filename='images/books/' ~
-                                    item.book['cover_image']
+                                    filename='images/' + item['cover_image']
                                 ) }}"
-                                alt="{{ item.book['title'] }}">
+                                alt="{{ item['title'] }}"
+                            >
 
-                            {% else %}
+                        {% else %}
 
-                            <div
-                                class="cover-placeholder"
-                                style="background: {{
-                                    item.book['cover_color']
-                                }};">
-                                {{ item.book['title'] }}
+                            <div class="cart-placeholder-cover">
+                                📚
                             </div>
 
-                            {% endif %}
+                        {% endif %}
 
-                        </div>
+                    </div>
 
-                        <div class="cart-info">
 
-                            <span class="book-category">
-                                {{ item.book['category'] }}
-                            </span>
+                    <!-- Book Information -->
+                    <div class="cart-book-info">
 
-                            <h2>
-                                {{ item.book['title'] }}
-                            </h2>
+                        <span class="cart-book-category">
+                            {{ item["category"]|default("Book") }}
+                        </span>
 
-                            <p>
-                                {{ item.book['author'] }}
-                            </p>
+                        <h2>
+                            {{ item["title"] }}
+                        </h2>
 
-                            <strong>
-                                ₹{{ "%.2f"|format(
-                                    item.book['price']
-                                ) }}
-                            </strong>
+                        <p class="cart-book-author">
+                            by {{ item["author"] }}
+                        </p>
 
-                            <small>
-                                {{ item.book['stock'] }}
-                                available
-                            </small>
+                        <p class="cart-book-price">
+                            ₹{{ "%.2f"|format(item["price"]) }}
+                            <span>each</span>
+                        </p>
 
-                        </div>
 
-                        <div class="cart-quantity">
+                        <!-- Quantity -->
+                        <form
+                            method="POST"
+                            action="{{ url_for('update_cart') }}"
+                            class="cart-quantity-form"
+                        >
 
-                            <label>
-                                Quantity
-                            </label>
+                            <div class="cart-quantity-control">
 
-                            <input
-                                type="number"
-                                name="quantity_{{ item.book['id'] }}"
-                                value="{{ item.quantity }}"
-                                min="0"
-                                max="{{ item.book['stock'] }}">
+                                <label
+                                    for="quantity-{{ item['id'] }}"
+                                >
+                                    Quantity
+                                </label>
 
-                        </div>
+                                <input
+                                    id="quantity-{{ item['id'] }}"
+                                    type="number"
+                                    name="quantity_{{ item['id'] }}"
+                                    value="{{ item['quantity'] }}"
+                                    min="0"
+                                    max="{{ item['stock'] }}"
+                                >
 
-                        <div class="cart-subtotal">
-
-                            <span>Subtotal</span>
-
-                            <strong>
-                                ₹{{ "%.2f"|format(
-                                    item.subtotal
-                                ) }}
-                            </strong>
+                            </div>
 
                             <button
                                 type="submit"
-                                formaction="{{
-                                    url_for(
-                                        'remove_from_cart',
-                                        book_id=item.book['id']
-                                    )
-                                }}"
-                                class="remove-button">
-                                Remove
+                                class="cart-update-button"
+                            >
+                                Update
                             </button>
 
-                        </div>
+                        </form>
 
-                    </article>
 
-                    {% endfor %}
-
-                    <div class="cart-actions">
-
-                        <button
-                            type="submit"
-                            class="secondary-button">
-                            Update Cart
-                        </button>
-
+                        <!-- Remove -->
                         <a
-                            href="{{ url_for('home') }}"
-                            class="text-link">
-                            ← Continue Shopping
+                            href="{{ url_for(
+                                'remove_from_cart',
+                                book_id=item['id']
+                            ) }}"
+                            class="cart-remove-link"
+                        >
+                            Remove from cart
                         </a>
 
                     </div>
 
-                </form>
+
+                    <!-- Item Total -->
+                    <div class="cart-item-total">
+
+                        <span>
+                            Item Total
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(item["subtotal"]) }}
+                        </strong>
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+
+                <!-- Continue Shopping -->
+                <a
+                    href="{{ url_for('home') }}"
+                    class="cart-continue-link"
+                >
+                    ← Continue Shopping
+                </a>
 
             </div>
 
-            <aside class="cart-summary">
 
-                <span class="section-label">
-                    ORDER SUMMARY
-                </span>
+            <!-- ORDER SUMMARY -->
+            <aside class="cart-summary-card">
 
-                <h2>Summary</h2>
+                <div class="cart-summary-header">
 
-                <div class="summary-line">
-                    <span>Items</span>
-                    <strong>{{ cart_count }}</strong>
+                    <span class="cart-label">
+                        ORDER SUMMARY
+                    </span>
+
+                    <h2>
+                        Your Order
+                    </h2>
+
                 </div>
 
-                <div class="summary-line total-line">
-                    <span>Total</span>
+
+                <!-- Subtotal -->
+                <div class="cart-summary-row">
+
+                    <span>
+                        Subtotal
+                    </span>
+
                     <strong>
                         ₹{{ "%.2f"|format(total) }}
                     </strong>
+
                 </div>
 
+
+                <!-- Discount -->
+                {% if discount > 0 %}
+
+                <div class="cart-summary-row cart-discount-row">
+
+                    <span>
+                        Discount
+                    </span>
+
+                    <strong>
+                        -₹{{ "%.2f"|format(discount) }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- Total -->
+                <div class="cart-summary-total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(final_total) }}
+                    </strong>
+
+                </div>
+
+
+                <!-- Coupon -->
+                <div class="cart-coupon">
+
+                    <h3>
+                        Have a coupon?
+                    </h3>
+
+                    {% if coupon_code %}
+
+                        <div class="applied-coupon">
+
+                            <div>
+                                <span>
+                                    Applied coupon
+                                </span>
+
+                                <strong>
+                                    {{ coupon_code }}
+                                </strong>
+                            </div>
+
+                            <a
+                                href="{{ url_for('remove_coupon') }}"
+                            >
+                                Remove
+                            </a>
+
+                        </div>
+
+                    {% else %}
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('apply_coupon') }}"
+                            class="coupon-form"
+                        >
+
+                            <input
+                                type="text"
+                                name="coupon_code"
+                                placeholder="Enter coupon code"
+                                required
+                            >
+
+                            <button type="submit">
+                                Apply
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Checkout -->
                 <a
                     href="{{ url_for('checkout') }}"
-                    class="primary-button full-button">
-                    Checkout
+                    class="cart-checkout-button"
+                >
+                    Proceed to Checkout
+                    <span>→</span>
                 </a>
+
+
+                <p class="cart-secure-note">
+                    🔒 Secure checkout
+                </p>
 
             </aside>
 
         </div>
 
+
         {% else %}
 
-        <div class="empty-state">
+        <!-- EMPTY CART -->
+        <div class="cart-empty-card">
 
-            <div class="empty-icon">🛒</div>
+            <div class="cart-empty-icon">
+                🛒
+            </div>
 
-            <span class="section-label">
-                CART EMPTY
+            <span class="cart-label">
+                YOUR CART
             </span>
 
-            <h2>Your cart is empty</h2>
+            <h2>
+                Your cart is empty
+            </h2>
 
             <p>
-                Find something you love and add it to your cart.
+                You haven't added any books yet.
+                Explore our collection and find your next great read.
             </p>
 
             <a
                 href="{{ url_for('home') }}"
-                class="primary-button">
+                class="cart-browse-button"
+            >
                 Browse Books
             </a>
 
