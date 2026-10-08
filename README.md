@@ -1,309 +1,489 @@
-# PageTurner Books
+1. Project Overview
 
-An online bookstore built with **Flask, SQLite, HTML, CSS, and JavaScript**.
+PageTurner Books is a full-stack online bookstore application. Customers can browse, search, filter, sort, register, log in, use a wishlist, manage a shopping cart, apply coupons, complete checkout, review orders, and see order status. Administrators can securely manage books and orders, view sales reports, and export data.
 
-PageTurner Books allows customers to browse books, search and filter the catalogue, add books to a cart, place orders, submit reviews, and find previous orders using their phone number. It also includes an admin area for managing books and viewing sales reports.
+2. Technologies
 
-## Features
+Python
 
-### Customer Features
+Flask
 
-* Browse available books
-* Search books by title or other catalogue information
-* Filter books by category
-* Sort books by title or price
-* Paginate the book catalogue with 6 books per page
-* View individual book details
-* Add books to the shopping cart
-* Increase or decrease cart quantities
-* Prevent customers from ordering more books than available stock
-* Display **Out of Stock** when a book has no stock
-* Reduce stock automatically after checkout
-* Submit book reviews with a 1–5 star rating
-* Display the average rating for books
-* Checkout with customer name, phone number, and delivery address
-* Find previous orders using a phone number
-* Display a friendly message when no orders are found
+SQLite
 
-### Admin Features
+HTML5
 
-* Admin login protected by a password
-* Session-based admin authentication
-* Add new books
-* Edit existing books
-* Delete books
-* Manage book stock
-* View sales reports
-* View total orders and revenue
-* View best-selling books
-* View orders grouped by category
+CSS3
 
-## Technologies Used
+JavaScript
 
-* **Python**
-* **Flask**
-* **SQLite**
-* **HTML5**
-* **CSS3**
-* **JavaScript**
-* **Jinja2**
+Jinja2
 
-## Project Structure
+Werkzeug password hashing
 
-```text
-pageturner-books/
-│
-├── static/
-│   ├── app.js
-│   ├── style.css
-│   └── images/
-│
+Fetch API
+
+3. Features
+
+3.1 Customer Features
+
+Book catalogue and book detail pages.
+
+Search by title or author.
+
+Category filtering.
+
+Title/price sorting.
+
+Pagination.
+
+Customer registration, login, and logout.
+
+Secure password hashing.
+
+Shopping cart with quantity updates and removal.
+
+Coupon application.
+
+Wishlist add/remove.
+
+Checkout and order confirmation.
+
+Customer order history.
+
+Order statuses: Placed, Packed, Delivered.
+
+Reviews and 1–5 ratings.
+
+Custom 404 and 500 pages.
+
+3.2 Admin Features
+
+Secure admin login/logout.
+
+Protected admin routes.
+
+Add, edit, and delete books.
+
+Manage customer orders.
+
+Update order status.
+
+Sales report.
+
+Top-selling books.
+
+CSV export.
+
+4. Project Structure
+
+PageTurner Books/
+├── app.py
+├── schema.sql
+├── seed.sql
+├── queries.sql
+├── README.md
+├── pageturner.db
 ├── templates/
-│   ├── admin_book_form.html
-│   ├── admin_login.html
-│   ├── admin.html
 │   ├── base.html
+│   ├── home.html
+│   ├── login.html
+│   ├── register.html
 │   ├── book_detail.html
 │   ├── cart.html
 │   ├── checkout.html
-│   ├── home.html
-│   ├── order.html
+│   ├── order_confirmation.html
 │   ├── orders.html
-│   └── report.html
-│
-├── app.py
-├── pageturner.db
-├── queries.sql
-├── README.md
-├── requirements.txt
-├── schema.sql
-└── seed.sql
-```
+│   ├── wishlist.html
+│   ├── 404.html
+│   ├── 500.html
+│   ├── admin_login.html
+│   ├── admin_dashboard.html
+│   ├── admin_book_form.html
+│   ├── admin_orders.html
+│   └── admin_report.html
+└── static/
+    ├── style.css
+    ├── app.js
+    └── images/
 
-## Run the Project
+5. Database Tables
 
-Open PowerShell in the project folder.
+books — catalogue, price, stock, description, cover image.
 
-### 1. Create a virtual environment
+users — customer accounts and password hashes.
 
-```powershell
-python -m venv .venv
-```
+admins — administrator accounts and password hashes.
 
-### 2. Activate the virtual environment
+orders — customer/order totals, discounts, status, and timestamps.
 
-```powershell
-.venv\Scripts\Activate.ps1
-```
+order_items — books and quantities belonging to each order.
 
-If PowerShell blocks script execution, run:
+reviews — customer ratings and comments.
 
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+wishlist — saved customer books with UNIQUE(user_id, book_id).
 
-Then activate the environment again:
+coupons — code, percentage, expiry date, and active flag.
 
-```powershell
-.venv\Scripts\Activate.ps1
-```
+Indexes are created for common category, order, title, author, order-item, wishlist, review, and coupon lookups.
 
-### 3. Install the required packages
+6. Seed Catalogue
 
-```powershell
-python -m pip install -r requirements.txt
-```
+Atomic Habits — James Clear — Self Help — ₹499
 
-### 4. Start the Flask application
+Deep Work — Cal Newport — Productivity — ₹450
 
-```powershell
+The 7 Habits of Highly Effective People — Stephen R. Covey — Self Help — ₹599
+
+Think and Grow Rich — Napoleon Hill — Personal Development — ₹399
+
+Ikigai — Héctor García — Lifestyle — ₹350
+
+Clean Code — Robert C. Martin — Programming — ₹699
+
+Python Crash Course — Eric Matthes — Programming — ₹799
+
+The Pragmatic Programmer — Andrew Hunt — Programming — ₹650
+
+A Brief History of Time — Stephen Hawking — Science — ₹550
+
+The Selfish Gene — Richard Dawkins — Science — ₹620
+
+Sapiens — Yuval Noah Harari — History — ₹699
+
+India After Gandhi — Ramachandra Guha — History — ₹799
+
+The Alchemist — Paulo Coelho — Fiction — ₹399
+
+Rich Dad Poor Dad — Robert T. Kiyosaki — Finance — ₹499
+
+7. Coupons
+
+WELCOME10 — 10% discount — active until 2099-12-31.
+
+BOOK20 — 20% discount — active until 2099-12-31.
+
+8. Search, Filter, Sort and Pagination
+
+The home page supports a combined q search parameter for title/author, category filtering, sorting, and pagination. Example: /?q=python&category=Programming&sort=price&page=2.
+
+title_asc
+
+title_desc
+
+price_asc
+
+price_desc
+
+Pagination preserves active search, category, and sort parameters. A no-results message is shown when nothing matches.
+
+9. Cart and Coupons
+
+Customers can add books, update quantities, and remove items.
+
+Cart totals include item subtotals.
+
+Coupon input uses name="coupon_code".
+
+Invalid or expired coupons produce a friendly message.
+
+The navigation displays the cart count.
+
+10. Checkout and Concurrency Safety
+
+Checkout runs inside a transaction and uses this safe stock update:
+
+UPDATE books
+SET stock = stock - ?
+WHERE id = ?
+  AND stock >= ?;
+
+The application checks cursor.rowcount. If it is zero, the requested stock is unavailable and the transaction is rolled back. This prevents two simultaneous purchases from both successfully buying the last copy.
+
+11. Authentication and Security
+
+Passwords are stored with Werkzeug generate_password_hash().
+
+Passwords are verified with check_password_hash().
+
+Customer-only routes require login.
+
+Admin routes require admin authentication.
+
+SECRET_KEY, ADMIN_EMAIL, and ADMIN_PASSWORD can be configured with environment variables.
+
+Do not store production passwords or secrets in source code.
+
+12. Wishlist
+
+Logged-in customers can save books.
+
+Toggling an existing book removes it.
+
+Toggling a missing book adds it.
+
+UNIQUE(user_id, book_id) prevents duplicate entries.
+
+Wishlist cards show image, category, title, author, price, stock, and actions.
+
+13. Orders and Status
+
+Successful checkout creates an order and related order_items.
+
+The order confirmation page is named order_confirmation.html.
+
+Customer history is orders.html.
+
+Admins can change status between Placed, Packed, and Delivered.
+
+Customers can see the current status in their order history.
+
+14. Reviews
+
+Book detail pages support review information, including review count and average rating. Server-side validation restricts ratings to 1 through 5.
+
+15. JavaScript and API
+
+static/app.js contains client-side functionality.
+
+/api/books returns JSON book data.
+
+Fetch is used for selected add-to-cart interactions without a full page reload.
+
+The cart badge can update after fetch operations.
+
+16. Validation and Error Handling
+
+Required form fields are validated server-side.
+
+Negative prices are rejected.
+
+Invalid quantities are rejected.
+
+Ratings must be 1–5.
+
+Empty-cart checkout is prevented.
+
+Custom 404 and 500 handlers are included.
+
+Database transactions roll back on checkout errors.
+
+17. Admin Sales Report
+
+The sales report calculates total orders, total sales, books sold, and top-selling books from the orders and order_items tables. A new database with no orders will correctly display zero values until a successful order is created.
+
+18. Important Routes
+
+/ — Home/catalogue
+
+/book/<book_id> — Book detail
+
+/api/books — JSON API
+
+/register — Register
+
+/login — Login
+
+/logout — Logout
+
+/wishlist — Wishlist
+
+/wishlist/toggle/<book_id> — Wishlist toggle
+
+/cart — Cart
+
+/cart/add/<book_id> — Add to cart
+
+/cart/update — Update cart
+
+/cart/remove/<book_id> — Remove item
+
+/cart/coupon — Apply coupon
+
+/checkout — Checkout
+
+/order/<order_id> — Order confirmation
+
+/orders — Order history
+
+/admin/login — Admin login
+
+/admin/logout — Admin logout
+
+/admin — Dashboard
+
+/admin/books/add — Add book
+
+/admin/books/edit/<book_id> — Edit book
+
+/admin/books/delete/<book_id> — Delete book
+
+/admin/orders — Manage orders
+
+/admin/report — Sales report
+
+/admin/export — CSV export
+
+19. Installation and Running
+
+Install Python 3.x.
+
+Open a terminal in the project folder.
+
+Optionally create a virtual environment.
+
+Install Flask and required packages.
+
+Ensure schema.sql and seed.sql are available.
+
+Run python app.py.
+
+Open the local Flask URL in a browser.
+
+Example:
+python -m venv venv
+venv\Scripts\activate
+pip install flask
 python app.py
-```
 
-Open the local address shown by Flask in your browser.
+20. Configuration
 
-## Database
+SECRET_KEY — Flask session secret.
 
-The project uses an existing SQLite database:
+ADMIN_EMAIL — administrator email.
 
-```text
-pageturner.db
-```
+ADMIN_PASSWORD — administrator password/initial setup value.
 
-The application connects to this database through Flask and SQLite.
+Use strong production secrets and keep them outside Git.
 
-The project also includes:
+21. GitHub Update Workflow
 
-```text
-schema.sql
-seed.sql
-queries.sql
-```
+Make changes in the local project.
 
-`schema.sql` contains the database structure, `seed.sql` contains initial book/sample data, and `queries.sql` contains SQL queries used by the project and reporting features.
+Run git status.
 
-## Stock Control
+Run git add .
 
-Each book has a stock quantity.
+Run git commit -m "Update PageTurner Books"
 
-The application:
+Run git push origin main.
 
-1. Checks available stock before adding a book to the cart.
-2. Prevents the customer from adding more copies than are available.
-3. Shows an **Out of Stock** badge when stock reaches zero.
-4. Checks stock again during checkout.
-5. Reduces the database stock after a successful purchase.
+Refresh GitHub and verify the changed files.
 
-The final checkout check is important because the stock may have changed after the customer added the book to their cart.
+Git commands are run from the local project folder. GitHub is the remote repository.
 
-## Reviews and Ratings
+22. Testing Checklist
 
-Customers can submit reviews containing:
+Home page loads.
 
-* Name
-* Rating from 1 to 5
-* Comment
+Search works.
 
-The application calculates the average rating for each book using the reviews stored in the database.
+Category and sorting work.
 
-Multiple reviews are included when calculating the average.
+Pagination works.
 
-## Order History
+Book detail works.
 
-Customers can find their orders by entering the phone number used during checkout.
+Registration/login work.
 
-The order history uses SQL joins and grouping to retrieve order information and the number of items in each order.
+Wishlist add/remove works.
 
-If the phone number does not match an order, the application displays a friendly **No orders found** message.
+Cart add/update/remove works.
 
-## Admin Area
+Quantity validation works.
 
-The admin section is protected by a password stored in the application configuration.
+Valid and invalid coupons work.
 
-After successful login, an admin session is created.
+Checkout creates an order.
 
-The admin can:
+Stock decreases safely.
 
-* Add books
-* Edit books
-* Delete books
-* Update stock
-* View the admin dashboard
-* View sales reports
+Concurrent last-copy checkout allows only one successful order.
 
-Unauthenticated users attempting to access protected admin pages are redirected to the admin login page.
+Order confirmation works.
 
-## Reports
+Order history works.
 
-The admin report page provides database-driven information including:
+Admin authentication works.
 
-* Total number of orders
-* Total revenue
-* Best-selling books
-* Orders per category
+Admin book management works.
 
-The report uses SQL aggregate functions such as:
+Admin order status works.
 
-```sql
-COUNT()
-SUM()
-GROUP BY
-ORDER BY
-```
+Sales report reflects orders.
 
-## Sorting and Pagination
+404/500 pages work.
 
-The book catalogue supports sorting by:
+23. Troubleshooting
 
-* Title
-* Price
+If Sales Report shows 0, check that the orders table contains completed orders.
 
-The catalogue displays **6 books per page** using SQL:
+If images show 404, verify the cover filename matches a file in static/images/.
 
-```sql
-LIMIT
-OFFSET
-```
+If coupons fail, confirm the form field is coupon_code.
 
-Customers can move between pages using **Previous** and **Next** controls.
+If cart quantities fail, confirm the form posts to update_cart and uses quantity_<book_id>.
 
-Category filtering and sorting can be used together.
+If checkout fails, inspect the Flask terminal and database transaction error.
 
-## SQL Queries
+If GitHub does not show changes, check git status, commit, and push to the correct branch.
 
-The `queries.sql` file contains the required database queries for the project.
+24. SQL Examples
 
-It includes queries for:
+Search:
+SELECT * FROM books WHERE title LIKE ? OR author LIKE ?;
 
-* Book information
-* Searching/filtering
-* Sorting
-* Stock information
-* Reviews and ratings
-* Order information
-* Best-selling books
-* Revenue
-* Orders by category
+Category:
+SELECT * FROM books WHERE category = ?;
 
-The report section contains the required aggregate SQL queries.
+Safe stock update:
+UPDATE books SET stock = stock - ? WHERE id = ? AND stock >= ?;
 
-## Testing
+Customer orders:
+SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC;
 
-The following cases should be tested before demonstrating the project:
+25. Application Flow
 
-### Cart Testing
+Customer browses books.
 
-* Add a book to the cart.
-* Increase the quantity.
-* Try to add more copies than available stock.
-* Try to add a book with zero stock.
-* Remove a book from the cart.
-* Test an empty cart.
-* Test quantity `0`.
+Customer searches/filters/sorts.
 
-### Checkout Testing
+Customer opens a book.
 
-* Place an order successfully.
-* Confirm that stock decreases after checkout.
-* Buy the last available copy.
-* Confirm that the book becomes **Out of Stock**.
-* Try purchasing a book after its stock reaches zero.
+Customer adds it to the cart.
 
-### Order History Testing
+Customer optionally applies a coupon.
 
-* Search using a valid phone number.
-* Search using an incorrect phone number.
-* Confirm that a friendly no-orders message is displayed.
+Customer logs in/registers.
 
-### Admin Testing
+Customer completes checkout.
 
-* Open the admin page without logging in.
-* Confirm that the user is redirected to the login page.
-* Log in with the correct admin password.
-* Add a book.
-* Edit a book.
-* Delete a book.
-* Check the admin report.
+The transaction safely updates stock and saves the order.
 
-### Review Testing
+Customer sees confirmation and order history.
 
-* Add one review.
-* Add multiple reviews for the same book.
-* Confirm that the average rating changes correctly.
+Admin manages books, orders, status, reports, and exports.
 
-## Important Stock-Concurrency Consideration
+26. Production Recommendations
 
-If two customers try to purchase the last copy at nearly the same time, the checkout operation should perform the stock check and stock update as part of a database transaction.
+Use HTTPS.
 
-SQLite transactions help prevent both customers from successfully reducing the same single stock item.
+Use a production WSGI server.
 
-The application should never rely only on the stock value displayed when the customer adds the book to the cart. The stock must be checked again during checkout.
+Use strong secrets and secure cookies.
 
-## Admin Password
+Back up the database.
 
-The admin password is kept in a variable in the Flask application and is checked during admin login.
+Do not commit private credentials or sensitive production data.
 
-For a real production application, the password should not be hard-coded. A secure environment variable and password hashing system should be used instead.
+Add CSRF protection for production forms.
+
+Review authorization on all state-changing routes.
+
+27. Project Status
+
+PageTurner Books contains the main bookstore workflow: catalogue browsing, search/filter/sort/pagination, authentication, wishlist, cart, coupons, safe checkout, orders, order status, reviews, admin management, reporting, JSON/fetch functionality, validation, indexes, and custom error handling.
+
+28. License
 
 ## License
 
