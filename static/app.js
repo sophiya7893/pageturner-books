@@ -1,5 +1,6 @@
 /* =========================================================
    PageTurner Books
+
    Main JavaScript
    File: static/app.js
    ========================================================= */
@@ -10,16 +11,20 @@
    ========================================================= */
 
 function showMessage(message, type = "info") {
-    const container = document.querySelector(".flash-container");
+
+    const container =
+        document.querySelector(".flash-container");
 
     if (!container) {
         alert(message);
         return;
     }
 
-    const messageBox = document.createElement("div");
+    const messageBox =
+        document.createElement("div");
 
-    messageBox.className = `flash-message flash-${type}`;
+    messageBox.className =
+        `flash-message flash-${type}`;
 
     messageBox.textContent = message;
 
@@ -36,7 +41,9 @@ function showMessage(message, type = "info") {
    ========================================================= */
 
 function updateCartBadge(count) {
-    const badge = document.getElementById("cart-count");
+
+    const badge =
+        document.getElementById("cart-count");
 
     if (!badge) {
         return;
@@ -47,137 +54,7 @@ function updateCartBadge(count) {
 
 
 /* =========================================================
-   3. ADD TO CART USING FETCH
-   ========================================================= */
-
-async function addToCartAjax(bookId, quantity = 1) {
-
-    try {
-
-        const response = await fetch(
-            `/api/cart/add/${bookId}`,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    quantity: quantity
-                })
-            }
-        );
-
-
-        const data = await response.json();
-
-
-        if (!response.ok) {
-
-            showMessage(
-                data.message || "Could not add book to cart.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        if (data.cart_count !== undefined) {
-            updateCartBadge(data.cart_count);
-        }
-
-
-        showMessage(
-            data.message || "Book added to cart.",
-            "success"
-        );
-
-
-    } catch (error) {
-
-        console.error("Add to cart error:", error);
-
-        showMessage(
-            "Something went wrong. Please try again.",
-            "error"
-        );
-    }
-}
-
-
-/* =========================================================
-   4. AJAX ADD-TO-CART BUTTONS
-   ========================================================= */
-
-function setupAjaxCartButtons() {
-
-    const forms = document.querySelectorAll(
-        ".ajax-cart-form"
-    );
-
-
-    forms.forEach(form => {
-
-        form.addEventListener(
-            "submit",
-            async function(event) {
-
-                event.preventDefault();
-
-
-                const bookId =
-                    this.dataset.bookId;
-
-                const quantityInput =
-                    this.querySelector(
-                        'input[name="quantity"]'
-                    );
-
-
-                let quantity = 1;
-
-
-                if (quantityInput) {
-
-                    quantity =
-                        parseInt(
-                            quantityInput.value,
-                            10
-                        );
-
-                }
-
-
-                if (
-                    !Number.isInteger(quantity) ||
-                    quantity < 1
-                ) {
-
-                    showMessage(
-                        "Quantity must be at least 1.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-
-                await addToCartAjax(
-                    bookId,
-                    quantity
-                );
-
-            }
-        );
-
-    });
-}
-
-
-/* =========================================================
-   5. API BOOK SEARCH
+   3. API BOOK SEARCH
    ========================================================= */
 
 async function searchBooksAPI(query) {
@@ -188,19 +65,16 @@ async function searchBooksAPI(query) {
             `/api/books?q=${encodeURIComponent(query)}`
         );
 
-
         if (!response.ok) {
             throw new Error(
                 "Book search failed"
             );
         }
 
-
-        const books = await response.json();
-
+        const books =
+            await response.json();
 
         displayBookSearchResults(books);
-
 
     } catch (error) {
 
@@ -218,7 +92,7 @@ async function searchBooksAPI(query) {
 
 
 /* =========================================================
-   6. DISPLAY SEARCH RESULTS
+   4. DISPLAY SEARCH RESULTS
    ========================================================= */
 
 function displayBookSearchResults(books) {
@@ -228,20 +102,18 @@ function displayBookSearchResults(books) {
             "api-book-results"
         );
 
-
     if (!resultsContainer) {
         return;
     }
 
-
     resultsContainer.innerHTML = "";
-
 
     if (!books || books.length === 0) {
 
         resultsContainer.innerHTML = `
             <div class="empty-state">
                 <h2>No books found</h2>
+
                 <p>
                     Try another title or author.
                 </p>
@@ -251,15 +123,17 @@ function displayBookSearchResults(books) {
         return;
     }
 
-
     books.forEach(book => {
 
         const card =
             document.createElement("article");
 
-
         card.className = "book-card";
 
+
+        /* ---------------------------------------------
+           Cover image
+           --------------------------------------------- */
 
         const image =
             book.cover_image
@@ -275,11 +149,17 @@ function displayBookSearchResults(books) {
                     >
                   `
                 : `
-                    <div class="book-cover placeholder-cover">
+                    <div
+                        class="book-cover placeholder-cover"
+                    >
                         📖
                     </div>
                   `;
 
+
+        /* ---------------------------------------------
+           Stock display
+           --------------------------------------------- */
 
         const stock =
             Number(book.stock) > 0
@@ -295,6 +175,10 @@ function displayBookSearchResults(books) {
                   `;
 
 
+        /* ---------------------------------------------
+           Book card HTML
+           --------------------------------------------- */
+
         card.innerHTML = `
 
             ${image}
@@ -307,24 +191,19 @@ function displayBookSearchResults(books) {
                     )}
                 </span>
 
-
                 <h3>
-                    <a
-                        href="/book/${book.id}"
-                    >
+                    <a href="/book/${book.id}">
                         ${escapeHTML(
                             book.title
                         )}
                     </a>
                 </h3>
 
-
                 <p class="book-author">
                     ${escapeHTML(
                         book.author || ""
                     )}
                 </p>
-
 
                 <div class="book-price-row">
 
@@ -337,7 +216,6 @@ function displayBookSearchResults(books) {
                     ${stock}
 
                 </div>
-
 
                 <div class="book-actions">
 
@@ -353,15 +231,15 @@ function displayBookSearchResults(books) {
             </div>
         `;
 
-
-        resultsContainer.appendChild(card);
-
+        resultsContainer.appendChild(
+            card
+        );
     });
 }
 
 
 /* =========================================================
-   7. HTML ESCAPING
+   5. HTML ESCAPING
    ========================================================= */
 
 function escapeHTML(value) {
@@ -376,7 +254,7 @@ function escapeHTML(value) {
 
 
 /* =========================================================
-   8. LIVE SEARCH
+   6. LIVE SEARCH
    ========================================================= */
 
 function setupLiveSearch() {
@@ -386,14 +264,11 @@ function setupLiveSearch() {
             "live-search"
         );
 
-
     if (!searchInput) {
         return;
     }
 
-
     let timer;
-
 
     searchInput.addEventListener(
         "input",
@@ -402,9 +277,7 @@ function setupLiveSearch() {
             const query =
                 this.value.trim();
 
-
             clearTimeout(timer);
-
 
             if (query.length === 0) {
 
@@ -420,7 +293,6 @@ function setupLiveSearch() {
                 return;
             }
 
-
             timer = setTimeout(
                 () => {
 
@@ -431,14 +303,13 @@ function setupLiveSearch() {
                 },
                 300
             );
-
         }
     );
 }
 
 
 /* =========================================================
-   9. QUANTITY VALIDATION
+   7. QUANTITY VALIDATION
    ========================================================= */
 
 function setupQuantityValidation() {
@@ -447,7 +318,6 @@ function setupQuantityValidation() {
         document.querySelectorAll(
             'input[type="number"]'
         );
-
 
     quantityInputs.forEach(input => {
 
@@ -461,13 +331,11 @@ function setupQuantityValidation() {
                         10
                     );
 
-
                 const max =
                     parseInt(
                         this.max || "999999",
                         10
                     );
-
 
                 let value =
                     parseInt(
@@ -475,33 +343,27 @@ function setupQuantityValidation() {
                         10
                     );
 
-
                 if (Number.isNaN(value)) {
                     value = min;
                 }
-
 
                 if (value < min) {
                     value = min;
                 }
 
-
                 if (value > max) {
                     value = max;
                 }
 
-
                 this.value = value;
-
             }
         );
-
     });
 }
 
 
 /* =========================================================
-   10. CONFIRM DELETE
+   8. CONFIRM DELETE
    ========================================================= */
 
 function setupDeleteConfirmation() {
@@ -510,7 +372,6 @@ function setupDeleteConfirmation() {
         document.querySelectorAll(
             ".delete-form"
         );
-
 
     deleteForms.forEach(form => {
 
@@ -523,20 +384,17 @@ function setupDeleteConfirmation() {
                         "Are you sure you want to delete this item?"
                     );
 
-
                 if (!confirmed) {
                     event.preventDefault();
                 }
-
             }
         );
-
     });
 }
 
 
 /* =========================================================
-   11. AUTO-HIDE FLASH MESSAGES
+   9. AUTO-HIDE FLASH MESSAGES
    ========================================================= */
 
 function setupFlashMessages() {
@@ -545,7 +403,6 @@ function setupFlashMessages() {
         document.querySelectorAll(
             ".flash-message"
         );
-
 
     messages.forEach(message => {
 
@@ -557,7 +414,6 @@ function setupFlashMessages() {
 
                 message.style.opacity = "0";
 
-
                 setTimeout(
                     () => {
                         message.remove();
@@ -568,13 +424,12 @@ function setupFlashMessages() {
             },
             5000
         );
-
     });
 }
 
 
 /* =========================================================
-   12. MOBILE MENU
+   10. MOBILE MENU
    ========================================================= */
 
 function setupMobileMenu() {
@@ -584,17 +439,14 @@ function setupMobileMenu() {
             "mobile-menu-button"
         );
 
-
     const menu =
         document.querySelector(
             ".main-nav"
         );
 
-
     if (!button || !menu) {
         return;
     }
-
 
     button.addEventListener(
         "click",
@@ -603,14 +455,13 @@ function setupMobileMenu() {
             menu.classList.toggle(
                 "mobile-open"
             );
-
         }
     );
 }
 
 
 /* =========================================================
-   13. FORM DOUBLE-SUBMIT PROTECTION
+   11. FORM DOUBLE-SUBMIT PROTECTION
    ========================================================= */
 
 function setupFormProtection() {
@@ -619,7 +470,6 @@ function setupFormProtection() {
         document.querySelectorAll(
             "form"
         );
-
 
     forms.forEach(form => {
 
@@ -632,25 +482,23 @@ function setupFormProtection() {
                         'button[type="submit"]'
                     );
 
-
                 if (!submitButton) {
                     return;
                 }
 
-
                 /*
-                 * Do not disable buttons for AJAX
-                 * forms because JavaScript handles them.
+                 * Wait a few milliseconds before
+                 * disabling the button.
+                 *
+                 * This allows the browser to perform
+                 * the normal form submission first.
+                 *
+                 * The form will therefore submit:
+                 *
+                 *     _csrf_token
+                 *     quantity
+                 *     and other form fields
                  */
-
-                if (
-                    this.classList.contains(
-                        "ajax-cart-form"
-                    )
-                ) {
-                    return;
-                }
-
 
                 setTimeout(
                     () => {
@@ -667,23 +515,19 @@ function setupFormProtection() {
                     },
                     10
                 );
-
             }
         );
-
     });
 }
 
 
 /* =========================================================
-   14. INITIALIZE
+   12. INITIALIZE
    ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     function() {
-
-        setupAjaxCartButtons();
 
         setupLiveSearch();
 
@@ -696,6 +540,5 @@ document.addEventListener(
         setupMobileMenu();
 
         setupFormProtection();
-
     }
 );

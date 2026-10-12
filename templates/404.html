@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Page Not Found - PageTurner Books{% endblock %}
+{% block title %}
+Page Not Found - PageTurner Books
+{% endblock %}
 
 {% block content %}
 
@@ -8,17 +10,28 @@
 
     <div class="error-card">
 
+        <!-- ERROR CODE -->
+
         <div class="error-number">
             404
         </div>
+
+
+        <!-- ICON -->
 
         <div class="error-icon">
             📖
         </div>
 
+
+        <!-- LABEL -->
+
         <span class="error-label">
             PAGE NOT FOUND
         </span>
+
+
+        <!-- MESSAGE -->
 
         <h1>
             Looks like this page went missing.
@@ -29,17 +42,21 @@
             may have been moved, or the link is no longer available.
         </p>
 
+
+        <!-- ACTIONS -->
+
         <div class="error-actions">
 
             <a
-                href="{{ url_for('home') }}"
+                href="{{ url_for('shop.home') }}"
                 class="error-primary-button"
             >
                 ← Back to Home
             </a>
 
+
             <a
-                href="{{ url_for('home') }}"
+                href="{{ url_for('shop.home') }}"
                 class="error-secondary-button"
             >
                 Browse Books

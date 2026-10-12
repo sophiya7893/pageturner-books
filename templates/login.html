@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Login - PageTurner Books{% endblock %}
+{% block title %}
+Login - PageTurner Books
+{% endblock %}
 
 {% block content %}
 
@@ -10,12 +12,42 @@
 
         <div class="card auth-card">
 
+            <!-- =================================================
+                 PAGE HEADER
+            ================================================== -->
+
             <div class="page-header">
-                <h1>Login</h1>
-                <p>Sign in to your PageTurner Books account.</p>
+
+                <h1>
+                    Login
+                </h1>
+
+                <p>
+                    Sign in to your PageTurner Books account.
+                </p>
+
             </div>
 
-            <form method="POST" action="{{ url_for('login') }}">
+
+            <!-- =================================================
+                 LOGIN FORM
+            ================================================== -->
+
+            <form
+                method="POST"
+                action="{{ url_for('auth.login') }}"
+            >
+
+                <!-- STEP 33: CSRF TOKEN -->
+
+                <input
+                    type="hidden"
+                    name="_csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+
+                <!-- EMAIL -->
 
                 <div class="form-group">
 
@@ -30,11 +62,14 @@
                         class="form-control"
                         placeholder="Enter your email"
                         value="{{ request.form.get('email', '') }}"
+                        autocomplete="email"
                         required
                     >
 
                 </div>
 
+
+                <!-- PASSWORD -->
 
                 <div class="form-group">
 
@@ -48,11 +83,14 @@
                         name="password"
                         class="form-control"
                         placeholder="Enter your password"
+                        autocomplete="current-password"
                         required
                     >
 
                 </div>
 
+
+                <!-- LOGIN BUTTON -->
 
                 <button
                     type="submit"
@@ -64,13 +102,31 @@
             </form>
 
 
+            <!-- =================================================
+                 AUTH LINKS
+            ================================================== -->
+
             <div class="auth-footer">
 
                 <p>
                     Don't have an account?
-                    <a href="{{ url_for('register') }}">
+
+                    <a href="{{ url_for('shop.register') }}">
                         Create an account
                     </a>
+                </p>
+
+
+                <p>
+
+                    <a
+                        href="{{ url_for(
+                            'auth.forgot_password'
+                        ) }}"
+                    >
+                        Forgot your password?
+                    </a>
+
                 </p>
 
             </div>

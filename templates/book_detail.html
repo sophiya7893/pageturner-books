@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}
-{{ book['title'] }} | PageTurner Books
+{{ book["title"] }} | PageTurner Books
 {% endblock %}
+
 
 {% block content %}
 
@@ -10,29 +11,46 @@
 
     <div class="book-page-container">
 
-        <!-- Breadcrumb -->
+
+        <!-- =================================================
+             BREADCRUMB
+        ================================================== -->
+
         <div class="book-breadcrumb">
-            <a href="{{ url_for('home') }}">Home</a>
+
+            <a href="{{ url_for('shop.home') }}">
+                Home
+            </a>
+
             <span>›</span>
-            <span>{{ book['category'] }}</span>
+
+            <span>
+                {{ book["category"] }}
+            </span>
+
             <span>›</span>
-            <strong>{{ book['title'] }}</strong>
+
+            <strong>
+                {{ book["title"] }}
+            </strong>
+
         </div>
 
 
-        <!-- =========================
+        <!-- =================================================
              BOOK DETAILS
-        ========================== -->
+        ================================================== -->
 
         <div class="book-main-card">
 
-            <!-- Book Cover -->
+
+            <!-- BOOK COVER -->
 
             <div class="book-cover-area">
 
                 <div class="book-cover">
 
-                    {% if book['cover_image'] %}
+                    {% if book["cover_image"] %}
 
                         <img
                             src="{{ url_for(
@@ -45,8 +63,13 @@
                     {% else %}
 
                         <div class="book-placeholder">
+
                             <span>📚</span>
-                            <p>{{ book['title'] }}</p>
+
+                            <p>
+                                {{ book["title"] }}
+                            </p>
+
                         </div>
 
                     {% endif %}
@@ -56,51 +79,66 @@
             </div>
 
 
-            <!-- Book Information -->
+            <!-- BOOK INFORMATION -->
 
             <div class="book-information">
 
                 <span class="book-category-badge">
-                    {{ book['category'] }}
+                    {{ book["category"] }}
                 </span>
 
-
                 <h1>
-                    {{ book['title'] }}
+                    {{ book["title"] }}
                 </h1>
 
-
                 <p class="book-author">
-                    by <strong>{{ book['author'] }}</strong>
+                    by
+                    <strong>
+                        {{ book["author"] }}
+                    </strong>
                 </p>
 
 
-                <!-- Rating -->
+                <!-- =========================================
+                     RATING
+                ========================================== -->
 
                 <div class="book-rating-row">
 
-                    {% if book['review_count'] > 0 %}
+                    {% if book["review_count"] > 0 %}
 
                         <div class="rating-stars">
 
                             {% for number in range(1, 6) %}
 
-                                {% if number <= book['average_rating']|round(0, 'floor') %}
+                                {% if number <=
+                                    book["average_rating"]|round(
+                                        0,
+                                        "floor"
+                                    )
+                                %}
+
                                     ★
+
                                 {% else %}
+
                                     ☆
+
                                 {% endif %}
 
                             {% endfor %}
 
                         </div>
 
+
                         <strong>
-                            {{ "%.1f"|format(book['average_rating']) }}
+                            {{ "%.1f"|format(
+                                book["average_rating"]
+                            ) }}
                         </strong>
 
                         <span>
-                            ({{ book['review_count'] }} reviews)
+                            ({{ book["review_count"] }} reviews)
                         </span>
 
                     {% else %}
@@ -114,14 +152,18 @@
                 </div>
 
 
-                <!-- Price -->
+                <!-- =========================================
+                     PRICE
+                ========================================== -->
 
                 <div class="book-price">
-                    ₹{{ "%.2f"|format(book['price']) }}
+                    ₹{{ "%.2f"|format(book["price"]) }}
                 </div>
 
 
-                <!-- Description -->
+                <!-- =========================================
+                     DESCRIPTION
+                ========================================== -->
 
                 <div class="book-description">
 
@@ -130,19 +172,25 @@
                     </h3>
 
                     <p>
-                        {{ book['description'] }}
+                        {{ book["description"] }}
                     </p>
 
                 </div>
 
 
-                <!-- Stock -->
+                <!-- =========================================
+                     STOCK
+                ========================================== -->
 
-                {% if book['stock'] > 0 %}
+                {% if book["stock"] > 0 %}
 
                     <div class="book-stock available">
+
                         <span>✓</span>
-                        {{ book['stock'] }} copies available
+
+                        {{ book["stock"] }}
+                        copies available
+
                     </div>
 
                 {% else %}
@@ -154,18 +202,29 @@
                 {% endif %}
 
 
-                <!-- Purchase Area -->
+                <!-- =========================================
+                     ADD TO CART
+                ========================================== -->
 
-                {% if book['stock'] > 0 %}
+                {% if book["stock"] > 0 %}
 
                     <form
                         method="POST"
                         action="{{ url_for(
-                            'add_to_cart',
+                            'shop.add_to_cart',
                             book_id=book['id']
                         ) }}"
                         class="book-purchase-form"
                     >
+
+                        <!-- STEP 33: CSRF -->
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
 
                         <div class="quantity-control">
 
@@ -180,6 +239,7 @@
                                 min="1"
                                 max="{{ book['stock'] }}"
                                 value="1"
+                                required
                             >
 
                         </div>
@@ -206,16 +266,181 @@
 
                 {% endif %}
 
+
+                <!-- =========================================
+                     WISHLIST
+                ========================================== -->
+
+                {% if current_user %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'shop.toggle_wishlist',
+                            book_id=book['id']
+                        ) }}"
+                        class="book-detail-wishlist-form"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="home-secondary-btn"
+                        >
+                            ❤️ Add / Remove Wishlist
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
             </div>
 
         </div>
 
 
-        <!-- =========================
+        <!-- =================================================
+             STEP 36
+             CUSTOMERS ALSO BOUGHT
+        ================================================== -->
+
+        {% if recommendations %}
+
+            <section class="book-recommendations">
+
+                <div class="recommendations-header">
+
+                    <span class="reviews-label">
+                        RECOMMENDED
+                    </span>
+
+                    <h2>
+                        Customers Also Bought
+                    </h2>
+
+                    <p>
+                        Books frequently purchased together
+                        with this book.
+                    </p>
+
+                </div>
+
+
+                <div class="recommendations-grid">
+
+                    {% for recommended in recommendations %}
+
+                        <article class="recommendation-card">
+
+
+                            <!-- RECOMMENDED BOOK IMAGE -->
+
+                            <a
+                                href="{{ url_for(
+                                    'shop.book_detail',
+                                    book_id=recommended['id']
+                                ) }}"
+                                class="recommendation-image"
+                            >
+
+                                {% if recommended["cover_image"] %}
+
+                                    <img
+                                        src="{{ url_for(
+                                            'static',
+                                            filename='images/' ~
+                                            recommended['cover_image']
+                                        ) }}"
+                                        alt="{{ recommended['title'] }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="book-placeholder">
+
+                                        <span>📚</span>
+
+                                        <p>
+                                            {{ recommended["title"] }}
+                                        </p>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </a>
+
+
+                            <!-- RECOMMENDED BOOK INFO -->
+
+                            <div class="recommendation-info">
+
+                                <span class="book-category-badge">
+                                    {{ recommended["category"] }}
+                                </span>
+
+                                <h3>
+
+                                    <a
+                                        href="{{ url_for(
+                                            'shop.book_detail',
+                                            book_id=recommended['id']
+                                        ) }}"
+                                    >
+                                        {{ recommended["title"] }}
+                                    </a>
+
+                                </h3>
+
+
+                                <p>
+                                    by {{ recommended["author"] }}
+                                </p>
+
+
+                                <strong class="book-price">
+
+                                    ₹{{ "%.2f"|format(
+                                        recommended["price"]
+                                    ) }}
+
+                                </strong>
+
+
+                                <a
+                                    href="{{ url_for(
+                                        'shop.book_detail',
+                                        book_id=recommended['id']
+                                    ) }}"
+                                    class="view-order-button"
+                                >
+                                    View Book →
+                                </a>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+        {% endif %}
+
+
+        <!-- =================================================
              REVIEWS
-        ========================== -->
+        ================================================== -->
 
         <section class="book-reviews">
+
 
             <div class="reviews-top">
 
@@ -226,38 +451,57 @@
                     </span>
 
                     <h2>
-                        Reviews & Ratings
+                        Reviews &amp; Ratings
                     </h2>
 
                     <p>
-                        See what other readers think about this book.
+                        See what other readers think
+                        about this book.
                     </p>
 
                 </div>
 
 
-                {% if book['review_count'] > 0 %}
+                {% if book["review_count"] > 0 %}
 
                     <div class="rating-summary">
 
                         <div class="rating-number">
-                            {{ "%.1f"|format(book['average_rating']) }}
+
+                            {{ "%.1f"|format(
+                                book["average_rating"]
+                            ) }}
+
                         </div>
 
+
                         <div class="rating-stars large">
+
                             {% for number in range(1, 6) %}
 
-                                {% if number <= book['average_rating']|round(0, 'floor') %}
+                                {% if number <=
+                                    book["average_rating"]|round(
+                                        0,
+                                        "floor"
+                                    )
+                                %}
+
                                     ★
+
                                 {% else %}
+
                                     ☆
+
                                 {% endif %}
 
                             {% endfor %}
+
                         </div>
 
+
                         <span>
-                            {{ book['review_count'] }} reviews
+                            {{ book["review_count"] }}
+                            reviews
                         </span>
 
                     </div>
@@ -269,7 +513,10 @@
 
             <div class="reviews-layout">
 
-                <!-- Review List -->
+
+                <!-- =========================================
+                     REVIEW LIST
+                ========================================== -->
 
                 <div class="review-list">
 
@@ -284,17 +531,23 @@
                                     <div class="review-user">
 
                                         <div class="review-avatar">
-                                            {{ review['name'][0]|upper }}
+
+                                            {{
+                                                (review["name"] or "R")[0]
+                                                |upper
+                                            }}
+
                                         </div>
+
 
                                         <div>
 
                                             <strong>
-                                                {{ review['name'] }}
+                                                {{ review["name"] }}
                                             </strong>
 
                                             <small>
-                                                {{ review['created_at'] }}
+                                                {{ review["created_at"] }}
                                             </small>
 
                                         </div>
@@ -306,10 +559,16 @@
 
                                         {% for number in range(1, 6) %}
 
-                                            {% if number <= review['rating'] %}
+                                            {% if number <=
+                                                review["rating"]|int
+                                            %}
+
                                                 ★
+
                                             {% else %}
+
                                                 ☆
+
                                             {% endif %}
 
                                         {% endfor %}
@@ -322,7 +581,7 @@
                                 <div class="review-content">
 
                                     <p>
-                                        {{ review['comment'] }}
+                                        {{ review["comment"] }}
                                     </p>
 
                                 </div>
@@ -330,6 +589,7 @@
                             </article>
 
                         {% endfor %}
+
 
                     {% else %}
 
@@ -344,7 +604,8 @@
                             </h3>
 
                             <p>
-                                Be the first reader to review this book.
+                                Be the first reader to
+                                review this book.
                             </p>
 
                         </div>
@@ -354,7 +615,9 @@
                 </div>
 
 
-                <!-- Review Form -->
+                <!-- =========================================
+                     REVIEW FORM
+                ========================================== -->
 
                 <div class="review-form">
 
@@ -367,101 +630,135 @@
                     </h3>
 
                     <p>
-                        Your feedback helps other readers choose their next book.
+                        Your feedback helps other readers
+                        choose their next book.
                     </p>
 
 
-                    <form
-                        method="POST"
-                        action="{{ url_for(
-                            'add_review',
-                            book_id=book['id']
-                        ) }}"
-                    >
+                    {% if current_user %}
 
-                        <div class="review-form-group">
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'shop.add_review',
+                                book_id=book['id']
+                            ) }}"
+                        >
 
-                            <label for="review-name">
-                                Your Name
-                            </label>
+                            <!-- STEP 33: CSRF -->
 
                             <input
-                                type="text"
-                                id="review-name"
-                                name="name"
-                                placeholder="Enter your name"
-                                required
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ csrf_token() }}"
                             >
 
-                        </div>
+
+                            <div class="review-form-group">
+
+                                <label for="review-name">
+                                    Your Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="review-name"
+                                    name="name"
+                                    value="{{ current_user['name'] }}"
+                                    required
+                                >
+
+                            </div>
 
 
-                        <div class="review-form-group">
+                            <div class="review-form-group">
 
-                            <label for="review-rating">
-                                Rating
-                            </label>
+                                <label for="review-rating">
+                                    Rating
+                                </label>
 
-                            <select
-                                id="review-rating"
-                                name="rating"
-                                required
+                                <select
+                                    id="review-rating"
+                                    name="rating"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select a rating
+                                    </option>
+
+                                    <option value="5">
+                                        ★★★★★ — Excellent
+                                    </option>
+
+                                    <option value="4">
+                                        ★★★★☆ — Very Good
+                                    </option>
+
+                                    <option value="3">
+                                        ★★★☆☆ — Good
+                                    </option>
+
+                                    <option value="2">
+                                        ★★☆☆☆ — Fair
+                                    </option>
+
+                                    <option value="1">
+                                        ★☆☆☆☆ — Poor
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="review-form-group">
+
+                                <label for="review-comment">
+                                    Your Review
+                                </label>
+
+                                <textarea
+                                    id="review-comment"
+                                    name="comment"
+                                    rows="5"
+                                    placeholder="What did you think about this book?"
+                                    required
+                                ></textarea>
+
+                            </div>
+
+
+                            <button
+                                type="submit"
+                                class="submit-review-button"
                             >
+                                Submit Review
+                            </button>
 
-                                <option value="">
-                                    Select a rating
-                                </option>
+                        </form>
 
-                                <option value="5">
-                                    ★★★★★ — Excellent
-                                </option>
+                    {% else %}
 
-                                <option value="4">
-                                    ★★★★☆ — Very Good
-                                </option>
+                        <div class="empty-reviews">
 
-                                <option value="3">
-                                    ★★★☆☆ — Good
-                                </option>
+                            <p>
+                                Please log in to write a review.
+                            </p>
 
-                                <option value="2">
-                                    ★★☆☆☆ — Fair
-                                </option>
-
-                                <option value="1">
-                                    ★☆☆☆☆ — Poor
-                                </option>
-
-                            </select>
+                            <a
+                                href="{{ url_for(
+                                    'auth.login',
+                                    next=request.url
+                                ) }}"
+                                class="submit-review-button"
+                            >
+                                Login to Review
+                            </a>
 
                         </div>
 
-
-                        <div class="review-form-group">
-
-                            <label for="review-comment">
-                                Your Review
-                            </label>
-
-                            <textarea
-                                id="review-comment"
-                                name="comment"
-                                rows="5"
-                                placeholder="What did you think about this book?"
-                                required
-                            ></textarea>
-
-                        </div>
-
-
-                        <button
-                            type="submit"
-                            class="submit-review-button"
-                        >
-                            Submit Review
-                        </button>
-
-                    </form>
+                    {% endif %}
 
                 </div>
 

@@ -6,6 +6,10 @@
 
 <div class="container">
 
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
     <section class="hero">
 
         <div class="hero-content">
@@ -32,11 +36,15 @@
     </section>
 
 
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
+
     <section class="search-section">
 
         <form
             method="GET"
-            action="{{ url_for('home') }}"
+            action="{{ url_for('shop.home') }}"
             class="search-form"
         >
 
@@ -47,6 +55,7 @@
                 placeholder="Search by title or author..."
                 class="form-control"
             >
+
 
             <select
                 name="category"
@@ -129,6 +138,10 @@
     </section>
 
 
+    <!-- =====================================================
+         BOOKS
+    ====================================================== -->
+
     <section id="books">
 
         <div class="section-header">
@@ -140,6 +153,7 @@
                     Our Books
                 {% endif %}
             </h2>
+
 
             {% if total_books is defined %}
 
@@ -158,177 +172,213 @@
 
                 {% for book in books %}
 
-                <article class="book-card">
-
-                    <a
-                        href="{{ url_for('book_detail', book_id=book['id']) }}"
-                        class="book-image-link"
-                    >
-
-                        {% if book["cover_image"] %}
-
-                            <img
-                                src="{{ url_for(
-                                    'static',
-                                    filename='images/' + book['cover_image']
-                                ) }}"
-                                alt="{{ book['title'] }}"
-                                class="book-cover"
-                            >
-
-                        {% else %}
-
-                            <div class="book-cover placeholder-cover">
-                                📖
-                            </div>
-
-                        {% endif %}
-
-                    </a>
+                    <article class="book-card">
 
 
-                    <div class="book-card-body">
+                        <!-- BOOK COVER -->
 
-                        <span class="book-category">
-                            {{ book["category"] }}
-                        </span>
+                        <a
+                            href="{{ url_for(
+                                'shop.book_detail',
+                                book_id=book['id']
+                            ) }}"
+                            class="book-image-link"
+                        >
 
-                        <h3>
+                            {% if book["cover_image"] %}
 
-                            <a
-                                href="{{ url_for(
-                                    'book_detail',
-                                    book_id=book['id']
-                                ) }}"
-                            >
-                                {{ book["title"] }}
-                            </a>
-
-                        </h3>
-
-                        <p class="book-author">
-                            {{ book["author"] }}
-                        </p>
-
-
-                        <div class="book-price-row">
-
-                            <strong class="book-price">
-                                ₹{{ "%.2f"|format(book["price"]) }}
-                            </strong>
-
-                            {% if book["stock"] > 0 %}
-
-                                <span class="stock available">
-                                    {{ book["stock"] }} available
-                                </span>
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='images/' + book['cover_image']
+                                    ) }}"
+                                    alt="{{ book['title'] }}"
+                                    class="book-cover"
+                                >
 
                             {% else %}
 
-                                <span class="stock sold-out">
-                                    Sold Out
-                                </span>
+                                <div class="book-cover placeholder-cover">
+                                    📖
+                                </div>
 
                             {% endif %}
 
-                        </div>
+                        </a>
 
 
-                        <div class="book-actions">
+                        <!-- BOOK INFORMATION -->
 
-                            <a
-                                href="{{ url_for(
-                                    'book_detail',
-                                    book_id=book['id']
-                                ) }}"
-                                class="btn btn-secondary"
-                            >
-                                View
-                            </a>
+                        <div class="book-card-body">
+
+                            <span class="book-category">
+                                {{ book["category"] }}
+                            </span>
 
 
-                            {% if book["stock"] > 0 %}
+                            <h3>
 
-                            <form
-                                method="POST"
-                                action="{{ url_for(
-                                    'add_to_cart',
-                                    book_id=book['id']
-                                ) }}"
-                            >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
+                                <a
+                                    href="{{ url_for(
+                                        'shop.book_detail',
+                                        book_id=book['id']
+                                    ) }}"
                                 >
-                                    Add to Cart
-                                </button>
+                                    {{ book["title"] }}
+                                </a>
 
-                            </form>
+                            </h3>
 
-                            {% endif %}
+
+                            <p class="book-author">
+                                {{ book["author"] }}
+                            </p>
+
+
+                            <div class="book-price-row">
+
+                                <strong class="book-price">
+                                    ₹{{ "%.2f"|format(book["price"]) }}
+                                </strong>
+
+
+                                {% if book["stock"] > 0 %}
+
+                                    <span class="stock available">
+                                        {{ book["stock"] }} available
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="stock sold-out">
+                                        Sold Out
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- BOOK ACTIONS -->
+
+                            <div class="book-actions">
+
+                                <a
+                                    href="{{ url_for(
+                                        'shop.book_detail',
+                                        book_id=book['id']
+                                    ) }}"
+                                    class="btn btn-secondary"
+                                >
+                                    View
+                                </a>
+
+
+                                {% if book["stock"] > 0 %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'shop.add_to_cart',
+                                            book_id=book['id']
+                                        ) }}"
+                                    >
+
+                                        <!-- STEP 33: CSRF -->
+
+                                        <input
+                                            type="hidden"
+                                            name="_csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+                                        <input
+                                            type="hidden"
+                                            name="quantity"
+                                            value="1"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary"
+                                        >
+                                            Add to Cart
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                            </div>
 
                         </div>
 
-                    </div>
-
-                </article>
+                    </article>
 
                 {% endfor %}
 
             </div>
 
 
+            <!-- =================================================
+                 PAGINATION
+            ================================================== -->
+
             {% if total_pages is defined and total_pages > 1 %}
 
-            <div class="pagination">
-
-                {% if page > 1 %}
-
-                    <a
-                        href="{{ url_for(
-                            'home',
-                            q=search,
-                            category=selected_category,
-                            sort=sort,
-                            page=page-1
-                        ) }}"
-                        class="btn btn-secondary"
-                    >
-                        ← Previous
-                    </a>
-
-                {% endif %}
+                <div class="pagination">
 
 
-                <span class="page-number">
-                    Page {{ page }} of {{ total_pages }}
-                </span>
+                    {% if page > 1 %}
+
+                        <a
+                            href="{{ url_for(
+                                'shop.home',
+                                q=search,
+                                category=selected_category,
+                                sort=sort,
+                                page=page-1
+                            ) }}"
+                            class="btn btn-secondary"
+                        >
+                            ← Previous
+                        </a>
+
+                    {% endif %}
 
 
-                {% if page < total_pages %}
+                    <span class="page-number">
+                        Page {{ page }} of {{ total_pages }}
+                    </span>
 
-                    <a
-                        href="{{ url_for(
-                            'home',
-                            q=search,
-                            category=selected_category,
-                            sort=sort,
-                            page=page+1
-                        ) }}"
-                        class="btn btn-secondary"
-                    >
-                        Next →
-                    </a>
 
-                {% endif %}
+                    {% if page < total_pages %}
 
-            </div>
+                        <a
+                            href="{{ url_for(
+                                'shop.home',
+                                q=search,
+                                category=selected_category,
+                                sort=sort,
+                                page=page+1
+                            ) }}"
+                            class="btn btn-secondary"
+                        >
+                            Next →
+                        </a>
+
+                    {% endif %}
+
+                </div>
 
             {% endif %}
 
 
         {% else %}
+
+            <!-- =================================================
+                 EMPTY STATE
+            ================================================== -->
 
             <div class="empty-state">
 
@@ -341,7 +391,7 @@
                 </p>
 
                 <a
-                    href="{{ url_for('home') }}"
+                    href="{{ url_for('shop.home') }}"
                     class="btn btn-primary"
                 >
                     View All Books

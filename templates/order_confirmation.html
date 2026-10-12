@@ -10,25 +10,48 @@ Order #{{ order["id"] }} - PageTurner Books
 
     <div class="order-confirmation-container">
 
-        <!-- SUCCESS HEADER -->
+        <!-- =================================================
+             ORDER HEADER
+        ================================================== -->
+
         <div class="order-success-card">
 
             <div class="order-success-icon">
                 ✓
             </div>
 
-            <span class="order-success-label">
-                ORDER PLACED SUCCESSFULLY
-            </span>
 
-            <h1>
-                Thank You for Your Order!
-            </h1>
+            {% if order["status"] == "Cancelled" %}
 
-            <p>
-                Your books are on their way to becoming part of your
-                reading collection.
-            </p>
+                <span class="order-success-label">
+                    ORDER DETAILS
+                </span>
+
+                <h1>
+                    Order #{{ order["id"] }}
+                </h1>
+
+                <p>
+                    This order has been cancelled.
+                </p>
+
+            {% else %}
+
+                <span class="order-success-label">
+                    ORDER PLACED SUCCESSFULLY
+                </span>
+
+                <h1>
+                    Thank You for Your Order!
+                </h1>
+
+                <p>
+                    Your books are on their way to becoming
+                    part of your reading collection.
+                </p>
+
+            {% endif %}
+
 
             <div class="order-number">
                 Order #{{ order["id"] }}
@@ -37,10 +60,17 @@ Order #{{ order["id"] }} - PageTurner Books
         </div>
 
 
-        <!-- ORDER DETAILS -->
+        <!-- =================================================
+             ORDER DETAILS
+        ================================================== -->
+
         <div class="order-detail-card">
 
-            <!-- HEADER -->
+
+            <!-- =============================================
+                 HEADER
+            ============================================== -->
+
             <div class="order-detail-header">
 
                 <div>
@@ -61,15 +91,25 @@ Order #{{ order["id"] }} - PageTurner Books
 
 
                 <!-- STATUS -->
+
                 <span
-                    class="order-status
-                    {% if order['status'] == 'Placed' %}
-                        order-status-placed
-                    {% elif order['status'] == 'Packed' %}
-                        order-status-packed
-                    {% elif order['status'] == 'Delivered' %}
-                        order-status-delivered
-                    {% endif %}"
+                    class="
+                        order-status
+
+                        {% if order['status'] == 'Placed' %}
+                            order-status-placed
+
+                        {% elif order['status'] == 'Packed' %}
+                            order-status-packed
+
+                        {% elif order['status'] == 'Delivered' %}
+                            order-status-delivered
+
+                        {% elif order['status'] == 'Cancelled' %}
+                            order-status-cancelled
+
+                        {% endif %}
+                    "
                 >
                     {{ order["status"] }}
                 </span>
@@ -77,14 +117,21 @@ Order #{{ order["id"] }} - PageTurner Books
             </div>
 
 
-            <!-- CUSTOMER INFORMATION -->
+            <!-- =================================================
+                 CUSTOMER INFORMATION
+            ================================================== -->
+
             <div class="order-customer-section">
 
                 <h3>
                     Delivery Information
                 </h3>
 
+
                 <div class="order-customer-grid">
+
+
+                    <!-- CUSTOMER -->
 
                     <div class="order-info-box">
 
@@ -99,6 +146,8 @@ Order #{{ order["id"] }} - PageTurner Books
                     </div>
 
 
+                    <!-- EMAIL -->
+
                     <div class="order-info-box">
 
                         <span>
@@ -111,6 +160,8 @@ Order #{{ order["id"] }} - PageTurner Books
 
                     </div>
 
+
+                    <!-- PHONE -->
 
                     <div class="order-info-box">
 
@@ -125,6 +176,8 @@ Order #{{ order["id"] }} - PageTurner Books
                     </div>
 
 
+                    <!-- STEP 28: ADDRESS SNAPSHOT -->
+
                     <div class="order-info-box order-address-box">
 
                         <span>
@@ -132,7 +185,7 @@ Order #{{ order["id"] }} - PageTurner Books
                         </span>
 
                         <strong>
-                            {{ order["address"] }}
+                            {{ order["address_snapshot"] }}
                         </strong>
 
                     </div>
@@ -142,12 +195,16 @@ Order #{{ order["id"] }} - PageTurner Books
             </div>
 
 
-            <!-- ORDERED BOOKS -->
+            <!-- =================================================
+                 STEP 29 - ORDER ITEMS
+            ================================================== -->
+
             <div class="ordered-books-section">
 
                 <div class="ordered-books-header">
 
                     <div>
+
                         <span class="order-section-label">
                             YOUR BOOKS
                         </span>
@@ -155,15 +212,20 @@ Order #{{ order["id"] }} - PageTurner Books
                         <h3>
                             Ordered Books
                         </h3>
+
                     </div>
 
+
                     <span class="ordered-books-count">
+
                         {{ items|length }}
+
                         {% if items|length == 1 %}
                             book
                         {% else %}
                             books
                         {% endif %}
+
                     </span>
 
                 </div>
@@ -173,40 +235,44 @@ Order #{{ order["id"] }} - PageTurner Books
 
                     {% for item in items %}
 
-                    <div class="ordered-book-item">
+                        <div class="ordered-book-item">
 
-                        <div class="ordered-book-number">
-                            {{ loop.index }}
+
+                            <div class="ordered-book-number">
+                                {{ loop.index }}
+                            </div>
+
+
+                            <div class="ordered-book-info">
+
+                                <strong>
+                                    {{ item["title"] }}
+                                </strong>
+
+                                <span>
+                                    {{ item["author"] }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="ordered-book-quantity">
+                                × {{ item["quantity"] }}
+                            </div>
+
+
+                            <!-- PRICE AT TIME OF PURCHASE -->
+
+                            <div class="ordered-book-price">
+
+                                ₹{{ "%.2f"|format(
+                                    item["price_at_purchase"]
+                                    * item["quantity"]
+                                ) }}
+
+                            </div>
+
                         </div>
-
-
-                        <div class="ordered-book-info">
-
-                            <strong>
-                                {{ item["title"] }}
-                            </strong>
-
-                            <span>
-                                {{ item["author"] }}
-                            </span>
-
-                        </div>
-
-
-                        <div class="ordered-book-quantity">
-                            × {{ item["quantity"] }}
-                        </div>
-
-
-                        <div class="ordered-book-price">
-
-                            ₹{{ "%.2f"|format(
-                                item["price"] * item["quantity"]
-                            ) }}
-
-                        </div>
-
-                    </div>
 
                     {% endfor %}
 
@@ -215,8 +281,14 @@ Order #{{ order["id"] }} - PageTurner Books
             </div>
 
 
-            <!-- PAYMENT SUMMARY -->
+            <!-- =================================================
+                 PAYMENT SUMMARY
+            ================================================== -->
+
             <div class="order-summary-section">
+
+
+                <!-- SUBTOTAL -->
 
                 <div class="order-summary-row">
 
@@ -226,45 +298,49 @@ Order #{{ order["id"] }} - PageTurner Books
 
                     <strong>
                         ₹{{ "%.2f"|format(
-                            order["total_amount"] +
-                            order["discount_amount"]
+                            order["total_amount"]
+                            + (order["discount_amount"] or 0)
                         ) }}
                     </strong>
 
                 </div>
 
+
+                <!-- COUPON -->
 
                 {% if order["coupon_code"] %}
 
-                <div class="order-summary-row order-coupon-row">
+                    <div class="order-summary-row order-coupon-row">
 
-                    <span>
-                        Coupon
-                    </span>
+                        <span>
+                            Coupon
+                        </span>
 
-                    <strong>
-                        {{ order["coupon_code"] }}
-                    </strong>
+                        <strong>
+                            {{ order["coupon_code"] }}
+                        </strong>
 
-                </div>
+                    </div>
 
 
-                <div class="order-summary-row order-discount-row">
+                    <div class="order-summary-row order-discount-row">
 
-                    <span>
-                        Discount
-                    </span>
+                        <span>
+                            Discount
+                        </span>
 
-                    <strong>
-                        -₹{{ "%.2f"|format(
-                            order["discount_amount"]
-                        ) }}
-                    </strong>
+                        <strong>
+                            -₹{{ "%.2f"|format(
+                                order["discount_amount"] or 0
+                            ) }}
+                        </strong>
 
-                </div>
+                    </div>
 
                 {% endif %}
 
+
+                <!-- FINAL TOTAL -->
 
                 <div class="order-final-total">
 
@@ -282,10 +358,85 @@ Order #{{ order["id"] }} - PageTurner Books
 
             </div>
 
+
+            <!-- =================================================
+                 STEP 35 - CANCEL ORDER
+            ================================================== -->
+
+            {% if
+                order["status"] == "Placed"
+                and current_user
+                and current_user["role"] == "customer"
+            %}
+
+                <div class="order-cancel-section">
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'shop.cancel_order',
+                            order_id=order['id']
+                        ) }}"
+                        onsubmit="return confirm(
+                            'Are you sure you want to cancel this order?'
+                        );"
+                    >
+
+                        <!-- STEP 33: CSRF -->
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="order-cancel-button"
+                        >
+                            Cancel Order
+                        </button>
+
+                    </form>
+
+
+                    <p>
+                        You can cancel this order while
+                        its status is Placed.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 CANCELLED MESSAGE
+            ================================================== -->
+
+            {% if order["status"] == "Cancelled" %}
+
+                <div class="order-cancelled-message">
+
+                    <strong>
+                        This order has been cancelled.
+                    </strong>
+
+                    <p>
+                        The book stock has been restored.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
         </div>
 
 
-        <!-- NEXT STEPS -->
+        <!-- =================================================
+             NEXT STEPS
+        ================================================== -->
+
         <div class="order-next-section">
 
             <div class="order-next-message">
@@ -294,15 +445,39 @@ Order #{{ order["id"] }} - PageTurner Books
                     📚
                 </span>
 
+
                 <div>
+
                     <strong>
                         What's next?
                     </strong>
 
-                    <p>
-                        We'll prepare your books for delivery.
-                        You can track your order status from My Orders.
-                    </p>
+
+                    {% if order["status"] == "Cancelled" %}
+
+                        <p>
+                            This order has been cancelled.
+                            You can continue shopping and
+                            place a new order at any time.
+                        </p>
+
+                    {% elif order["status"] == "Delivered" %}
+
+                        <p>
+                            This order has been delivered.
+                            We hope you enjoy your books.
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            We'll prepare your books for delivery.
+                            You can track your order status from
+                            My Orders.
+                        </p>
+
+                    {% endif %}
+
                 </div>
 
             </div>
@@ -311,7 +486,7 @@ Order #{{ order["id"] }} - PageTurner Books
             <div class="order-actions">
 
                 <a
-                    href="{{ url_for('home') }}"
+                    href="{{ url_for('shop.home') }}"
                     class="order-primary-button"
                 >
                     Continue Shopping
@@ -319,14 +494,16 @@ Order #{{ order["id"] }} - PageTurner Books
                 </a>
 
 
-                {% if session.get("user_id") %}
+                {% if current_user %}
 
-                <a
-                    href="{{ url_for('order_history') }}"
-                    class="order-secondary-button"
-                >
-                    View My Orders
-                </a>
+                    <a
+                        href="{{ url_for(
+                            'shop.order_history'
+                        ) }}"
+                        class="order-secondary-button"
+                    >
+                        View My Orders
+                    </a>
 
                 {% endif %}
 

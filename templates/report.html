@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Sales Report - PageTurner Books
+Sales Report - PageTurner Books
 {% endblock %}
 
 {% block content %}
@@ -10,7 +10,9 @@
 
     <div class="sales-report-container">
 
-        <!-- Header -->
+        <!-- =================================================
+             HEADER
+        ================================================== -->
 
         <div class="sales-report-header">
 
@@ -25,14 +27,17 @@
                 </h1>
 
                 <p>
-                    Overview of PageTurner Books sales and performance.
+                    Overview of PageTurner Books sales
+                    and performance.
                 </p>
 
             </div>
 
 
             <a
-                href="{{ url_for('admin_dashboard') }}"
+                href="{{ url_for(
+                    'admin.admin_dashboard'
+                ) }}"
                 class="sales-dashboard-button"
             >
                 ← Dashboard
@@ -41,9 +46,14 @@
         </div>
 
 
-        <!-- Statistics -->
+        <!-- =================================================
+             STATISTICS
+        ================================================== -->
 
         <div class="sales-stats-grid">
+
+
+            <!-- TOTAL ORDERS -->
 
             <div class="sales-stat-card">
 
@@ -66,6 +76,8 @@
             </div>
 
 
+            <!-- TOTAL SALES -->
+
             <div class="sales-stat-card">
 
                 <div class="sales-stat-icon">
@@ -79,13 +91,17 @@
                     </span>
 
                     <strong>
-                        ₹{{ "%.2f"|format(total_sales|default(0)) }}
+                        ₹{{ "%.2f"|format(
+                            total_sales|default(0)
+                        ) }}
                     </strong>
 
                 </div>
 
             </div>
 
+
+            <!-- BOOKS SOLD -->
 
             <div class="sales-stat-card">
 
@@ -110,145 +126,163 @@
         </div>
 
 
-        <!-- Top Selling Books -->
+        <!-- =================================================
+             TOP SELLING BOOKS
+        ================================================== -->
 
         {% if top_books %}
 
-        <div class="sales-books-card">
+            <div class="sales-books-card">
 
-            <div class="sales-section-header">
+                <div class="sales-section-header">
 
-                <div>
+                    <div>
 
-                    <span class="sales-section-label">
-                        Best Sellers
-                    </span>
+                        <span class="sales-section-label">
+                            Best Sellers
+                        </span>
 
-                    <h2>
-                        Top Selling Books
-                    </h2>
+                        <h2>
+                            Top Selling Books
+                        </h2>
 
-                    <p>
-                        Books generating the highest sales volume.
-                    </p>
+                        <p>
+                            Books generating the highest
+                            sales volume.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="sales-table-wrapper">
+
+                    <table class="sales-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    #
+                                </th>
+
+                                <th>
+                                    Book
+                                </th>
+
+                                <th>
+                                    Author
+                                </th>
+
+                                <th>
+                                    Quantity Sold
+                                </th>
+
+                                <th>
+                                    Revenue
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for book in top_books %}
+
+                                <tr>
+
+                                    <td>
+
+                                        <span class="sales-rank">
+                                            {{ loop.index }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <strong class="sales-book-title">
+                                            {{ book["title"] }}
+                                        </strong>
+
+                                    </td>
+
+
+                                    <td class="sales-author">
+                                        {{ book["author"] }}
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="sales-quantity">
+                                            {{ book["quantity_sold"] }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <strong class="sales-revenue">
+
+                                            ₹{{ "%.2f"|format(
+                                                book["revenue"]
+                                            ) }}
+
+                                        </strong>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
 
                 </div>
 
             </div>
 
 
-            <div class="sales-table-wrapper">
-
-                <table class="sales-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                #
-                            </th>
-
-                            <th>
-                                Book
-                            </th>
-
-                            <th>
-                                Author
-                            </th>
-
-                            <th>
-                                Quantity Sold
-                            </th>
-
-                            <th>
-                                Revenue
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        {% for book in top_books %}
-
-                        <tr>
-
-                            <td>
-                                <span class="sales-rank">
-                                    {{ loop.index }}
-                                </span>
-                            </td>
-
-                            <td>
-
-                                <strong class="sales-book-title">
-                                    {{ book["title"] }}
-                                </strong>
-
-                            </td>
-
-                            <td class="sales-author">
-                                {{ book["author"] }}
-                            </td>
-
-                            <td>
-
-                                <span class="sales-quantity">
-                                    {{ book["quantity_sold"] }}
-                                </span>
-
-                            </td>
-
-                            <td>
-
-                                <strong class="sales-revenue">
-                                    ₹{{ "%.2f"|format(book["revenue"]) }}
-                                </strong>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
         {% else %}
 
-        <!-- Empty State -->
+            <!-- =============================================
+                 EMPTY STATE
+            ============================================== -->
 
-        <div class="sales-empty-card">
+            <div class="sales-empty-card">
 
-            <div class="sales-empty-icon">
-                📊
+                <div class="sales-empty-icon">
+                    📊
+                </div>
+
+                <h2>
+                    No Sales Yet
+                </h2>
+
+                <p>
+                    Sales information will appear here
+                    once customers place orders.
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'admin.admin_dashboard'
+                    ) }}"
+                    class="sales-dashboard-button"
+                >
+                    Back to Dashboard
+                </a>
+
             </div>
-
-            <h2>
-                No Sales Yet
-            </h2>
-
-            <p>
-                Sales information will appear here once customers place orders.
-            </p>
-
-            <a
-                href="{{ url_for('admin_dashboard') }}"
-                class="sales-dashboard-button"
-            >
-                Back to Dashboard
-            </a>
-
-        </div>
 
         {% endif %}
 

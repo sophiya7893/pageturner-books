@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Login - PageTurner Books{% endblock %}
+{% block title %}
+Admin Login - PageTurner Books
+{% endblock %}
 
 {% block content %}
 
@@ -8,14 +10,41 @@
 
     <div class="auth-container card">
 
+        <!-- =============================================
+             HEADER
+        ============================================== -->
+
         <h1>
             Admin Login
         </h1>
 
+        <p>
+            Sign in with your staff or administrator account.
+        </p>
+
+
+        <!-- =============================================
+             LOGIN FORM
+        ============================================== -->
+
         <form
             method="POST"
-            action="{{ url_for('admin_login') }}"
+            action="{{ url_for(
+                'auth.login',
+                next=url_for('admin.admin_dashboard')
+            ) }}"
         >
+
+            <!-- STEP 33: CSRF -->
+
+            <input
+                type="hidden"
+                name="_csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+
+            <!-- EMAIL -->
 
             <div class="form-group">
 
@@ -28,11 +57,15 @@
                     id="email"
                     name="email"
                     class="form-control"
+                    value="{{ request.form.get('email', '') }}"
+                    autocomplete="email"
                     required
                 >
 
             </div>
 
+
+            <!-- PASSWORD -->
 
             <div class="form-group">
 
@@ -45,11 +78,14 @@
                     id="password"
                     name="password"
                     class="form-control"
+                    autocomplete="current-password"
                     required
                 >
 
             </div>
 
+
+            <!-- SUBMIT -->
 
             <button
                 type="submit"

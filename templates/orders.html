@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}My Orders - PageTurner Books{% endblock %}
+{% block title %}
+My Orders - PageTurner Books
+{% endblock %}
 
 {% block content %}
 
@@ -8,10 +10,14 @@
 
     <div class="orders-page-container">
 
-        <!-- PAGE HEADER -->
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
         <div class="orders-page-header">
 
             <div>
+
                 <span class="orders-label">
                     ORDER HISTORY
                 </span>
@@ -20,258 +26,242 @@
                     My Orders
                 </h1>
 
-                {% if session.get("user_id") %}
-
-                    <p>
-                        View your previous orders and their current status.
-                    </p>
-
-                {% else %}
-
-                    <p>
-                        Find your previous orders using the phone number
-                        used during checkout.
-                    </p>
-
-                {% endif %}
+                <p>
+                    View your previous orders and their
+                    current status.
+                </p>
 
             </div>
 
+
             {% if orders %}
+
                 <div class="orders-count-badge">
+
                     {{ orders|length }}
+
                     {% if orders|length == 1 %}
                         Order
                     {% else %}
                         Orders
                     {% endif %}
+
                 </div>
+
             {% endif %}
 
         </div>
 
 
-        <!-- GUEST ORDER SEARCH -->
-        {% if not session.get("user_id") %}
+        <!-- =================================================
+             ORDER LIST
+        ================================================== -->
 
-        <div class="order-search-card">
-
-            <div class="order-search-content">
-
-                <span class="orders-label">
-                    FIND AN ORDER
-                </span>
-
-                <h2>
-                    Search Your Orders
-                </h2>
-
-                <p>
-                    Enter the phone number you used when placing your order.
-                </p>
-
-            </div>
-
-            <form
-                method="GET"
-                action="{{ url_for('order_history') }}"
-                class="order-search-form"
-            >
-
-                <div class="order-search-input">
-
-                    <label for="phone">
-                        Phone Number
-                    </label>
-
-                    <input
-                        type="text"
-                        id="phone"
-                        name="phone"
-                        value="{{ phone or '' }}"
-                        placeholder="Enter phone number"
-                        required
-                    >
-
-                </div>
-
-                <button
-                    type="submit"
-                    class="order-search-button"
-                >
-                    Find Orders
-                </button>
-
-            </form>
-
-        </div>
-
-        {% endif %}
-
-
-        <!-- ORDERS -->
         {% if orders %}
 
-        <div class="orders-list">
+            <div class="orders-list">
 
-            {% for order in orders %}
+                {% for order in orders %}
 
-            <article class="order-history-card">
-
-                <!-- ORDER HEADER -->
-                <div class="order-history-header">
-
-                    <div>
-
-                        <span class="order-history-label">
-                            ORDER
-                        </span>
-
-                        <h2>
-                            #{{ order["id"] }}
-                        </h2>
-
-                        <p>
-                            {{ order["created_at"] }}
-                        </p>
-
-                    </div>
+                    <article class="order-history-card">
 
 
-                    <span
-                        class="order-history-status
-                        {% if order['status'] == 'Placed' %}
-                            order-history-status-placed
-                        {% elif order['status'] == 'Packed' %}
-                            order-history-status-packed
-                        {% elif order['status'] == 'Delivered' %}
-                            order-history-status-delivered
-                        {% endif %}"
-                    >
-                        {{ order["status"] }}
-                    </span>
+                        <!-- =============================
+                             ORDER HEADER
+                        ============================== -->
 
-                </div>
+                        <div class="order-history-header">
 
+                            <div>
 
-                <!-- ORDER INFORMATION -->
-                <div class="order-history-info">
+                                <span class="order-history-label">
+                                    ORDER
+                                </span>
 
-                    <div class="order-history-info-item">
+                                <h2>
+                                    #{{ order["id"] }}
+                                </h2>
 
-                        <span>
-                            Customer
-                        </span>
+                                <p>
+                                    {{ order["created_at"] }}
+                                </p>
 
-                        <strong>
-                            {{ order["customer_name"] }}
-                        </strong>
-
-                    </div>
+                            </div>
 
 
-                    <div class="order-history-info-item">
+                            <!-- ORDER STATUS -->
 
-                        <span>
-                            Email
-                        </span>
+                            <span
+                                class="
+                                    order-history-status
 
-                        <strong>
-                            {{ order["email"] }}
-                        </strong>
+                                    {% if order['status'] == 'Placed' %}
+                                        order-history-status-placed
 
-                    </div>
+                                    {% elif order['status'] == 'Packed' %}
+                                        order-history-status-packed
 
+                                    {% elif order['status'] == 'Delivered' %}
+                                        order-history-status-delivered
 
-                    <div class="order-history-info-item">
+                                    {% elif order['status'] == 'Cancelled' %}
+                                        order-history-status-cancelled
 
-                        <span>
-                            Order Total
-                        </span>
+                                    {% endif %}
+                                "
+                            >
+                                {{ order["status"] }}
+                            </span>
 
-                        <strong class="order-history-price">
-                            ₹{{ "%.2f"|format(order["total_amount"]) }}
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <!-- COUPON -->
-                {% if order["coupon_code"] %}
-
-                <div class="order-history-coupon">
-
-                    <span>
-                        Coupon
-                    </span>
-
-                    <strong>
-                        {{ order["coupon_code"] }}
-                    </strong>
-
-                    <span>
-                        Saved ₹{{ "%.2f"|format(
-                            order["discount_amount"] or 0
-                        ) }}
-                    </span>
-
-                </div>
-
-                {% endif %}
+                        </div>
 
 
-                <!-- FOOTER -->
-                <div class="order-history-footer">
+                        <!-- =============================
+                             ORDER INFORMATION
+                        ============================== -->
 
-                    <div>
+                        <div class="order-history-info">
 
-                        <span>
-                            Total
-                        </span>
+                            <div class="order-history-info-item">
 
-                        <strong>
-                            ₹{{ "%.2f"|format(order["total_amount"]) }}
-                        </strong>
+                                <span>
+                                    Customer
+                                </span>
 
-                    </div>
+                                <strong>
+                                    {{ order["customer_name"] }}
+                                </strong>
+
+                            </div>
 
 
-                    {% if session.get("user_id") %}
+                            <div class="order-history-info-item">
 
-                    <a
-                        href="{{ url_for(
-                            'order_confirmation',
-                            order_id=order['id']
-                        ) }}"
-                        class="view-order-button"
-                    >
-                        View Order
-                        <span>→</span>
-                    </a>
+                                <span>
+                                    Email
+                                </span>
 
-                    {% endif %}
+                                <strong>
+                                    {{ order["email"] }}
+                                </strong>
 
-                </div>
+                            </div>
 
-            </article>
 
-            {% endfor %}
+                            <div class="order-history-info-item">
 
-        </div>
+                                <span>
+                                    Order Total
+                                </span>
+
+                                <strong class="order-history-price">
+                                    ₹{{ "%.2f"|format(
+                                        order["total_amount"]
+                                    ) }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =============================
+                             COUPON INFORMATION
+                        ============================== -->
+
+                        {% if order["coupon_code"] %}
+
+                            <div class="order-history-coupon">
+
+                                <span>
+                                    Coupon
+                                </span>
+
+                                <strong>
+                                    {{ order["coupon_code"] }}
+                                </strong>
+
+                                <span>
+                                    Saved
+                                    ₹{{ "%.2f"|format(
+                                        order["discount_amount"] or 0
+                                    ) }}
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =============================
+                             CANCELLED MESSAGE
+                        ============================== -->
+
+                        {% if order["status"] == "Cancelled" %}
+
+                            <div class="order-cancelled-message">
+
+                                This order has been cancelled
+                                and its items were returned
+                                to inventory.
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =============================
+                             FOOTER
+                        ============================== -->
+
+                        <div class="order-history-footer">
+
+                            <div>
+
+                                <span>
+                                    Total
+                                </span>
+
+                                <strong>
+                                    ₹{{ "%.2f"|format(
+                                        order["total_amount"]
+                                    ) }}
+                                </strong>
+
+                            </div>
+
+
+                            <a
+                                href="{{ url_for(
+                                    'shop.order_confirmation',
+                                    order_id=order['id']
+                                ) }}"
+                                class="view-order-button"
+                            >
+                                View Order
+                                <span>→</span>
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
 
 
         {% else %}
 
-        <!-- EMPTY STATE -->
-        <div class="orders-empty-card">
+            <!-- =============================================
+                 EMPTY ORDER HISTORY
+            ============================================== -->
 
-            <div class="orders-empty-icon">
-                📦
-            </div>
+            <div class="orders-empty-card">
 
-            {% if session.get("user_id") %}
+                <div class="orders-empty-icon">
+                    📦
+                </div>
 
                 <span class="orders-label">
                     ORDER HISTORY
@@ -283,56 +273,18 @@
 
                 <p>
                     You haven't placed any orders yet.
-                    Find something you love and start your collection.
+                    Find something you love and start
+                    your collection.
                 </p>
 
                 <a
-                    href="{{ url_for('home') }}"
+                    href="{{ url_for('shop.home') }}"
                     class="orders-browse-button"
                 >
                     Browse Books
                 </a>
 
-            {% elif phone %}
-
-                <span class="orders-label">
-                    SEARCH RESULTS
-                </span>
-
-                <h2>
-                    No Orders Found
-                </h2>
-
-                <p>
-                    We couldn't find any orders for this phone number.
-                    Please check the number and try again.
-                </p>
-
-                <a
-                    href="{{ url_for('order_history') }}"
-                    class="orders-browse-button"
-                >
-                    Search Again
-                </a>
-
-            {% else %}
-
-                <span class="orders-label">
-                    ORDER HISTORY
-                </span>
-
-                <h2>
-                    Find Your Orders
-                </h2>
-
-                <p>
-                    Enter the phone number used during checkout
-                    to find your previous orders.
-                </p>
-
-            {% endif %}
-
-        </div>
+            </div>
 
         {% endif %}
 

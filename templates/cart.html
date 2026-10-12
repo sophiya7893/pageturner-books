@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Shopping Cart - PageTurner Books{% endblock %}
+{% block title %}
+Shopping Cart - PageTurner Books
+{% endblock %}
 
 {% block content %}
 
-<section class="cart-page">
+<div class="cart-page">
 
-    <div class="cart-page-container">
+    <div class="cart-container">
 
-        <!-- Header -->
+        <!-- ================================
+             PAGE HEADER
+        ================================= -->
+
         <div class="cart-page-header">
 
             <div>
-                <span class="cart-label">
-                    YOUR SHOPPING BAG
+
+                <span class="cart-eyebrow">
+                    YOUR BASKET
                 </span>
 
                 <h1>
@@ -21,19 +27,27 @@
                 </h1>
 
                 <p>
-                    Review your selected books before checkout.
+                    Review your books before proceeding
+                    to checkout.
                 </p>
+
             </div>
 
+
             {% if items %}
-                <div class="cart-count-badge">
+
+                <span class="cart-item-count">
+
                     {{ items|length }}
+
                     {% if items|length == 1 %}
-                        item
+                        Book
                     {% else %}
-                        items
+                        Books
                     {% endif %}
-                </div>
+
+                </span>
+
             {% endif %}
 
         </div>
@@ -41,145 +55,228 @@
 
         {% if items %}
 
-        <div class="cart-layout">
-
-            <!-- CART ITEMS -->
-            <div class="cart-items">
-
-                {% for item in items %}
-
-                <article class="cart-item-card">
-
-                    <!-- Book Image -->
-                    <div class="cart-book-cover">
-
-                        {% if item["cover_image"] %}
-
-                            <img
-                                src="{{ url_for(
-                                    'static',
-                                    filename='images/' + item['cover_image']
-                                ) }}"
-                                alt="{{ item['title'] }}"
-                            >
-
-                        {% else %}
-
-                            <div class="cart-placeholder-cover">
-                                📚
-                            </div>
-
-                        {% endif %}
-
-                    </div>
+            <div class="cart-layout">
 
 
-                    <!-- Book Information -->
-                    <div class="cart-book-info">
+                <!-- ================================
+                     CART ITEMS
+                ================================= -->
 
-                        <span class="cart-book-category">
-                            {{ item["category"]|default("Book") }}
-                        </span>
+                <div class="cart-items-card">
 
-                        <h2>
-                            {{ item["title"] }}
-                        </h2>
+                    {% for item in items %}
 
-                        <p class="cart-book-author">
-                            by {{ item["author"] }}
-                        </p>
-
-                        <p class="cart-book-price">
-                            ₹{{ "%.2f"|format(item["price"]) }}
-                            <span>each</span>
-                        </p>
+                        <div class="cart-item">
 
 
-                        <!-- Quantity -->
-                        <form
-                            method="POST"
-                            action="{{ url_for('update_cart') }}"
-                            class="cart-quantity-form"
-                        >
+                            <!-- BOOK COVER -->
 
-                            <div class="cart-quantity-control">
+                            <div class="cart-item-cover">
 
-                                <label
-                                    for="quantity-{{ item['id'] }}"
-                                >
-                                    Quantity
-                                </label>
+                                {% if item.cover_image %}
 
-                                <input
-                                    id="quantity-{{ item['id'] }}"
-                                    type="number"
-                                    name="quantity_{{ item['id'] }}"
-                                    value="{{ item['quantity'] }}"
-                                    min="0"
-                                    max="{{ item['stock'] }}"
-                                >
+                                    <img
+                                        src="{{ url_for(
+                                            'static',
+                                            filename='images/' ~ item.cover_image
+                                        ) }}"
+                                        alt="{{ item.title }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="cart-cover-placeholder">
+                                        📖
+                                    </div>
+
+                                {% endif %}
 
                             </div>
 
-                            <button
-                                type="submit"
-                                class="cart-update-button"
-                            >
-                                Update
-                            </button>
 
-                        </form>
+                            <!-- BOOK INFORMATION -->
 
+                            <div class="cart-item-details">
 
-                        <!-- Remove -->
-                        <a
-                            href="{{ url_for(
-                                'remove_from_cart',
-                                book_id=item['id']
-                            ) }}"
-                            class="cart-remove-link"
-                        >
-                            Remove from cart
-                        </a>
-
-                    </div>
+                                <span class="cart-item-category">
+                                    {{ item.category or "Book" }}
+                                </span>
 
 
-                    <!-- Item Total -->
-                    <div class="cart-item-total">
+                                <h2>
 
-                        <span>
-                            Item Total
-                        </span>
+                                    <a
+                                        href="{{ url_for(
+                                            'shop.book_detail',
+                                            book_id=item.id
+                                        ) }}"
+                                    >
+                                        {{ item.title }}
+                                    </a>
 
-                        <strong>
-                            ₹{{ "%.2f"|format(item["subtotal"]) }}
-                        </strong>
-
-                    </div>
-
-                </article>
-
-                {% endfor %}
+                                </h2>
 
 
-                <!-- Continue Shopping -->
-                <a
-                    href="{{ url_for('home') }}"
-                    class="cart-continue-link"
-                >
-                    ← Continue Shopping
-                </a>
+                                {% if item.author %}
 
-            </div>
+                                    <p class="cart-item-author">
+                                        by {{ item.author }}
+                                    </p>
+
+                                {% endif %}
 
 
-            <!-- ORDER SUMMARY -->
-            <aside class="cart-summary-card">
+                                <!-- STOCK -->
 
-                <div class="cart-summary-header">
+                                <div class="cart-stock-info">
 
-                    <span class="cart-label">
+                                    {% if item.stock == 0 %}
+
+                                        <span class="cart-stock-out">
+                                            Out of stock
+                                        </span>
+
+                                    {% elif item.stock < 5 %}
+
+                                        <span class="cart-stock-low">
+                                            Only {{ item.stock }} left
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="cart-stock-good">
+                                            In stock
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <!-- =========================
+                                     QUANTITY
+                                ========================== -->
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'shop.update_cart',
+                                        book_id=item.id
+                                    ) }}"
+                                    class="cart-quantity-form"
+                                >
+
+                                    <!-- STEP 33: CSRF -->
+
+                                    <input
+                                        type="hidden"
+                                        name="_csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+
+                                    <label
+                                        for="quantity-{{ item.id }}"
+                                    >
+                                        Quantity
+                                    </label>
+
+
+                                    <div class="cart-quantity-controls">
+
+                                        <input
+                                            type="number"
+                                            id="quantity-{{ item.id }}"
+                                            name="quantity"
+                                            value="{{ item.quantity }}"
+                                            min="0"
+                                            max="{{ item.stock }}"
+                                            required
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="cart-update-btn"
+                                        >
+                                            Update
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+
+                                <!-- =========================
+                                     REMOVE
+                                ========================== -->
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'shop.remove_from_cart',
+                                        book_id=item.id
+                                    ) }}"
+                                    class="cart-remove-form"
+                                >
+
+                                    <!-- STEP 33: CSRF -->
+
+                                    <input
+                                        type="hidden"
+                                        name="_csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="cart-remove-btn"
+                                    >
+                                        Remove
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                            <!-- PRICE -->
+
+                            <div class="cart-item-price">
+
+                                <span class="cart-unit-price">
+
+                                    ₹{{ "%.2f"|format(
+                                        item.price
+                                    ) }}
+
+                                    each
+
+                                </span>
+
+                                <strong>
+
+                                    ₹{{ "%.2f"|format(
+                                        item.subtotal
+                                    ) }}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- ================================
+                     ORDER SUMMARY
+                ================================= -->
+
+                <aside class="cart-summary-card">
+
+                    <span class="cart-summary-eyebrow">
                         ORDER SUMMARY
                     </span>
 
@@ -187,164 +284,247 @@
                         Your Order
                     </h2>
 
-                </div>
 
+                    <div class="cart-summary-lines">
 
-                <!-- Subtotal -->
-                <div class="cart-summary-row">
+                        {% for item in items %}
 
-                    <span>
-                        Subtotal
-                    </span>
+                            <div class="cart-summary-line">
 
-                    <strong>
-                        ₹{{ "%.2f"|format(total) }}
-                    </strong>
-
-                </div>
-
-
-                <!-- Discount -->
-                {% if discount > 0 %}
-
-                <div class="cart-summary-row cart-discount-row">
-
-                    <span>
-                        Discount
-                    </span>
-
-                    <strong>
-                        -₹{{ "%.2f"|format(discount) }}
-                    </strong>
-
-                </div>
-
-                {% endif %}
-
-
-                <!-- Total -->
-                <div class="cart-summary-total">
-
-                    <span>
-                        Total
-                    </span>
-
-                    <strong>
-                        ₹{{ "%.2f"|format(final_total) }}
-                    </strong>
-
-                </div>
-
-
-                <!-- Coupon -->
-                <div class="cart-coupon">
-
-                    <h3>
-                        Have a coupon?
-                    </h3>
-
-                    {% if coupon_code %}
-
-                        <div class="applied-coupon">
-
-                            <div>
                                 <span>
-                                    Applied coupon
+                                    {{ item.title }}
+                                    × {{ item.quantity }}
                                 </span>
 
                                 <strong>
-                                    {{ coupon_code }}
+
+                                    ₹{{ "%.2f"|format(
+                                        item.subtotal
+                                    ) }}
+
                                 </strong>
+
                             </div>
 
-                            <a
-                                href="{{ url_for('remove_coupon') }}"
+                        {% endfor %}
+
+                    </div>
+
+
+                    <div class="cart-summary-divider"></div>
+
+
+                    <!-- =========================
+                         COUPON
+                    ========================== -->
+
+                    <div class="cart-coupon-section">
+
+                        <h3>
+                            Coupon
+                        </h3>
+
+
+                        {% if coupon_code %}
+
+                            <div class="cart-coupon-applied">
+
+                                <p>
+                                    Applied:
+                                    <strong>
+                                        {{ coupon_code }}
+                                    </strong>
+                                </p>
+
+
+                                {% if discount_amount %}
+
+                                    <p>
+                                        Discount:
+                                        <strong>
+                                            -₹{{ "%.2f"|format(
+                                                discount_amount
+                                            ) }}
+                                        </strong>
+                                    </p>
+
+                                {% endif %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'shop.remove_coupon'
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="_csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="cart-remove-btn"
+                                    >
+                                        Remove Coupon
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                        {% else %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'shop.apply_coupon'
+                                ) }}"
+                                class="cart-coupon-form"
                             >
-                                Remove
-                            </a>
 
-                        </div>
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
 
-                    {% else %}
+                                <input
+                                    type="text"
+                                    name="coupon_code"
+                                    placeholder="Enter coupon code"
+                                    autocomplete="off"
+                                    required
+                                >
 
-                        <form
-                            method="POST"
-                            action="{{ url_for('apply_coupon') }}"
-                            class="coupon-form"
+                                <button
+                                    type="submit"
+                                    class="cart-update-btn"
+                                >
+                                    Apply
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="cart-summary-divider"></div>
+
+
+                    <!-- TOTAL -->
+
+                    <div class="cart-summary-total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(total) }}
+                        </strong>
+
+                    </div>
+
+
+                    <p class="cart-summary-note">
+                        Final stock availability is checked
+                        again when you place your order.
+                    </p>
+
+
+                    <!-- CHECKOUT -->
+
+                    <a
+                        href="{{ url_for('shop.checkout') }}"
+                        class="cart-checkout-btn"
+                    >
+                        Proceed to Checkout
+                    </a>
+
+
+                    <!-- CLEAR CART -->
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'shop.clear_cart'
+                        ) }}"
+                        class="cart-clear-form"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
                         >
 
-                            <input
-                                type="text"
-                                name="coupon_code"
-                                placeholder="Enter coupon code"
-                                required
-                            >
+                        <button
+                            type="submit"
+                            class="cart-remove-btn"
+                        >
+                            Clear Cart
+                        </button>
 
-                            <button type="submit">
-                                Apply
-                            </button>
-
-                        </form>
-
-                    {% endif %}
-
-                </div>
+                    </form>
 
 
-                <!-- Checkout -->
-                <a
-                    href="{{ url_for('checkout') }}"
-                    class="cart-checkout-button"
-                >
-                    Proceed to Checkout
-                    <span>→</span>
-                </a>
+                    <a
+                        href="{{ url_for('shop.home') }}"
+                        class="cart-continue-link"
+                    >
+                        ← Continue Shopping
+                    </a>
 
+                </aside>
 
-                <p class="cart-secure-note">
-                    🔒 Secure checkout
-                </p>
-
-            </aside>
-
-        </div>
+            </div>
 
 
         {% else %}
 
-        <!-- EMPTY CART -->
-        <div class="cart-empty-card">
+            <!-- ================================
+                 EMPTY CART
+            ================================= -->
 
-            <div class="cart-empty-icon">
-                🛒
+            <div class="cart-empty-card">
+
+                <div class="cart-empty-icon">
+                    🛒
+                </div>
+
+                <span class="cart-eyebrow">
+                    YOUR BASKET
+                </span>
+
+                <h2>
+                    Your cart is empty
+                </h2>
+
+                <p>
+                    You haven't added any books yet.
+                    Explore the catalogue and find your
+                    next great read.
+                </p>
+
+                <a
+                    href="{{ url_for('shop.home') }}"
+                    class="cart-shop-btn"
+                >
+                    Browse Books
+                </a>
+
             </div>
-
-            <span class="cart-label">
-                YOUR CART
-            </span>
-
-            <h2>
-                Your cart is empty
-            </h2>
-
-            <p>
-                You haven't added any books yet.
-                Explore our collection and find your next great read.
-            </p>
-
-            <a
-                href="{{ url_for('home') }}"
-                class="cart-browse-button"
-            >
-                Browse Books
-            </a>
-
-        </div>
 
         {% endif %}
 
     </div>
 
-</section>
+</div>
 
 {% endblock %}

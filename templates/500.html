@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+Server Error - PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<div class="error-page">
+
+    <div class="error-card">
+
+        <!-- ERROR CODE -->
+
+        <div class="error-number">
+            500
+        </div>
+
+
+        <!-- ICON -->
+
+        <div class="error-icon">
+            ⚠️
+        </div>
+
+
+        <!-- LABEL -->
+
+        <span class="error-label">
+            INTERNAL SERVER ERROR
+        </span>
+
+
+        <!-- MESSAGE -->
+
+        <h1>
+            Something went wrong.
+        </h1>
+
+        <p>
+            PageTurner Books encountered an unexpected error
+            while processing your request.
+        </p>
+
+        <p>
+            Please return to the home page and try again.
+        </p>
+
+
+        <!-- ACTIONS -->
+
+        <div class="error-actions">
+
+            <a
+                href="{{ url_for('shop.home') }}"
+                class="error-primary-button"
+            >
+                ← Back to Home
+            </a>
+
+
+            <a
+                href="{{ url_for('shop.home') }}"
+                class="error-secondary-button"
+            >
+                Browse Books
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

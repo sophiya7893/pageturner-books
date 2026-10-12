@@ -485,6 +485,4 @@ PageTurner Books contains the main bookstore workflow: catalogue browsing, searc
 
 28. License
 
-## License
-
 This project was created as an educational bookstore web application using Flask and SQLite.
