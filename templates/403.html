@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Forbidden | PageTurner Books</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f0ff, #e6edff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #25213a;
+        }
+
+        .error-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 560px;
+            padding: 50px 35px;
+            text-align: center;
+            border-radius: 22px;
+            box-shadow: 0 18px 55px rgba(55, 40, 100, 0.12);
+        }
+
+        .book-icon {
+            font-size: 55px;
+            margin-bottom: 18px;
+        }
+
+        .error-code {
+            font-size: 86px;
+            font-weight: 800;
+            letter-spacing: -4px;
+            line-height: 1.1;
+            color: #7048e8;
+        }
+
+        h1 {
+            font-size: 27px;
+            margin: 18px 0 12px;
+        }
+
+        .message {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #6b6878;
+            margin-bottom: 28px;
+        }
+
+        .divider {
+            width: 65px;
+            height: 4px;
+            border-radius: 10px;
+            background: #7048e8;
+            margin: 22px auto;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 22px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: #7048e8;
+        }
+
+        .btn-primary:hover {
+            background: #5834c5;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            color: #7048e8;
+            background: #f1edff;
+        }
+
+        .btn-secondary:hover {
+            background: #e4dcff;
+        }
+
+        .footer {
+            margin-top: 35px;
+            font-size: 12px;
+            color: #9994a7;
+        }
+
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 38px 22px;
+            }
+
+            .error-code {
+                font-size: 68px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="error-card">
+        <div class="book-icon">📚</div>
+
+        <div class="error-code">403</div>
+
+        <div class="divider"></div>
+
+        <h1>Access Forbidden</h1>
+
+        <p class="message">
+            Sorry! You don't have permission to access this page.
+            Please check your login details or return to our bookstore.
+        </p>
+
+        <div class="buttons">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+                Back to Login
+            </a>
+
+            <a href="{{ url_for('shop.home') }}" class="btn btn-secondary">
+                Explore Books
+            </a>
+        </div>
+
+        <div class="footer">
+            © PageTurner Books · Every book opens a new world.
+        </div>
+    </main>
+</body>
+</html>

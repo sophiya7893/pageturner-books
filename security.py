@@ -1,9 +1,11 @@
+
 import hmac
 import secrets
 from functools import wraps
 
 from flask import (
     abort,
+    current_app,
     redirect,
     request,
     session,
@@ -17,14 +19,14 @@ CSRF_SESSION_KEY = "_csrf_token"
 
 
 # ============================================================
-# CSRF PROTECTION - STEP 33
+# CSRF PROTECTION
 # ============================================================
 
 def generate_csrf_token():
     """
-    Create one random CSRF token for the user's session.
+    Create a random CSRF token for the current session.
 
-    The same token is reused during the session.
+    The same token is reused until the session is cleared.
     """
 
     token = session.get(CSRF_SESSION_KEY)
@@ -38,68 +40,69 @@ def generate_csrf_token():
 
 def get_submitted_csrf_token():
     """
-    HTML forms send the CSRF token using _csrf_token.
+    Read the token submitted by an HTML form or API request.
 
-    JSON/API requests may send it using:
-        X-CSRF-Token
+    HTML forms:
+        <input type="hidden" name="csrf_token" ...>
+
+    API requests:
+        X-CSRF-Token: <token>
     """
 
-    token = request.form.get(
-        "_csrf_token",
-        ""
-    )
+    token = request.form.get("csrf_token", "")
 
-    if token:
-        return token
+    if not token:
+        token = request.form.get("_csrf_token", "")
 
-    return request.headers.get(
-        "X-CSRF-Token",
-        ""
-    )
+    if not token:
+        token = request.headers.get("X-CSRF-Token", "")
+
+    return token.strip()
 
 
 def validate_csrf_token():
     """
-    Reject POST requests when the CSRF token
-    is missing or incorrect.
+    Reject POST requests when the token is missing or invalid.
     """
 
-    expected = session.get(
-        CSRF_SESSION_KEY
-    )
-
+    expected = session.get(CSRF_SESSION_KEY)
     submitted = get_submitted_csrf_token()
 
     if not expected or not submitted:
-        abort(
-            400,
-            description="Missing CSRF token."
+        current_app.logger.warning(
+            "CSRF validation failed: missing token; "
+            "session token exists=%s, submitted token exists=%s",
+            bool(expected),
+            bool(submitted),
         )
 
-    if not hmac.compare_digest(
-        expected,
-        submitted
-    ):
         abort(
             400,
-            description="Invalid CSRF token."
+            description="Missing CSRF token. Refresh the page and try again.",
+        )
+
+    if not hmac.compare_digest(expected, submitted):
+        current_app.logger.warning(
+            "CSRF validation failed: token mismatch."
+        )
+
+        abort(
+            400,
+            description="Invalid CSRF token. Refresh the page and try again.",
         )
 
 
 def install_csrf_protection(app):
     """
-    Install CSRF protection globally.
+    Install global CSRF protection.
 
-    Every POST request must contain a valid token.
+    Every POST request must provide a valid session token.
     """
 
-    app.jinja_env.globals[
-        "csrf_token"
-    ] = generate_csrf_token
+    app.jinja_env.globals["csrf_token"] = generate_csrf_token
 
     @app.before_request
     def csrf_before_request():
-
         if request.method == "POST":
             validate_csrf_token()
 
@@ -110,14 +113,10 @@ def install_csrf_protection(app):
 
 def current_user():
     """
-    Return the currently logged-in user.
-
-    Returns None when no user is logged in.
+    Return the logged-in user, or None if nobody is logged in.
     """
 
-    user_id = session.get(
-        "user_id"
-    )
+    user_id = session.get("user_id")
 
     if not user_id:
         return None
@@ -134,7 +133,7 @@ def current_user():
         FROM users
         WHERE id = ?
         """,
-        (user_id,)
+        (user_id,),
     ).fetchone()
 
 
@@ -144,75 +143,57 @@ def current_user():
 
 def login_required(view):
     """
-    Require a logged-in user.
+    Require the user to be logged in.
     """
 
     @wraps(view)
-    def wrapped_view(
-        *args,
-        **kwargs
-    ):
-
+    def wrapped_view(*args, **kwargs):
         user = current_user()
 
         if user is None:
             return redirect(
                 url_for(
                     "auth.login",
-                    next=request.url
+                    next=request.url,
                 )
             )
 
-        return view(
-            *args,
-            **kwargs
-        )
+        return view(*args, **kwargs)
 
     return wrapped_view
 
 
 # ============================================================
-# ROLE REQUIRED - STEP 30
+# ROLE REQUIRED
 # ============================================================
 
 def role_required(*allowed_roles):
     """
-    Require one of the supplied roles.
+    Restrict access to the specified roles.
 
     Example:
-
         @role_required("admin")
-
-    or:
 
         @role_required("staff", "admin")
     """
 
     def decorator(view):
-
         @wraps(view)
-        def wrapped_view(
-            *args,
-            **kwargs
-        ):
-
+        def wrapped_view(*args, **kwargs):
             user = current_user()
 
             if user is None:
                 return redirect(
                     url_for(
                         "auth.login",
-                        next=request.url
+                        next=request.url,
                     )
                 )
 
             if user["role"] not in allowed_roles:
                 abort(403)
 
-            return view(
-                *args,
-                **kwargs
-            )
+            return view(*args, **kwargs)
 
         return wrapped_view
 
@@ -224,9 +205,7 @@ def role_required(*allowed_roles):
 # ============================================================
 
 def admin_required(view):
-    return role_required(
-        "admin"
-    )(view)
+    return role_required("admin")(view)
 
 
 # ============================================================
@@ -234,7 +213,4 @@ def admin_required(view):
 # ============================================================
 
 def staff_or_admin_required(view):
-    return role_required(
-        "staff",
-        "admin"
-    )(view)
+    return role_required("staff", "admin")(view)

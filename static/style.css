@@ -10309,3 +10309,53 @@ already has its own label.
     background: #b56d3e;
     border-radius: 7px;
 }
+
+
+
+/* User Login - Black with cream text */
+.main-nav .nav-user-login {
+    background: #24211c;
+    color: #f7efdf;
+    border: 1px solid #24211c;
+}
+
+.main-nav .nav-user-login:hover {
+    background: #40392f;
+    color: #f7efdf;
+    border-color: #40392f;
+}
+
+/* Admin Login - Black with cream text */
+.main-nav .nav-admin-login {
+    background: #24211c;
+    color: #f7efdf;
+    border: 1px solid #24211c;
+}
+
+.main-nav .nav-admin-login:hover {
+    background: #40392f;
+    color: #f7efdf;
+    border-color: #40392f;
+}
+
+/* Keep navbar spacing consistent */
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+    .main-nav {
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .main-nav .nav-user-login,
+    .main-nav .nav-admin-login {
+        padding: 8px 11px;
+        font-size: 13px;
+    }
+}

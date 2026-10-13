@@ -41,29 +41,16 @@ admin_bp = Blueprint(
 # ADMIN LOGIN COMPATIBILITY
 # ============================================================
 
-@admin_bp.route("/admin/login")
+# ============================================================
+# ADMIN LOGIN
+# ============================================================
+
+@admin_bp.route("/admin/login", methods=["GET"])
 def admin_login():
-    """
-    Admins and staff use the normal user login.
-
-    Step 30 uses users.role rather than
-    a separate admin authentication system.
-    """
-
-    return redirect(
-        url_for(
-            "auth.login",
-            next=url_for(
-                "admin.admin_dashboard"
-            )
-        )
-    )
+    return render_template("admin_login.html")
 
 
-@admin_bp.route(
-    "/admin/logout",
-    methods=["POST"]
-)
+@admin_bp.route("/admin/logout", methods=["POST"])
 def admin_logout():
     session.clear()
 
@@ -72,9 +59,17 @@ def admin_logout():
         "success"
     )
 
-    return redirect(
-        url_for("auth.login")
-    )
+    return redirect(url_for("admin.admin_login"))
+
+
+    
+    # Allow only customer accounts on User Login.
+    if user and user["role"] != "customer":
+        flash(
+            "This login is for customers only. Please use the appropriate login page.",
+            "danger"
+        )
+        return render_template("403.html"), 403
 
 
 # ============================================================

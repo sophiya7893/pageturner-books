@@ -120,18 +120,29 @@
                  LOGGED-OUT USER
             ============================================== -->
 
-            {% else %}
+            
+{% else %}
 
-                <a href="{{ url_for('auth.login') }}">
-                    Login
-                </a>
+    <a
+        href="{{ url_for('auth.login') }}"
+        class="nav-user-login"
+    >
+        👤 User Login
+    </a>
 
+    <a href="{{ url_for('shop.register') }}">
+        Register
+    </a>
 
-                <a href="{{ url_for('shop.register') }}">
-                    Register
-                </a>
+    <a
+        href="{{ url_for('admin.admin_login') }}"
+        class="nav-admin-login"
+    >
+        🔐 Admin Login
+    </a>
 
-            {% endif %}
+{% endif %}
+
 
 
             <!-- CART -->

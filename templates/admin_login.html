@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}
@@ -7,72 +8,43 @@ Admin Login - PageTurner Books
 {% block content %}
 
 <div class="container">
-
     <div class="auth-container card">
 
-        <!-- =============================================
-             HEADER
-        ============================================== -->
+        <h1>Admin Login</h1>
+        <p>Sign in with your administrator account.</p>
 
-        <h1>
-            Admin Login
-        </h1>
-
-        <p>
-            Sign in with your staff or administrator account.
-        </p>
-
-
-        <!-- =============================================
-             LOGIN FORM
-        ============================================== -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
 
         <form
             method="POST"
-            action="{{ url_for(
-                'auth.login',
-                next=url_for('admin.admin_dashboard')
-            ) }}"
+            action="{{ url_for('auth.admin_login_submit') }}"
         >
-
-            <!-- STEP 33: CSRF -->
-
             <input
                 type="hidden"
                 name="_csrf_token"
                 value="{{ csrf_token() }}"
             >
 
-
-            <!-- EMAIL -->
-
             <div class="form-group">
-
-                <label for="email">
-                    Email
-                </label>
-
+                <label for="email">Admin Email</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     class="form-control"
-                    value="{{ request.form.get('email', '') }}"
-                    autocomplete="email"
+                    autocomplete="username"
                     required
                 >
-
             </div>
 
-
-            <!-- PASSWORD -->
-
             <div class="form-group">
-
-                <label for="password">
-                    Password
-                </label>
-
+                <label for="password">Password</label>
                 <input
                     type="password"
                     id="password"
@@ -81,23 +53,22 @@ Admin Login - PageTurner Books
                     autocomplete="current-password"
                     required
                 >
-
             </div>
-
-
-            <!-- SUBMIT -->
 
             <button
                 type="submit"
                 class="btn btn-primary btn-full"
             >
-                Login
+                Sign In as Admin
             </button>
-
         </form>
 
-    </div>
+        <p>
+            Are you a customer?
+            <a href="{{ url_for('auth.login') }}">User Login</a>
+        </p>
 
+    </div>
 </div>
 
 {% endblock %}
