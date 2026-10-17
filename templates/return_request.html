@@ -1,0 +1,72 @@
+
+{% extends "base.html" %}
+
+{% block title %}Request a Return | PageTurner Books{% endblock %}
+
+{% block content %}
+<main class="return-form-page">
+    <div class="return-form-container">
+
+        <a href="{{ url_for('shop.orders') }}"
+           class="return-back-link">
+            &larr; Back to Orders
+        </a>
+
+        <section class="return-form-card">
+            <h1>Request a Return</h1>
+            <p class="return-form-subtitle">
+                Order #{{ order.id }} — Select the item and provide a reason.
+            </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="return-form-alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="post" class="return-request-form">
+                <label for="order_item_id">Book</label>
+
+                <select id="order_item_id"
+                        name="order_item_id"
+                        required>
+                    {% for item in items %}
+                        {% set remaining =
+                            item.quantity - (item.already_requested or 0) %}
+
+                        {% if remaining > 0 %}
+                            <option value="{{ item.order_item_id }}">
+                                {{ item.title }} ({{ remaining }} returnable)
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+
+                <label for="quantity">Quantity</label>
+                <input id="quantity"
+                       name="quantity"
+                       type="number"
+                       min="1"
+                       value="1"
+                       required>
+
+                <label for="reason">Reason for return</label>
+                <textarea id="reason"
+                          name="reason"
+                          rows="5"
+                          maxlength="1000"
+                          placeholder="Explain why you want to return this book."
+                          required></textarea>
+
+                <button type="submit" class="return-submit-btn">
+                    Submit Return Request
+                </button>
+            </form>
+        </section>
+    </div>
+</main>
+{% endblock %}

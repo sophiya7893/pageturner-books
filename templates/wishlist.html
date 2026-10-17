@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Wishlist - PageTurner Books
+{% endblock %}
+
+
+{% block content %}
+
+<section class="wishlist-page">
+
+    <div class="page-container">
+
+        <div class="page-header">
+
+            <span class="page-eyebrow">
+                MY ACCOUNT
+            </span>
+
+            <h1>
+                My Wishlist
+            </h1>
+
+            <p>
+                Books you saved for later.
+            </p>
+
+        </div>
+
+
+        {% if books %}
+
+            <div class="book-grid">
+
+                {% for book in books %}
+
+                    <article class="book-card">
+
+                        <div class="book-cover-wrapper">
+
+                            <a
+                                href="{{ url_for(
+                                    'shop.book_detail',
+                                    book_id=book['id']
+                                ) }}"
+                            >
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='images/' ~ book['cover_image']
+                                    ) }}"
+                                    alt="{{ book['title'] }}"
+                                    class="book-cover"
+                                >
+
+                            </a>
+
+
+                            <!-- =============================
+                                 REMOVE HEART
+                            ============================== -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'shop.toggle_wishlist',
+                                    book_id=book['id']
+                                ) }}"
+                                class="wishlist-heart-form"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="wishlist-heart active"
+                                    aria-label="Remove from wishlist"
+                                    title="Remove from wishlist"
+                                >
+                                    ♥
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <div class="book-card-body">
+
+                            <h3>
+
+                                <a
+                                    href="{{ url_for(
+                                        'shop.book_detail',
+                                        book_id=book['id']
+                                    ) }}"
+                                >
+                                    {{ book["title"] }}
+                                </a>
+
+                            </h3>
+
+
+                            <p class="book-author">
+                                {{ book["author"] }}
+                            </p>
+
+
+                            <!-- =============================
+                                 RATING
+                            ============================== -->
+
+                            <div class="book-rating">
+
+                                {% if book["review_count"]|int > 0 %}
+
+                                    <span class="rating-star">
+                                        ★
+                                    </span>
+
+                                    <strong>
+                                        {{ "%.1f"|format(
+                                            book["average_rating"]|float
+                                        ) }}
+                                    </strong>
+
+                                    <span>
+                                        ({{ book["review_count"] }})
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="no-rating">
+                                        No reviews yet
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <strong class="book-price">
+                                {{ book["price_paise"]|money }}
+                            </strong>
+
+
+                            <!-- =============================
+                                 STEP 51
+                            ============================== -->
+
+                            {% if book["stock"]|int == 0 %}
+
+                                <span class="stock-badge out-of-stock">
+                                    Out of stock
+                                </span>
+
+                            {% elif book["stock"]|int < 5 %}
+
+                                <span class="stock-badge low-stock">
+                                    Only {{ book["stock"] }} left
+                                </span>
+
+                            {% else %}
+
+                                <span class="stock-badge in-stock">
+                                    In stock
+                                </span>
+
+                            {% endif %}
+
+
+                            {% if book["stock"]|int > 0 %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'shop.add_to_cart',
+                                        book_id=book['id']
+                                    ) }}"
+                                    class="book-card-cart-form"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="_csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="quantity"
+                                        value="1"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="shop-btn shop-btn-primary"
+                                    >
+                                        Add to Cart
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <button
+                                    type="button"
+                                    class="shop-btn shop-btn-disabled"
+                                    disabled
+                                >
+                                    Out of Stock
+                                </button>
+
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h2>
+                    Your wishlist is empty
+                </h2>
+
+                <p>
+                    Tap the heart on a book to save it here.
+                </p>
+
+                <a
+                    href="{{ url_for('shop.home') }}"
+                    class="shop-btn shop-btn-primary"
+                >
+                    Browse Books
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

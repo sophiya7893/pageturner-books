@@ -1,0 +1,116 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Returns | PageTurner Books{% endblock %}
+
+{% block content %}
+<main class="admin-cr-page">
+    <div class="admin-cr-container">
+
+        <!-- Page Header -->
+        <header class="admin-cr-header">
+            <div class="admin-cr-heading">
+                <h1>Return Requests</h1>
+                <p>Review customer return requests and update their status.</p>
+            </div>
+
+            <div class="admin-cr-actions">
+                <a href="{{ url_for('admin.admin_dashboard') }}"
+                   class="admin-cr-btn admin-cr-btn-secondary">
+                    &larr; Back to Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Return Requests Table -->
+        <section class="admin-cr-card">
+            <div class="admin-cr-table-wrap">
+                <table class="admin-cr-table">
+                    <thead>
+                        <tr>
+                            <th>Return</th>
+                            <th>Order</th>
+                            <th>Book</th>
+                            <th>Qty</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for r in returns %}
+                        <tr>
+                            <td>#{{ r.id }}</td>
+                            <td>#{{ r.order_id }}</td>
+                            <td>{{ r.title or 'Book' }}</td>
+                            <td>{{ r.quantity }}</td>
+                            <td class="admin-cr-reason">
+                                {{ r.reason }}
+                            </td>
+                            <td>
+                                <span class="admin-cr-status
+                                    {% if r.status|lower == 'pending' %}
+                                        status-pending
+                                    {% elif r.status|lower == 'approved' %}
+                                        status-approved
+                                    {% elif r.status|lower == 'rejected' %}
+                                        status-rejected
+                                    {% else %}
+                                        status-other
+                                    {% endif %}">
+                                    {{ r.status }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if r.status|lower == 'pending' %}
+                                <div class="admin-cr-actions-cell">
+
+                                    <form method="post"
+                                          action="{{ url_for(
+                                              'shop.admin_decide_return',
+                                              return_id=r.id,
+                                              action='approve'
+                                          ) }}">
+                                        <button type="submit"
+                                                class="admin-cr-btn admin-cr-btn-approve">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <form method="post"
+                                          action="{{ url_for(
+                                              'shop.admin_decide_return',
+                                              return_id=r.id,
+                                              action='reject'
+                                          ) }}">
+                                        <button type="submit"
+                                                class="admin-cr-btn admin-cr-btn-reject">
+                                            Reject
+                                        </button>
+                                    </form>
+
+                                </div>
+                                {% else %}
+                                    <span class="admin-cr-no-action">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="admin-cr-empty">
+                                <div class="admin-cr-empty-icon">📚</div>
+                                <strong>No return requests found</strong>
+                                <p>Customer return requests will appear here.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</main>
+{% endblock %}

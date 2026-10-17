@@ -1,0 +1,74 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Admin Login - PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="auth-container card">
+
+        <h1>Admin Login</h1>
+        <p>Sign in with your administrator account.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form
+            method="POST"
+            action="{{ url_for('auth.admin_login_submit') }}"
+        >
+            <input
+                type="hidden"
+                name="_csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <div class="form-group">
+                <label for="email">Admin Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="form-control"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary btn-full"
+            >
+                Sign In as Admin
+            </button>
+        </form>
+
+        <p>
+            Are you a customer?
+            <a href="{{ url_for('auth.login') }}">User Login</a>
+        </p>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,551 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ book["title"] }} - PageTurner Books
+{% endblock %}
+
+
+{% block content %}
+
+<section class="book-detail-page">
+
+    <div class="page-container">
+
+        <!-- =================================================
+             BREADCRUMB
+        ================================================== -->
+
+        <nav class="breadcrumb">
+
+            <a href="{{ url_for('shop.home') }}">
+                Home
+            </a>
+
+            <span>
+                /
+            </span>
+
+            <span>
+                {{ book["title"] }}
+            </span>
+
+        </nav>
+
+
+        <!-- =================================================
+             BOOK
+        ================================================== -->
+
+        <div class="book-detail-grid">
+
+            <!-- =============================================
+                 COVER
+            ============================================== -->
+
+            <div class="book-detail-cover">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='images/' ~ book['cover_image']
+                    ) }}"
+                    alt="{{ book['title'] }}"
+                >
+
+            </div>
+
+
+            <!-- =============================================
+                 DETAILS
+            ============================================== -->
+
+            <div class="book-detail-info">
+
+                <span class="section-eyebrow">
+                    BOOK DETAILS
+                </span>
+
+                <h1>
+                    {{ book["title"] }}
+                </h1>
+
+                <p class="book-detail-author">
+                    by {{ book["author"] }}
+                </p>
+
+
+                <!-- =========================================
+                     STEP 55
+                     RATING
+                ========================================== -->
+
+                <div class="book-detail-rating">
+
+                    {% if book["review_count"]|int > 0 %}
+
+                        <span class="rating-star">
+                            ★
+                        </span>
+
+                        <strong>
+                            {{ "%.1f"|format(
+                                book["average_rating"]|float
+                            ) }}
+                        </strong>
+
+                        <span>
+                            {{ book["review_count"] }}
+
+                            {% if book["review_count"]|int == 1 %}
+                                review
+                            {% else %}
+                                reviews
+                            {% endif %}
+                        </span>
+
+                    {% else %}
+
+                        <span>
+                            No reviews yet
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================================
+                     CATEGORIES
+                ========================================== -->
+
+                {% if categories %}
+
+                    <div class="book-meta-list">
+
+                        {% for category in categories %}
+
+                            <a
+                                href="{{ url_for(
+                                    'shop.home',
+                                    category=category['name']
+                                ) }}"
+                                class="category-pill"
+                            >
+                                {{ category["name"] }}
+                            </a>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =========================================
+                     TAGS
+                ========================================== -->
+
+                {% if tags %}
+
+                    <div class="book-tag-list">
+
+                        {% for tag in tags %}
+
+                            <span class="book-tag">
+                                {{ tag["name"] }}
+                            </span>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =========================================
+                     DESCRIPTION
+                ========================================== -->
+
+                <div class="book-description">
+
+                    <p>
+                        {{ book["description"] }}
+                    </p>
+
+                </div>
+
+
+                <!-- =========================================
+                     PRICE
+                ========================================== -->
+
+                <div class="book-detail-price">
+                    {{ book["price_paise"]|money }}
+                </div>
+
+
+                <!-- =========================================
+                     STEP 51
+                     STOCK
+                ========================================== -->
+
+                <div class="book-detail-stock">
+
+                    {% if book["available_stock"]|int == 0 %}
+
+                        <span class="stock-badge out-of-stock">
+                            Out of stock
+                        </span>
+
+                    {% elif book["available_stock"]|int < 5 %}
+
+                        <span class="stock-badge low-stock">
+                            Only {{ book["available_stock"] }} left
+                        </span>
+
+                    {% else %}
+
+                        <span class="stock-badge in-stock">
+                            In stock
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================================
+                     CART
+                ========================================== -->
+
+                {% if book["available_stock"]|int > 0 %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'shop.add_to_cart',
+                            book_id=book['id']
+                        ) }}"
+                        class="book-detail-cart"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+
+                        <div class="quantity-field">
+
+                            <label for="quantity">
+                                Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                id="quantity"
+                                name="quantity"
+                                value="1"
+                                min="1"
+                                max="{{ book['stock'] }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="shop-btn shop-btn-primary"
+                        >
+                            Add to Cart
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <button
+                        type="button"
+                        class="shop-btn shop-btn-disabled"
+                        disabled
+                    >
+                        Out of Stock
+                    </button>
+
+                {% endif %}
+
+
+                <!-- =========================================
+                     STEP 52
+                     WISHLIST
+                ========================================== -->
+
+                {% if current_user %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'shop.toggle_wishlist',
+                            book_id=book['id']
+                        ) }}"
+                        class="detail-wishlist-form"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="shop-btn shop-btn-secondary"
+                        >
+
+                            {% if in_wishlist %}
+
+                                ♥ Remove from Wishlist
+
+                            {% else %}
+
+                                ♡ Add to Wishlist
+
+                            {% endif %}
+
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <p class="login-hint">
+
+                        <a href="{{ url_for('auth.login') }}">
+                            Log in
+                        </a>
+
+                        to save this book to your wishlist.
+
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             STEP 55
+             REVIEWS
+        ================================================== -->
+
+        <section class="reviews-section">
+
+            <div class="section-heading">
+
+                <span class="section-eyebrow">
+                    CUSTOMER REVIEWS
+                </span>
+
+                <h2>
+                    Reviews
+                </h2>
+
+            </div>
+
+
+            <!-- =============================================
+                 REVIEW FORM
+            ============================================== -->
+
+            {% if current_user %}
+
+                {% if can_review %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'shop.add_review',
+                            book_id=book['id']
+                        ) }}"
+                        class="review-form"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+
+                        <div class="form-group">
+
+                            <label for="rating">
+                                Rating
+                            </label>
+
+                            <select
+                                id="rating"
+                                name="rating"
+                                required
+                            >
+
+                                <option value="">
+                                    Choose rating
+                                </option>
+
+                                <option value="5">
+                                    5 - Excellent
+                                </option>
+
+                                <option value="4">
+                                    4 - Very Good
+                                </option>
+
+                                <option value="3">
+                                    3 - Good
+                                </option>
+
+                                <option value="2">
+                                    2 - Fair
+                                </option>
+
+                                <option value="1">
+                                    1 - Poor
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="comment">
+                                Review
+                            </label>
+
+                            <textarea
+                                id="comment"
+                                name="comment"
+                                rows="5"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="shop-btn shop-btn-primary"
+                        >
+                            Submit Review
+                        </button>
+
+                    </form>
+
+
+                {% elif already_reviewed %}
+
+                    <div class="review-message">
+
+                        You have already reviewed this book.
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="review-message">
+
+                        Purchase this book before submitting
+                        a review.
+
+                    </div>
+
+                {% endif %}
+
+            {% else %}
+
+                <div class="review-message">
+
+                    <a href="{{ url_for('auth.login') }}">
+                        Log in
+                    </a>
+
+                    to review a book you purchased.
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =============================================
+                 REVIEW LIST
+            ============================================== -->
+
+            {% if reviews %}
+
+                <div class="review-list">
+
+                    {% for review in reviews %}
+
+                        <article class="review-card">
+
+                            <div class="review-header">
+
+                                <strong>
+                                    {{ review["user_name"] }}
+                                </strong>
+
+                                <span class="review-rating">
+
+                                    {% for number in range(
+                                        review["rating"]
+                                    ) %}
+                                        ★
+                                    {% endfor %}
+
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                {{ review["comment"] }}
+                            </p>
+
+
+                            <small>
+                                {{ review["created_at"] }}
+                            </small>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state compact">
+
+                    <p>
+                        No reviews yet. Be the first verified
+                        buyer to review this book.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</section>
+
+{% endblock %}

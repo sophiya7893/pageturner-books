@@ -1,0 +1,48 @@
+
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<section class="page-container notifications-page">
+
+    <div class="page-heading">
+        <h1>Notifications</h1>
+        <p>Stay updated with your orders and account activity.</p>
+    </div>
+
+    <div class="notifications-list">
+        {% for n in notifications %}
+        <article class="card notification-row {% if not n.is_read %}unread{% endif %}">
+
+            <div class="notification-icon">
+                {% if not n.is_read %}
+                    &#128276;
+                {% else %}
+                    &#128488;
+                {% endif %}
+            </div>
+
+            <div class="notification-content">
+                <a href="{{ url_for('extras.open_notification', notification_id=n.id) }}">
+                    {{ n.text }}
+                </a>
+                <small>{{ n.created_at }}</small>
+            </div>
+
+            {% if not n.is_read %}
+            <span class="unread-indicator" title="Unread"></span>
+            {% endif %}
+
+        </article>
+        {% else %}
+        <div class="empty-notifications">
+            <div class="empty-icon">&#128276;</div>
+            <h2>No notifications yet</h2>
+            <p>When there are updates about your orders or account, they will appear here.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</section>
+{% endblock %}

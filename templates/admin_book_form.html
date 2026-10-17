@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if book %}
+        Edit Book
+    {% else %}
+        Add Book
+    {% endif %}
+    - PageTurner Books
+{% endblock %}
+
+
+{% block content %}
+
+<div class="admin-book-page">
+
+    <div class="admin-book-container">
+
+        <!-- =============================================
+             HEADER
+        ============================================== -->
+
+        <div class="admin-book-header">
+
+            <span class="admin-book-label">
+                📚 Book Management
+            </span>
+
+            <h1>
+                {% if book %}
+                    Edit Book
+                {% else %}
+                    Add New Book
+                {% endif %}
+            </h1>
+
+            <p>
+                {% if book %}
+                    Update the details of this book.
+                {% else %}
+                    Add a new book to your
+                    PageTurner Books catalogue.
+                {% endif %}
+            </p>
+
+        </div>
+
+
+        <div class="admin-book-card">
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="admin-book-form"
+            >
+
+                <!-- =====================================
+                     STEP 33 - CSRF
+                ====================================== -->
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+
+                <!-- =====================================
+                     BOOK INFORMATION
+                ====================================== -->
+
+                <div class="admin-form-section">
+
+                    <h2>
+                        Book Information
+                    </h2>
+
+                    <p class="admin-form-section-text">
+                        Enter the basic information
+                        about the book.
+                    </p>
+
+
+                    <div class="form-group">
+
+                        <label for="title">
+                            Title
+                        </label>
+
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            class="form-control"
+                            value="{{ request.form.get(
+                                'title',
+                                book['title'] if book else ''
+                            ) }}"
+                            placeholder="Enter book title"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="author">
+                            Author
+                        </label>
+
+                        <input
+                            type="text"
+                            id="author"
+                            name="author"
+                            class="form-control"
+                            value="{{ request.form.get(
+                                'author',
+                                book['author'] if book else ''
+                            ) }}"
+                            placeholder="Enter author name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="category">
+                            Category
+                        </label>
+
+                        <input
+                            type="text"
+                            id="category"
+                            name="category"
+                            class="form-control"
+                            value="{{ request.form.get(
+                                'category',
+                                book['category'] if book else ''
+                            ) }}"
+                            placeholder="Example: Programming"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     PRICE AND STOCK
+                ====================================== -->
+
+                <div class="admin-form-section">
+
+                    <h2>
+                        Price &amp; Stock
+                    </h2>
+
+                    <p class="admin-form-section-text">
+                        Set the selling price and
+                        available quantity.
+                    </p>
+
+
+                    <div class="admin-form-row">
+
+                        <div class="form-group">
+
+                            <label for="price">
+                                Price (₹)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="price"
+                                name="price"
+                                step="0.01"
+                                min="0"
+                                class="form-control"
+                                value="{{ request.form.get(
+                                    'price',
+                                    book['price'] if book else ''
+                                ) }}"
+                                placeholder="0.00"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="stock">
+                                Stock Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                id="stock"
+                                name="stock"
+                                min="0"
+                                class="form-control"
+                                value="{{ request.form.get(
+                                    'stock',
+                                    book['stock'] if book else '0'
+                                ) }}"
+                                placeholder="0"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     DESCRIPTION
+                ====================================== -->
+
+                <div class="admin-form-section">
+
+                    <h2>
+                        Book Description
+                    </h2>
+
+                    <p class="admin-form-section-text">
+                        Add a short description that
+                        customers can read.
+                    </p>
+
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="6"
+                            class="form-control"
+                            placeholder="Enter a description of the book..."
+                        >{{ request.form.get(
+                            'description',
+                            book['description'] if book else ''
+                        ) }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     STEP 38 - IMAGE UPLOAD
+                ====================================== -->
+
+                <div class="admin-form-section">
+
+                    <h2>
+                        Cover Image
+                    </h2>
+
+                    <p class="admin-form-section-text">
+                        Upload a JPG, PNG or WebP image.
+                        Maximum file size: 1 MB.
+                    </p>
+
+
+                    <!-- CURRENT IMAGE -->
+
+                    {% if book and book["cover_image"] %}
+
+                        <div class="admin-current-cover">
+
+                            <p>
+                                <strong>
+                                    Current Cover
+                                </strong>
+                            </p>
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='images/' ~
+                                    book['cover_image']
+                                ) }}"
+                                alt="{{ book['title'] }}"
+                                style="
+                                    max-width: 140px;
+                                    max-height: 200px;
+                                    object-fit: cover;
+                                "
+                            >
+
+                            <p>
+                                <small>
+                                    Upload a new image below
+                                    only if you want to replace it.
+                                </small>
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="form-group">
+
+                        <label for="cover_image">
+                            {% if book %}
+                                New Cover Image
+                            {% else %}
+                                Cover Image
+                            {% endif %}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="cover_image"
+                            name="cover_image"
+                            class="form-control"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        >
+
+                        <small class="admin-form-help">
+                            Allowed: JPG, JPEG, PNG, WebP.
+                            Maximum: 1 MB.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     ACTIONS
+                ====================================== -->
+
+                <div class="admin-form-actions">
+
+                    <a
+                        href="{{ url_for(
+                            'admin.admin_dashboard'
+                        ) }}"
+                        class="admin-cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="admin-save-button"
+                    >
+
+                        {% if book %}
+                            Update Book
+                        {% else %}
+                            Add Book
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

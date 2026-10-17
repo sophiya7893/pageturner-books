@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice #{{ order.id }} | PageTurner Books{% endblock %}
+
+{% block content %}
+<section class="invoice-page">
+    <div class="invoice-container">
+
+        <div class="invoice-topbar no-print">
+            <a href="{{ url_for('shop.orders') }}" class="invoice-back">
+                ← Back to Orders
+            </a>
+
+            <button type="button" class="invoice-print"
+                    onclick="window.print()">
+                Print Invoice
+            </button>
+        </div>
+
+        <div class="invoice-card">
+
+            <header class="invoice-header">
+                <div>
+                    <p class="invoice-brand">PAGETURNER BOOKS</p>
+                    <h1>INVOICE</h1>
+                    <p class="invoice-subtitle">
+                        Thank you for shopping with us.
+                    </p>
+                </div>
+
+                <div class="invoice-number">
+                    <span>Invoice Number</span>
+                    <strong>#{{ order.id }}</strong>
+                    <span class="invoice-status">
+                        {{ order.status }}
+                    </span>
+                </div>
+            </header>
+
+            <div class="invoice-divider"></div>
+
+            <div class="invoice-details">
+                <div>
+                    <h3>Bill To</h3>
+                    <p><strong>{{ order.customer_name }}</strong></p>
+                    <p>{{ order.email }}</p>
+
+                    {% if order.phone %}
+                    <p>Phone: {{ order.phone }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h3>Delivery Address</h3>
+                    <p>{{ order.address_snapshot or 'Address unavailable' }}</p>
+                    {% if order.created_at %}
+                    <p class="invoice-date">
+                        Order Date: {{ order.created_at }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h3 class="invoice-section-title">Order Items</h3>
+
+            <div class="invoice-table-wrap">
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th class="invoice-right">Amount</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.title or 'Book' }}</strong>
+                                {% if item.author %}
+                                <small>{{ item.author }}</small>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ item.price_paise|money }}
+                            </td>
+
+                            <td>{{ item.quantity }}</td>
+
+                            <td class="invoice-right">
+                                {{ ((item.price_paise|int) * (item.quantity|int))|money }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="invoice-empty">
+                                No order items found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="invoice-summary">
+                <div class="invoice-summary-row">
+                    <span>Subtotal</span>
+                    <span>{{ subtotal_paise|default(order.total_paise + (order.discount_paise or 0), true)|money }}</span>
+                </div>
+
+                <div class="invoice-summary-row">
+                    <span>Coupon discount</span>
+                    <span class="invoice-discount">
+                        −{{ order.discount_paise|default(0, true)|money }}
+                    </span>
+                </div>
+
+                <div class="invoice-summary-row">
+                    <span>Shipping</span>
+                    <span>{{ order.shipping_paise|default(0)|money }}</span>
+                </div>
+
+                <div class="invoice-summary-row">
+                    <span>Tax</span>
+                    <span>{{ order.tax_paise|default(0)|money }}</span>
+                </div>
+
+                <div class="invoice-total-row">
+                    <strong>Total paid</strong>
+                    <strong>{{ order.total_paise|money }}</strong>
+                </div>
+            </div>
+
+            <footer class="invoice-footer">
+                <h3>Thank You!</h3>
+                <p>
+                    Thank you for choosing PageTurner Books.
+                    We hope you enjoy your reading.
+                </p>
+
+                <div class="invoice-footer-actions no-print">
+                    <a href="{{ url_for('shop.order_tracking',
+                                        order_id=order.id) }}">
+                        Track Order
+                    </a>
+
+                    <a href="{{ url_for('shop.orders') }}">
+                        Back to Orders
+                    </a>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

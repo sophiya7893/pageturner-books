@@ -1,0 +1,40 @@
+CREATE TABLE IF NOT EXISTS user_sessions (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+ token_hash TEXT NOT NULL UNIQUE, user_agent TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ last_seen TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS admin_log (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, action TEXT NOT NULL,
+ target TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS api_rate_limits (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT NOT NULL, requested_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_api_rate_ip_time ON api_rate_limits(ip, requested_at);
+CREATE TABLE IF NOT EXISTS messages (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL,
+ text TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ is_read INTEGER NOT NULL DEFAULT 0 CHECK(is_read IN (0,1))
+);
+CREATE TABLE IF NOT EXISTS notifications (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, text TEXT NOT NULL,
+ link TEXT, is_read INTEGER NOT NULL DEFAULT 0 CHECK(is_read IN (0,1)),
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, is_read);
+CREATE TABLE IF NOT EXISTS shipping_zones (
+ zone_prefix TEXT PRIMARY KEY, price_paise INTEGER NOT NULL CHECK(price_paise >= 0)
+);
+INSERT OR IGNORE INTO shipping_zones(zone_prefix, price_paise) VALUES ('DEFAULT', 5000), ('1', 4000), ('2', 4500), ('3', 5000), ('4', 5500), ('5', 6000), ('6', 6500), ('7', 7000), ('8', 7500), ('9', 8000);
+CREATE TABLE IF NOT EXISTS site_settings (
+ key TEXT PRIMARY KEY, value TEXT NOT NULL
+);
+INSERT OR IGNORE INTO site_settings(key,value) VALUES ('free_shipping_threshold_paise','50000');
+CREATE TABLE IF NOT EXISTS book_imports (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, file_hash TEXT NOT NULL UNIQUE, imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_admin_log_created ON admin_log(created_at);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON user_sessions(user_id);

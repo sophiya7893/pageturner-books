@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+
+{% block title %}
+Order Confirmation - PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<section class="order-confirmation-page">
+
+    <div class="order-confirmation-container">
+
+        <!-- =================================================
+             SUCCESS HEADER
+        ================================================== -->
+
+        <div class="order-confirmation-hero">
+
+            <div class="order-success-icon">
+                ✓
+            </div>
+
+            <span class="order-confirmation-eyebrow">
+                ORDER CONFIRMED
+            </span>
+
+            <h1>
+                Thank You for Your Order
+            </h1>
+
+            <p>
+                Your order has been placed successfully.
+                You can review the complete order details below.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             ORDER DETAILS
+        ================================================== -->
+
+        <section class="order-confirmation-card">
+
+            <div class="order-confirmation-card-header">
+
+                <div>
+
+                    <span class="order-card-eyebrow">
+                        ORDER INFORMATION
+                    </span>
+
+                    <h2>
+                        Order Details
+                    </h2>
+
+                </div>
+
+
+                <span
+                    class="
+                        order-confirmation-status
+
+                        {% if order['status'] == 'Placed' %}
+                            order-confirmation-status-placed
+
+                        {% elif order['status'] == 'Packed' %}
+                            order-confirmation-status-packed
+
+                        {% elif order['status'] == 'Shipped' %}
+                            order-confirmation-status-shipped
+
+                        {% elif order['status'] == 'Delivered' %}
+                            order-confirmation-status-delivered
+
+                        {% elif order['status'] == 'Cancelled' %}
+                            order-confirmation-status-cancelled
+                        {% endif %}
+                    "
+                >
+                    {{ order["status"] }}
+                </span>
+
+            </div>
+
+
+            <div class="order-confirmation-info-grid">
+
+                <div class="order-confirmation-info-item">
+
+                    <span>
+                        Order ID
+                    </span>
+
+                    <strong>
+                        #{{ order["id"] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="order-confirmation-info-item">
+
+                    <span>
+                        Order Date
+                    </span>
+
+                    <strong>
+                        {{ order["created_at"] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="order-confirmation-info-item">
+
+                    <span>
+                        Status
+                    </span>
+
+                    <strong>
+                        {{ order["status"] }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CUSTOMER + DELIVERY
+        ================================================== -->
+
+        <section class="order-confirmation-card">
+
+            <div class="order-confirmation-card-header">
+
+                <div>
+
+                    <span class="order-card-eyebrow">
+                        DELIVERY
+                    </span>
+
+                    <h2>
+                        Customer Details
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="order-customer-grid">
+
+                <div class="order-customer-item">
+
+                    <span>
+                        Customer Name
+                    </span>
+
+                    <strong>
+                        {{ order["customer_name"] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="order-customer-item">
+
+                    <span>
+                        Email Address
+                    </span>
+
+                    <strong>
+                        {{ order["email"] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="order-customer-item">
+
+                    <span>
+                        Phone Number
+                    </span>
+
+                    <strong>
+                        {{ order["phone"] or "Not provided" }}
+                    </strong>
+
+                </div>
+
+
+                <div class="order-customer-item order-address-item">
+
+                    <span>
+                        Delivery Address
+                    </span>
+
+                    <strong>
+                        {{ order["address_snapshot"] }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             BOOKS ORDERED
+        ================================================== -->
+
+        <section class="order-confirmation-card">
+
+            <div class="order-confirmation-card-header">
+
+                <div>
+
+                    <span class="order-card-eyebrow">
+                        ITEMS
+                    </span>
+
+                    <h2>
+                        Books Ordered
+                    </h2>
+
+                </div>
+
+
+                {% if items %}
+
+                    <span class="order-item-count">
+                        {{ items|length }}
+
+                        {% if items|length == 1 %}
+                            Item
+                        {% else %}
+                            Items
+                        {% endif %}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            {% if items %}
+
+                <div class="order-confirmation-table-wrapper">
+
+                    <table class="order-confirmation-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Book
+                                </th>
+
+                                <th>
+                                    Author
+                                </th>
+
+                                <th>
+                                    Price
+                                </th>
+
+                                <th>
+                                    Quantity
+                                </th>
+
+                                <th>
+                                    Subtotal
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for item in items %}
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="order-book-cell">
+
+                                            {% if item["cover_image"] %}
+
+                                                <img
+                                                    src="{{ url_for(
+                                                        'static',
+                                                        filename='images/' ~ item['cover_image']
+                                                    ) }}"
+                                                    alt="{{ item['title'] }}"
+                                                    class="order-book-image"
+                                                >
+
+                                            {% endif %}
+
+
+                                            <strong>
+                                                {{ item["title"] }}
+                                            </strong>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        {{ item["author"] }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ item["price_paise"] | money }}
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="order-quantity-badge">
+                                            {{ item["quantity"] }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td class="order-line-total">
+                                        {{ item["subtotal_paise"] | money }}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="order-no-items">
+
+                    <p>
+                        No order items were found.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- =================================================
+             PAYMENT SUMMARY
+        ================================================== -->
+
+        <section class="order-confirmation-card">
+
+            <div class="order-confirmation-card-header">
+
+                <div>
+
+                    <span class="order-card-eyebrow">
+                        PAYMENT
+                    </span>
+
+                    <h2>
+                        Payment Summary
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="order-payment-wrapper">
+
+                <div class="order-payment-summary">
+
+                    <div class="order-payment-row">
+
+                        <span>
+                            Subtotal
+                        </span>
+
+                        <strong>
+                            {{
+                                (order["subtotal_paise"] | int) | money
+                            }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-payment-row">
+
+                        <span>
+                            Coupon
+                        </span>
+
+                        <strong>
+
+                            {% if order["coupon_code"] %}
+
+                                {{ order["coupon_code"] }}
+
+                            {% else %}
+
+                                Not applied
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-payment-row">
+
+                        <span>
+                            Discount
+                        </span>
+
+                        <strong class="order-discount-value">
+
+                            {% if (order["discount_paise"] | int) > 0 %}
+
+                                -{{ order["discount_paise"] | int | money }}
+
+                            {% else %}
+
+                                {{ 0 | money }}
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-payment-row"><span>Shipping</span><strong>{{ order["shipping_paise"]|int|money }}</strong></div>
+                    <div class="order-payment-row"><span>Tax (5%)</span><strong>{{ order["tax_paise"]|int|money }}</strong></div>
+
+                    <div class="order-payment-total">
+
+                        <span>
+                            Total Paid
+                        </span>
+
+                        <strong>
+                            {{ order["total_paise"] | int | money }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <div class="order-confirmation-actions">
+
+            <a
+                href="{{ url_for('shop.orders') }}"
+                class="order-confirmation-secondary-btn"
+            >
+                ← View My Orders
+            </a>
+
+
+            <a
+                href="{{ url_for('shop.home') }}"
+                class="order-confirmation-primary-btn"
+            >
+                Continue Shopping
+                <span>→</span>
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

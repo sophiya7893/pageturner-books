@@ -1,0 +1,277 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+{{ page_title }} | PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<section class="address-form-page">
+
+    <div class="container">
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
+        <div class="addresses-header">
+
+            <div>
+
+                <span class="checkout-label">
+                    ADDRESS BOOK
+                </span>
+
+                <h1>
+                    {{ page_title }}
+                </h1>
+
+                <p>
+                    Enter your delivery address details below.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ADDRESS FORM
+        ================================================== -->
+
+        <div class="checkout-form-card">
+
+            <form
+                method="POST"
+                class="checkout-form"
+            >
+
+                <!-- =========================================
+                     STEP 33 - CSRF TOKEN
+                ========================================== -->
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+
+                <!-- =========================================
+                     LABEL
+                ========================================== -->
+
+                <div class="checkout-form-group">
+
+                    <label for="label">
+                        Address Label
+                    </label>
+
+                    <input
+                        id="label"
+                        type="text"
+                        name="label"
+                        placeholder="Home, Work, Parents..."
+                        value="{{ request.form.get(
+                            'label',
+                            address['label'] if address else ''
+                        ) }}"
+                        maxlength="50"
+                        required
+                    >
+
+                    <small>
+                        Example: Home, Work or Parents
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                     ADDRESS LINE
+                ========================================== -->
+
+                <div class="checkout-form-group">
+
+                    <label for="line1">
+                        Address
+                    </label>
+
+                    <textarea
+                        id="line1"
+                        name="line1"
+                        rows="4"
+                        placeholder="House number, building, street, area"
+                        required
+                    >{{ request.form.get(
+                        'line1',
+                        address['line1'] if address else ''
+                    ) }}</textarea>
+
+                </div>
+
+
+                <!-- =========================================
+                     CITY
+                ========================================== -->
+
+                <div class="checkout-form-group">
+
+                    <label for="city">
+                        City
+                    </label>
+
+                    <input
+                        id="city"
+                        type="text"
+                        name="city"
+                        placeholder="Enter city"
+                        value="{{ request.form.get(
+                            'city',
+                            address['city'] if address else ''
+                        ) }}"
+                        maxlength="100"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     PINCODE
+                ========================================== -->
+
+                <div class="checkout-form-group">
+
+                    <label for="pincode">
+                        Pincode
+                    </label>
+
+                    <input
+                        id="pincode"
+                        type="text"
+                        name="pincode"
+                        placeholder="Enter pincode"
+                        value="{{ request.form.get(
+                            'pincode',
+                            address['pincode'] if address else ''
+                        ) }}"
+                        maxlength="10"
+                        inputmode="numeric"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     PHONE NUMBER
+                ========================================== -->
+
+                <div class="checkout-form-group">
+
+                    <label for="phone">
+                        Phone Number
+                    </label>
+
+                    <input
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        placeholder="Enter 10-digit phone number"
+                        value="{{ request.form.get(
+                            'phone',
+                            address['phone'] if address and address['phone'] else ''
+                        ) }}"
+                        minlength="10"
+                        maxlength="10"
+                        pattern="[0-9]{10}"
+                        inputmode="numeric"
+                        autocomplete="tel"
+                        required
+                    >
+
+                    <small>
+                        Enter a 10-digit mobile number.
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                     STEP 28 - DEFAULT ADDRESS
+                ========================================== -->
+
+                <div class="checkout-form-group">
+
+                    <label class="address-default-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="is_default"
+                            value="1"
+
+                            {% if request.method == "POST" %}
+
+                                {% if request.form.get("is_default") %}
+                                    checked
+                                {% endif %}
+
+                            {% elif address and address["is_default"] %}
+
+                                checked
+
+                            {% endif %}
+                        >
+
+                        <span>
+                            Make this my default address
+                        </span>
+
+                    </label>
+
+                    <small>
+                        Your default address will be automatically
+                        selected during checkout.
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                     ACTION BUTTONS
+                ========================================== -->
+
+                <div class="address-form-actions">
+
+                    <button
+                        type="submit"
+                        class="place-order-button"
+                    >
+                        {% if address %}
+                            Update Address
+                        {% else %}
+                            Save Address
+                        {% endif %}
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('shop.addresses') }}"
+                        class="order-secondary-button"
+                    >
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

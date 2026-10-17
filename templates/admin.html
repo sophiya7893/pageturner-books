@@ -1,0 +1,532 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - PageTurner Books{% endblock %}
+
+{% block content %}
+
+<section class="admin-page">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="admin-page-header">
+            <div>
+                <span class="section-label">ADMINISTRATION</span>
+                <h1>Admin Dashboard</h1>
+                <p>Manage books, stock, orders, coupons, returns and store performance.</p>
+            </div>
+
+            <div class="admin-header-actions">
+                <a href="{{ url_for('admin.admin_add_book') }}"
+                   class="button primary-button">+ Add Book</a>
+
+                <a href="{{ url_for('admin.admin_orders') }}"
+                   class="button secondary-button">Manage Orders</a>
+
+                <a href="{{ url_for('admin.admin_report') }}"
+                   class="button secondary-button">View Report</a>
+            </div>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="admin-stats-grid">
+
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon">📚</div>
+                <div class="admin-stat-content">
+                    <span class="admin-stat-label">Total Books</span>
+                    <strong class="admin-stat-value">{{ books | length }}</strong>
+                </div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon">📦</div>
+                <div class="admin-stat-content">
+                    <span class="admin-stat-label">Total Orders</span>
+                    <strong class="admin-stat-value">{{ total_orders | default(0) }}</strong>
+                </div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon">₹</div>
+                <div class="admin-stat-content">
+                    <span class="admin-stat-label">Revenue</span>
+                    <strong class="admin-stat-value">
+                        {{ total_revenue_paise | default(0) | money }}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon">👥</div>
+                <div class="admin-stat-content">
+                    <span class="admin-stat-label">Customers</span>
+                    <strong class="admin-stat-value">{{ total_users | default(0) }}</strong>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <div>
+                    <span class="section-label">QUICK ACTIONS</span>
+                    <h2>Store Management</h2>
+                    <p>Access all store administration features.</p>
+                </div>
+            </div>
+
+            <div class="admin-quick-grid">
+
+                <a href="{{ url_for('admin.admin_add_book') }}"
+                   class="admin-quick-card">
+                    <span class="admin-quick-icon">📚</span>
+                    <div>
+                        <strong>Add New Book</strong>
+                        <small>Add books, prices, stock, categories and tags.</small>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('admin.admin_orders') }}"
+                   class="admin-quick-card">
+                    <span class="admin-quick-icon">📦</span>
+                    <div>
+                        <strong>Manage Orders</strong>
+                        <small>View customer orders and update their status.</small>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('admin.admin_report') }}"
+                   class="admin-quick-card">
+                    <span class="admin-quick-icon">📊</span>
+                    <div>
+                        <strong>Sales Report</strong>
+                        <small>View revenue and best-selling books.</small>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('admin.admin_coupons') }}"
+                   class="admin-quick-card">
+                    <span class="admin-quick-icon">🎟️</span>
+                    <div>
+                        <strong>Manage Coupons</strong>
+                        <small>Create and manage discount codes.</small>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('admin.admin_returns') }}"
+                   class="admin-quick-card">
+                    <span class="admin-quick-icon">↩️</span>
+                    <div>
+                        <strong>Manage Returns</strong>
+                        <small>Review and process customer return requests.</small>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('extras.admin_messages') }}"
+                   class="admin-quick-card">
+                    <span class="admin-quick-icon">✉️</span>
+                    <div>
+                        <strong>Contact Messages</strong>
+                        <small>Read visitor messages and mark them as read.</small>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('extras.import_books') }}"
+                   class="admin-quick-card">
+                    <span class="admin-quick-icon">📥</span>
+                    <div>
+                        <strong>Import Books CSV</strong>
+                        <small>Validate and import multiple books in one transaction.</small>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- ORDER STATUS -->
+        {% if status_counts %}
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <div>
+                    <span class="section-label">ORDERS</span>
+                    <h2>Order Status</h2>
+                </div>
+
+                <a href="{{ url_for('admin.admin_orders') }}"
+                   class="admin-text-link">View all orders →</a>
+            </div>
+
+            <div class="admin-status-grid">
+                {% for status_row in status_counts %}
+                <div class="admin-status-card">
+                    <span class="admin-status-name">{{ status_row["status"] }}</span>
+                    <strong>{{ status_row["count"] }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- LOW STOCK -->
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <div>
+                    <span class="section-label">INVENTORY</span>
+                    <h2>Low Stock</h2>
+                    <p>Books with 5 or fewer copies remaining.</p>
+                </div>
+
+                {% if low_stock_count is defined %}
+                <span class="status-badge warning">
+                    {{ low_stock_count }} book(s)
+                </span>
+                {% endif %}
+            </div>
+
+            {% set low_stock_namespace = namespace(count=0) %}
+
+            {% for stock_book in books %}
+                {% if stock_book["stock"] <= 5 %}
+                    {% set low_stock_namespace.count = low_stock_namespace.count + 1 %}
+                {% endif %}
+            {% endfor %}
+
+            {% if low_stock_namespace.count > 0 %}
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Author</th>
+                            <th>Stock</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for stock_book in books %}
+                            {% if stock_book["stock"] <= 5 %}
+                            <tr>
+                                <td><strong>{{ stock_book["title"] }}</strong></td>
+                                <td>{{ stock_book["author"] }}</td>
+                                <td>
+                                    {% if stock_book["stock"] <= 0 %}
+                                    <span class="status-badge danger">Out of Stock</span>
+                                    {% else %}
+                                    <span class="status-badge warning">
+                                        {{ stock_book["stock"] }} left
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin.admin_edit_book', book_id=stock_book['id']) }}"
+                                       class="admin-table-link">Edit</a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="admin-empty-state">
+                <span>✓</span>
+                <div>
+                    <strong>Stock looks good</strong>
+                    <p>No books currently need restocking.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TOP SELLING BOOKS -->
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <div>
+                    <span class="section-label">PERFORMANCE</span>
+                    <h2>Top Selling Books</h2>
+                    <p>Best-performing books from non-cancelled orders.</p>
+                </div>
+            </div>
+
+            {% if top_books %}
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Units Sold</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for top_book in top_books %}
+                        <tr>
+                            <td>
+                                <strong>{{ top_book["title"] }}</strong>
+                                {% if top_book["author"] is defined %}
+                                <div class="admin-table-subtext">{{ top_book["author"] }}</div>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ top_book["units"] | default(0) }}</strong></td>
+                            <td>
+                                <strong>{{ top_book["revenue_paise"] | default(0) | money }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="admin-empty-state">
+                <span>📚</span>
+                <div>
+                    <strong>No sales yet</strong>
+                    <p>Best-selling books will appear here after customers place orders.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RECENT ORDERS -->
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <div>
+                    <span class="section-label">RECENT ACTIVITY</span>
+                    <h2>Recent Orders</h2>
+                </div>
+
+                <a href="{{ url_for('admin.admin_orders') }}"
+                   class="admin-text-link">View all →</a>
+            </div>
+
+            {% if recent_orders %}
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td><strong>#{{ order["id"] }}</strong></td>
+                            <td>
+                                <strong>{{ order["customer_name"] }}</strong>
+                                {% if order["email"] is defined %}
+                                <div class="admin-table-subtext">{{ order["email"] }}</div>
+                                {% endif %}
+                            </td>
+                            <td>{{ order["created_at"] }}</td>
+                            <td>
+                                {% if order["status"] == "Cancelled" %}
+                                <span class="status-badge danger">Cancelled</span>
+                                {% elif order["status"] == "Delivered" %}
+                                <span class="status-badge success">Delivered</span>
+                                {% elif order["status"] == "Shipped" %}
+                                <span class="status-badge info">Shipped</span>
+                                {% else %}
+                                <span class="status-badge warning">{{ order["status"] }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ order["total_paise"] | default(0) | money }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="admin-empty-state">
+                <span>📦</span>
+                <div>
+                    <strong>No orders yet</strong>
+                    <p>New customer orders will appear here.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- REVENUE OVERVIEW -->
+        {% if revenue_data %}
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <div>
+                    <span class="section-label">LAST 7 DAYS</span>
+                    <h2>Revenue Overview</h2>
+                    <p>Daily revenue from non-cancelled orders.</p>
+                </div>
+            </div>
+
+            <div class="admin-revenue-list">
+                {% for revenue_row in revenue_data %}
+                <div class="admin-revenue-row">
+                    <div class="admin-revenue-date">{{ revenue_row["day"] }}</div>
+
+                    <div class="admin-revenue-track">
+                        <div class="admin-revenue-bar"
+                             style="width: {{ revenue_row['percentage'] | default(0) }}%">
+                        </div>
+                    </div>
+
+                    <strong class="admin-revenue-value">
+                        {{ revenue_row["revenue_paise"] | default(0) | money }}
+                    </strong>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- MANAGE BOOKS -->
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <div>
+                    <span class="section-label">CATALOGUE</span>
+                    <h2>Manage Books</h2>
+                    <p>Manage prices, stock, categories, tags and book information.</p>
+                </div>
+
+                <a href="{{ url_for('admin.admin_add_book') }}"
+                   class="button primary-button">+ Add Book</a>
+            </div>
+
+            {% if books %}
+            <div class="admin-table-wrap">
+                <table class="admin-table admin-books-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Categories</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for book in books %}
+                        <tr>
+                            <td>
+                                <div class="admin-book-cell">
+                                    {% if book["cover_image"] %}
+                                    <img
+                                        src="{{ url_for('static', filename='images/' ~ book['cover_image']) }}"
+                                        alt="{{ book['title'] }}"
+                                        class="admin-book-thumb"
+                                    >
+                                    {% else %}
+                                    <div class="admin-book-thumb-placeholder">📖</div>
+                                    {% endif %}
+
+                                    <div>
+                                        <strong>{{ book["title"] }}</strong>
+                                        <div class="admin-table-subtext">{{ book["author"] }}</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if book["category_names"] %}
+                                <div class="admin-category-list">
+                                    {% for category_name in book["category_names"].split(",") %}
+                                    <span class="admin-category-chip">{{ category_name }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <span class="admin-muted">No category</span>
+                                {% endif %}
+                            </td>
+
+                            <td><strong>{{ book["price_paise"] | default(0) | money }}</strong></td>
+
+                            <td>
+                                {% if book["stock"] <= 0 %}
+                                <span class="status-badge danger">Out of Stock</span>
+                                {% elif book["stock"] <= 3 %}
+                                <span class="status-badge warning">{{ book["stock"] }} left</span>
+                                {% else %}
+                                <span class="status-badge success">{{ book["stock"] }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="admin-table-actions">
+                                    <a href="{{ url_for('shop.book_detail', book_id=book['id']) }}"
+                                       class="admin-action-link">View</a>
+
+                                    <a href="{{ url_for('admin.admin_edit_book', book_id=book['id']) }}"
+                                       class="admin-action-link">Edit</a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('admin.admin_delete_book', book_id=book['id']) }}"
+                                          class="admin-delete-form"
+                                          onsubmit="return confirm('Delete this book?');">
+
+                                        <input type="hidden"
+                                               name="csrf_token"
+                                               value="{{ csrf_token() }}">
+
+                                        <button type="submit" class="admin-delete-button">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="admin-empty-state">
+                <span>📚</span>
+                <div>
+                    <strong>No books found</strong>
+                    <p>Add your first book to the catalogue.</p>
+                    <a href="{{ url_for('admin.admin_add_book') }}"
+                       class="button primary-button">Add Book</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- BOTTOM ACTIONS -->
+        <div class="admin-bottom-actions">
+            <a href="{{ url_for('admin.admin_report') }}"
+               class="button secondary-button">View Full Report</a>
+
+            <a href="{{ url_for('admin.admin_orders') }}"
+               class="button secondary-button">Manage Orders</a>
+
+            <a href="{{ url_for('admin.admin_coupons') }}"
+               class="button secondary-button">Manage Coupons</a>
+
+            <a href="{{ url_for('admin.admin_returns') }}"
+               class="button secondary-button">Manage Returns</a>
+
+            <form method="POST" action="{{ url_for('admin.admin_logout') }}">
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <button type="submit" class="button secondary-button">
+                    Admin Logout
+                </button>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

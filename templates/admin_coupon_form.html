@@ -1,0 +1,171 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {% if coupon %}
+        Edit Coupon | PageTurner Books
+    {% else %}
+        Add Coupon | PageTurner Books
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin-coupons-returns.css') }}">
+
+<section class="coupon-form-page">
+
+    <a href="{{ url_for('admin.admin_coupons') }}"
+       class="admin-back-link">
+        &larr; Back to Coupons
+    </a>
+
+    <div class="coupon-form-header">
+        <h1>
+            {% if coupon %}
+                Edit Coupon
+            {% else %}
+                Add New Coupon
+            {% endif %}
+        </h1>
+
+        <p>
+            {% if coupon %}
+                Update the coupon details and save your changes.
+            {% else %}
+                Create a discount coupon for PageTurner Books customers.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="coupon-form-card">
+
+        <form method="POST"
+              action="{% if coupon %}{{ url_for('admin.admin_edit_coupon', coupon_id=coupon['id']) }}{% else %}{{ url_for('admin.admin_add_coupon') }}{% endif %}">
+
+            <!-- CSRF Token -->
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <!-- Coupon Code -->
+            <div class="coupon-form-group">
+                <label for="code">Coupon Code *</label>
+
+                <input
+                    type="text"
+                    id="code"
+                    name="code"
+                    placeholder="Example: WELCOME10"
+                    value="{{ coupon['code'] if coupon else '' }}"
+                    maxlength="50"
+                    pattern="[A-Za-z0-9_-]+"
+                    title="Use letters, numbers, underscores, or hyphens only."
+                    autocomplete="off"
+                    required
+                >
+
+                <small class="coupon-form-help">
+                    Enter a unique code customers can use during checkout.
+                </small>
+            </div>
+
+            <!-- Discount Percentage -->
+            <div class="coupon-form-group">
+                <label for="percent">Discount Percentage *</label>
+
+                <input
+                    type="number"
+                    id="percent"
+                    name="percent"
+                    min="1"
+                    max="100"
+                    step="1"
+                    placeholder="Example: 10"
+                    value="{{ coupon['percent'] if coupon else '' }}"
+                    required
+                >
+
+                <small class="coupon-form-help">
+                    Enter a discount between 1% and 100%.
+                </small>
+            </div>
+
+            <!-- Expiry Date -->
+            <div class="coupon-form-group">
+                <label for="expiry_date">Expiry Date</label>
+
+                <input
+                    type="date"
+                    id="expiry_date"
+                    name="expiry_date"
+                    value="{{ coupon['expiry_date'] if coupon and coupon['expiry_date'] else '' }}"
+                >
+
+                <small class="coupon-form-help">
+                    Leave blank if the coupon does not have an expiry date.
+                </small>
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="min_order">Minimum order amount (₹)</label>
+                <input type="number" id="min_order" name="min_order" min="0" step="0.01"
+                       value="{{ ('%d.%02d' % (coupon['min_order_paise']//100, coupon['min_order_paise']%100)) if coupon and coupon['min_order_paise'] is not none else '0.00' }}">
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="max_discount">Maximum discount (₹, optional)</label>
+                <input type="number" id="max_discount" name="max_discount" min="0" step="0.01"
+                       value="{{ ('%d.%02d' % (coupon['max_discount_paise']//100, coupon['max_discount_paise']%100)) if coupon and coupon['max_discount_paise'] is not none else '' }}">
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="usage_limit">Total usage limit (optional)</label>
+                <input type="number" id="usage_limit" name="usage_limit" min="1" step="1"
+                       value="{{ coupon['usage_limit'] if coupon and coupon['usage_limit'] is not none else '' }}">
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="category_id">Restrict to one category (optional)</label>
+                <select id="category_id" name="category_id">
+                    <option value="">All categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category['id'] }}" {% if coupon and coupon['category_id'] == category['id'] %}selected{% endif %}>{{ category['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="coupon-form-group">
+                <label>
+                    <input type="checkbox" name="one_use_per_customer" value="1"
+                           {% if coupon and coupon['one_use_per_customer'] %}checked{% endif %}>
+                    Limit this coupon to one use per customer
+                </label>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="coupon-form-actions">
+
+                <button type="submit" class="coupon-form-btn">
+                    {% if coupon %}
+                        Save Changes
+                    {% else %}
+                        Create Coupon
+                    {% endif %}
+                </button>
+
+                <a href="{{ url_for('admin.admin_coupons') }}"
+                   class="coupon-form-btn coupon-form-btn-secondary">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

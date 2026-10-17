@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            PageTurner Books
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style1.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="site-header">
+
+    <div class="container nav-container">
+
+        <!-- =================================================
+             LOGO
+        ================================================== -->
+
+        <a
+            href="{{ url_for('shop.home') }}"
+            class="logo"
+        >
+            📚 PageTurner Books
+        </a>
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <nav class="main-nav">
+
+            <a href="{{ url_for('shop.home') }}">
+                Home
+            </a>
+
+
+            <!-- =============================================
+                 LOGGED-IN USER
+            ============================================== -->
+
+            {% if current_user %}
+
+                <!-- STEP 56: PROFILE -->
+
+                <a href="{{ url_for('shop.profile') }}">
+                    👤 My Profile
+                </a>
+
+
+                <!-- STEP 52: WISHLIST -->
+
+                <a href="{{ url_for('shop.wishlist') }}">
+                    ❤️ Wishlist
+                </a>
+
+
+                <!-- ORDERS -->
+
+                <a href="{{ url_for('shop.orders') }}">
+                    My Orders
+                </a>
+
+
+                <!-- ADDRESSES -->
+
+                <a href="{{ url_for('shop.addresses') }}">
+                    Addresses
+                </a>
+
+
+                <!-- =========================================
+                     STEP 30
+                     STAFF / ADMIN
+                ========================================== -->
+
+                {% if current_user["role"]
+                      in ["admin", "staff"] %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.admin_dashboard'
+                        ) }}"
+                    >
+                        🔐 Dashboard
+                    </a>
+
+                {% endif %}
+
+
+                <!-- =========================================
+                     STEP 33
+                     POST + CSRF LOGOUT
+                ========================================== -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for('auth.logout') }}"
+                    class="nav-logout-form"
+                >
+
+                    <input
+                        type="hidden"
+                        name="_csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button
+                        type="submit"
+                        class="nav-logout-button"
+                    >
+                        Logout
+                    </button>
+
+                </form>
+
+
+            <!-- =============================================
+                 LOGGED-OUT USER
+            ============================================== -->
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    class="nav-user-login"
+                >
+                    👤 User Login
+                </a>
+
+
+                <a href="{{ url_for('shop.register') }}">
+                    Register
+                </a>
+
+
+                <a
+                    href="{{ url_for('admin.admin_login') }}"
+                    class="nav-admin-login"
+                >
+                    🔐 Admin Login
+                </a>
+
+            {% endif %}
+
+
+            <!-- =============================================
+                 CART
+            ============================================== -->
+
+            <a
+                href="{{ url_for('shop.cart') }}"
+                class="cart-link"
+            >
+
+                🛒 Cart
+
+                <span
+                    id="cart-count"
+                    class="cart-count"
+                >
+                    {{ cart_count|default(0) }}
+                </span>
+
+            </a>
+
+        
+                <a href="{{ url_for('extras.contact') }}">Contact</a>
+                {% if current_user %}
+                    <a href="{{ url_for('extras.notifications') }}">🔔 Notifications{% if notification_count %} ({{ notification_count }}){% endif %}</a>
+                    <a href="{{ url_for('extras.devices') }}">My devices</a>
+                {% endif %}
+</nav>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     FLASH MESSAGES
+========================================================= -->
+
+{% with messages =
+    get_flashed_messages(with_categories=true)
+%}
+
+    {% if messages %}
+
+        <div class="container flash-container">
+
+            {% for category, message in messages %}
+
+                <div
+                    class="flash-message
+                           flash-{{ category }}"
+                >
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+
+<main>
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <div class="footer-top">
+
+            <!-- =============================================
+                 BRAND
+            ============================================== -->
+
+            <div class="footer-brand">
+
+                <a
+                    href="{{ url_for('shop.home') }}"
+                    class="footer-logo"
+                >
+                    📚 <span>PageTurner</span>
+                </a>
+
+                <p>
+                    Discover books you'll love,
+                    one page at a time.
+                </p>
+
+            </div>
+
+
+            <!-- =============================================
+                 FOOTER LINKS
+            ============================================== -->
+
+            <div class="footer-links">
+
+                <a href="{{ url_for('shop.home') }}">
+                    Home
+                </a>
+
+
+                <a href="{{ url_for('shop.cart') }}">
+                    Cart
+                </a>
+
+
+                {% if current_user %}
+
+                    <!-- STEP 56 -->
+
+                    <a href="{{ url_for('shop.profile') }}">
+                        My Profile
+                    </a>
+
+
+                    <!-- STEP 52 -->
+
+                    <a href="{{ url_for('shop.wishlist') }}">
+                        Wishlist
+                    </a>
+
+
+                    <a href="{{ url_for('shop.orders') }}">
+                        My Orders
+                    </a>
+
+
+                    <a href="{{ url_for('shop.addresses') }}">
+                        Addresses
+                    </a>
+
+
+                    {% if current_user["role"]
+                          in ["admin", "staff"] %}
+
+                        <a
+                            href="{{ url_for(
+                                'admin.admin_dashboard'
+                            ) }}"
+                        >
+                            Dashboard
+                        </a>
+
+                    {% endif %}
+
+
+                {% else %}
+
+                    <a href="{{ url_for('auth.login') }}">
+                        Login
+                    </a>
+
+
+                    <a href="{{ url_for('shop.register') }}">
+                        Register
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-line"></div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © {{ current_year|default(2026) }}
+                PageTurner Books
+            </span>
+
+            <span>
+                Made for book lovers 📖
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script
+    src="{{ url_for('static', filename='app.js') }}"
+></script>
+
+
+{% block scripts %}
+{% endblock %}
+
+
+</body>
+
+</html>

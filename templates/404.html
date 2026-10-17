@@ -1,0 +1,13 @@
+
+{% extends "base.html" %}
+
+{% block title %}404 Not Found | PageTurner Books{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <h1>404</h1>
+    <h2>Page Not Found</h2>
+    <p>Sorry, we couldn't find the page you're looking for.</p>
+    <a href="{{ url_for('shop.home') }}" class="btn">Back to Home</a>
+</section>
+{% endblock %}

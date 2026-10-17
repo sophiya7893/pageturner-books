@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Profile - PageTurner Books
+{% endblock %}
+
+
+{% block content %}
+
+<section class="profile-page">
+
+    <div class="page-container">
+
+        <!-- ================================================
+             HEADER
+        ================================================= -->
+
+        <div class="page-header">
+
+            <span class="page-eyebrow">
+                MY ACCOUNT
+            </span>
+
+            <h1>
+                Customer Profile
+            </h1>
+
+            <p>
+                View your account information and
+                shopping summary.
+            </p>
+
+        </div>
+
+
+        <!-- ================================================
+             PROFILE GRID
+        ================================================= -->
+
+        <div class="profile-grid">
+
+            <!-- ============================================
+                 CUSTOMER DETAILS
+            ============================================= -->
+
+            <section class="profile-card">
+
+                <h2>
+                    Account Details
+                </h2>
+
+                <div class="profile-info">
+
+                    <div class="profile-info-row">
+
+                        <span>
+                            Name
+                        </span>
+
+                        <strong>
+                            {{ user["name"] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-row">
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong>
+                            {{ user["email"] }}
+                        </strong>
+
+                    </div>
+
+
+                    {% if user["created_at"] %}
+
+                        <div class="profile-info-row">
+
+                            <span>
+                                Member Since
+                            </span>
+
+                            <strong>
+                                {{ user["created_at"] }}
+                            </strong>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="profile-actions">
+
+                    <a
+                        href="{{ url_for('auth.change_password') }}"
+                        class="shop-btn shop-btn-primary"
+                    >
+                        Change Password
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- ============================================
+                 SHOPPING SUMMARY
+            ============================================= -->
+
+            <section class="profile-card">
+
+                <h2>
+                    Shopping Summary
+                </h2>
+
+                <div class="profile-stat-grid">
+
+                    <div class="profile-stat">
+
+                        <span class="profile-stat-label">
+                            Orders
+                        </span>
+
+                        <strong class="profile-stat-number">
+                            {{ order_count }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <span class="profile-stat-label">
+                            Total Spent
+                        </span>
+
+                        <strong class="profile-stat-number">
+                            {{ total_spent_paise|money }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-actions">
+
+                    <a
+                        href="{{ url_for('shop.orders') }}"
+                        class="shop-btn shop-btn-secondary"
+                    >
+                        View My Orders
+                    </a>
+
+                    <a
+                        href="{{ url_for('shop.wishlist') }}"
+                        class="shop-btn shop-btn-secondary"
+                    >
+                        My Wishlist
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

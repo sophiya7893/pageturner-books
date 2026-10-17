@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}
+Manage Orders - PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<div class="manage-orders-page">
+
+    <div class="manage-orders-container">
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
+        <div class="manage-orders-header">
+
+            <div>
+
+                <span class="manage-orders-label">
+                    📦 Order Management
+                </span>
+
+                <h1>
+                    Manage Orders
+                </h1>
+
+                <p>
+                    View customer orders and update their
+                    current status.
+                </p>
+
+            </div>
+
+
+            {% if current_user
+                  and current_user["role"] == "admin" %}
+
+                <a
+                    href="{{ url_for(
+                        'admin.admin_dashboard'
+                    ) }}"
+                    class="manage-dashboard-button"
+                >
+                    ← Dashboard
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('shop.home') }}"
+                    class="manage-dashboard-button"
+                >
+                    ← Store
+                </a>
+
+            {% endif %}
+
+        </div>
+
+
+        {% if orders %}
+
+            <!-- =============================================
+                 ORDERS SUMMARY
+            ============================================== -->
+
+            <div class="manage-orders-summary">
+
+                <div class="orders-summary-card">
+
+                    <span class="orders-summary-icon">
+                        📋
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            {{ orders|length }}
+                        </strong>
+
+                        <span>
+                            Order{% if orders|length != 1 %}s{% endif %}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 ORDERS
+            ============================================== -->
+
+            <div class="manage-orders-list">
+
+                {% for order in orders %}
+
+                    <div class="manage-order-card">
+
+                        <!-- =================================
+                             ORDER HEADER
+                        ================================== -->
+
+                        <div class="manage-order-header">
+
+                            <div>
+
+                                <span class="manage-order-number">
+                                    Order #{{ order["id"] }}
+                                </span>
+
+                                <p class="manage-order-date">
+                                    {{ order["created_at"] }}
+                                </p>
+
+                            </div>
+
+
+                            <span
+                                class="
+                                    manage-order-status
+
+                                    {% if order['status'] == 'Placed' %}
+                                        manage-status-placed
+
+                                    {% elif order['status'] == 'Packed' %}
+                                        manage-status-packed
+
+                                    {% elif order['status'] == 'Shipped' %}
+                                        manage-status-shipped
+
+                                    {% elif order['status'] == 'Delivered' %}
+                                        manage-status-delivered
+
+                                    {% elif order['status'] == 'Cancelled' %}
+                                        manage-status-cancelled
+
+                                    {% endif %}
+                                "
+                            >
+                                {{ order["status"] }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- =================================
+                             CUSTOMER INFORMATION
+                        ================================== -->
+
+                        <div class="manage-order-info">
+
+                            <div class="manage-info-item">
+
+                                <span class="manage-info-label">
+                                    Customer
+                                </span>
+
+                                <strong>
+                                    {{ order["customer_name"] }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="manage-info-item">
+
+                                <span class="manage-info-label">
+                                    Email
+                                </span>
+
+                                <strong>
+                                    {{ order["email"] }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="manage-info-item">
+
+                                <span class="manage-info-label">
+                                    Order Total
+                                </span>
+
+                                <strong class="manage-order-price">
+                                    {{ order["total_paise"]|default(0)|money }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================
+                             COUPON
+                        ================================== -->
+
+                        {% if order["coupon_code"] %}
+
+                            <div class="manage-order-coupon">
+
+                                <span>
+                                    Coupon
+                                </span>
+
+                                <strong>
+                                    {{ order["coupon_code"] }}
+                                </strong>
+
+                                <span>
+                                    · Discount
+                                    {{ order["discount_paise"]|default(0)|money }}
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =================================
+                             ORDER DETAILS LINK
+                        ================================== -->
+
+                        <div class="manage-order-coupon">
+
+                            <a
+                                href="{{ url_for(
+                                    'shop.order_confirmation',
+                                    order_id=order['id']
+                                ) }}"
+                            >
+                                View Order Details →
+                            </a>
+
+                        </div>
+
+
+                        <!-- =================================
+                             STEP 30 - STATUS UPDATE
+                        ================================== -->
+
+                        <div class="manage-order-update">
+
+                            <div>
+
+                                <h3>
+                                    Update Order Status
+                                </h3>
+
+                                {% if order["status"] == "Cancelled" %}
+
+                                    <p>
+                                        This order has been cancelled.
+                                        Its status cannot be changed.
+                                    </p>
+
+                                {% else %}
+
+                                    <p>
+                                        Change the status shown
+                                        to the customer.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if order["status"] != "Cancelled" %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'admin.admin_update_order_status',
+                                        order_id=order['id']
+                                    ) }}"
+                                    class="manage-status-form"
+                                >
+
+                                    <!-- STEP 33: CSRF -->
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+
+                                    <select
+                                        name="status"
+                                        class="manage-status-select"
+                                        required
+                                    >
+
+                                        <!-- =================
+                                             PLACED
+                                        ================== -->
+
+                                        <option
+                                            value="Placed"
+                                            {% if order["status"] == "Placed" %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            Placed
+                                        </option>
+
+
+                                        <!-- =================
+                                             PACKED
+                                        ================== -->
+
+                                        <option
+                                            value="Packed"
+                                            {% if order["status"] == "Packed" %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            Packed
+                                        </option>
+
+
+                                        <!-- =================
+                                             SHIPPED
+                                        ================== -->
+
+                                        <option
+                                            value="Shipped"
+                                            {% if order["status"] == "Shipped" %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            Shipped
+                                        </option>
+
+
+                                        <!-- =================
+                                             DELIVERED
+                                        ================== -->
+
+                                        <option
+                                            value="Delivered"
+                                            {% if order["status"] == "Delivered" %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            Delivered
+                                        </option>
+
+
+                                        <!-- =================
+                                             CANCELLED
+                                             Only Placed orders
+                                             may be cancelled.
+                                        ================== -->
+
+                                        {% if order["status"] == "Placed" %}
+
+                                            <option value="Cancelled">
+                                                Cancelled
+                                            </option>
+
+                                        {% endif %}
+
+                                    </select>
+
+
+                                    <button
+                                        type="submit"
+                                        class="manage-update-button"
+                                    >
+                                        Update Status
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <!-- =============================================
+                 EMPTY STATE
+            ============================================== -->
+
+            <div class="manage-orders-empty">
+
+                <div class="manage-empty-icon">
+                    📦
+                </div>
+
+                <h2>
+                    No Orders Yet
+                </h2>
+
+                <p>
+                    There are no customer orders to manage
+                    at the moment.
+                </p>
+
+
+                {% if current_user
+                      and current_user["role"] == "admin" %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.admin_dashboard'
+                        ) }}"
+                        class="manage-dashboard-button"
+                    >
+                        Back to Dashboard
+                    </a>
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for('shop.home') }}"
+                        class="manage-dashboard-button"
+                    >
+                        Back to Store
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

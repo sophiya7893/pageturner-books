@@ -1,0 +1,327 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Checkout - PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<section class="checkout-page">
+
+    <div class="page-container">
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
+        <div class="page-header">
+
+            <span class="page-eyebrow">
+                CHECKOUT
+            </span>
+
+            <h1>
+                Complete Your Order
+            </h1>
+
+        </div>
+
+
+        <!-- =================================================
+             RESERVATION NOTICE
+        ================================================== -->
+
+        <div class="reservation-notice">
+
+            <strong>
+                Your books are temporarily reserved.
+            </strong>
+
+            <p>
+                Reservation expires at
+                {{ reservation_expires_at }} UTC.
+                Complete your order before the reservation
+                expires.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             CHECKOUT LAYOUT
+        ================================================== -->
+
+        <div class="checkout-layout">
+
+
+            <!-- =================================================
+                 SHIPPING ADDRESS
+            ================================================== -->
+
+            <section class="checkout-card">
+
+                <h2>
+                    Shipping Address
+                </h2>
+
+
+                {% if addresses %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('shop.place_order') }}"
+                        class="checkout-form"
+                    >
+
+                        <!-- =====================================
+                             CSRF TOKEN
+                        ====================================== -->
+
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+
+                        <!-- =====================================
+                             ADDRESS LIST
+                        ====================================== -->
+
+                        <div class="address-choice-list">
+
+                            {% for address in addresses %}
+
+                                <label class="address-choice">
+
+                                    <input
+                                        type="radio"
+                                        name="address_id"
+                                        value="{{ address['id'] }}"
+                                        {% if address["is_default"] %}
+                                            checked
+                                        {% endif %}
+                                        required
+                                    >
+
+
+                                    <span class="address-choice-content">
+
+                                        <!-- ADDRESS LABEL -->
+
+                                        <strong>
+                                            {{ address["label"] }}
+                                        </strong>
+
+
+                                        <!-- ADDRESS LINE -->
+
+                                        <span>
+                                            {{ address["line1"] }}
+                                        </span>
+
+
+                                        <!-- CITY + PINCODE -->
+
+                                        <span>
+                                            {{ address["city"] }}
+                                            -
+                                            {{ address["pincode"] }}
+                                        </span>
+
+
+                                        <!-- PHONE NUMBER -->
+
+                                        {% if address["phone"] %}
+
+                                            <span>
+                                                <strong>Phone:</strong>
+                                                {{ address["phone"] }}
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="address-phone-missing">
+                                                Phone number not added
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        <!-- DEFAULT BADGE -->
+
+                                        {% if address["is_default"] %}
+
+                                            <span class="default-badge">
+                                                Default
+                                            </span>
+
+                                        {% endif %}
+
+                                    </span>
+
+                                </label>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             MANAGE ADDRESSES
+                        ====================================== -->
+
+                        <div class="checkout-address-actions">
+
+                            <a
+                                href="{{ url_for('shop.addresses') }}"
+                                class="shop-btn shop-btn-secondary"
+                            >
+                                Manage Addresses
+                            </a>
+
+                        </div>
+
+
+                        <!-- =====================================
+                             PLACE ORDER
+                        ====================================== -->
+
+                        <button
+                            type="submit"
+                            class="shop-btn shop-btn-primary full-width"
+                        >
+                            Place Order
+                        </button>
+
+                    </form>
+
+
+                {% else %}
+
+                    <!-- =========================================
+                         NO SAVED ADDRESSES
+                    ========================================== -->
+
+                    <div class="empty-state compact">
+
+                        <p>
+                            You don't have any saved shipping
+                            addresses yet.
+                        </p>
+
+
+                        <a
+                            href="{{ url_for('shop.addresses') }}"
+                            class="shop-btn shop-btn-primary"
+                        >
+                            Add Address
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ORDER SUMMARY
+            ================================================== -->
+
+            <aside class="checkout-card checkout-summary">
+
+                <h2>
+                    Order Summary
+                </h2>
+
+
+                {% if items %}
+
+                    {% for item in items %}
+
+                        <div class="checkout-summary-item">
+
+                            <div>
+
+                                <strong>
+                                    {{ item["title"] }}
+                                </strong>
+
+                                <span>
+                                    {{ item["quantity"] }}
+                                    ×
+                                    {{ item["price_paise"]|money }}
+                                </span>
+
+                            </div>
+
+
+                            <strong>
+                                {{ item["subtotal_paise"]|money }}
+                            </strong>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                    <!-- =========================================
+                         TOTAL
+                    ========================================== -->
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <strong>{{ subtotal_paise|default(total_paise)|money }}</strong>
+                    </div>
+                    {% if discount_paise %}
+                    <div class="summary-row coupon-discount-row">
+                        <span>Coupon discount ({{ coupon_code }})</span>
+                        <strong>−{{ discount_paise|money }}</strong>
+                    </div>
+                    {% endif %}
+                    <div class="summary-row"><span>Shipping</span><strong>{{ shipping_paise|default(0)|money }}</strong></div>
+                    <div class="summary-row"><span>Tax (5%)</span><strong>{{ tax_paise|default(0)|money }}</strong></div>
+
+                    <div class="summary-row total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            {{ total_paise|money }}
+                        </strong>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state compact">
+
+                        <p>
+                            Your cart is empty.
+                        </p>
+
+                        <a
+                            href="{{ url_for('shop.home') }}"
+                            class="shop-btn shop-btn-primary"
+                        >
+                            Continue Shopping
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

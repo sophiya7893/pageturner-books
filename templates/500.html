@@ -1,0 +1,13 @@
+
+{% extends "base.html" %}
+
+{% block title %}500 Server Error | PageTurner Books{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <h1>500</h1>
+    <h2>Something Went Wrong</h2>
+    <p>Sorry, an unexpected error occurred. Please try again later.</p>
+    <a href="{{ url_for('shop.home') }}" class="btn">Back to Home</a>
+</section>
+{% endblock %}

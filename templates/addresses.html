@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Addresses - PageTurner Books
+{% endblock %}
+
+{% block content %}
+
+<div class="address-page">
+
+    <div class="address-container">
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
+        <div class="address-page-header">
+
+            <div>
+
+                <span class="address-eyebrow">
+                    ADDRESS BOOK
+                </span>
+
+                <h1>
+                    Shipping Addresses
+                </h1>
+
+                <p>
+                    Manage your saved delivery addresses and
+                    choose the default address used at checkout.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('shop.add_address') }}"
+                class="address-add-btn"
+            >
+                + Add New Address
+            </a>
+
+        </div>
+
+
+        {% if addresses %}
+
+            <!-- =============================================
+                 SAVED ADDRESS GRID
+            ============================================== -->
+
+            <div class="address-grid">
+
+                {% for address in addresses %}
+
+                    <article
+                        class="address-card
+                        {% if address['is_default'] %}
+                            address-card-default
+                        {% endif %}"
+                    >
+
+                        <!-- =================================
+                             CARD HEADER
+                        ================================== -->
+
+                        <div class="address-card-top">
+
+                            <div class="address-icon">
+                                📍
+                            </div>
+
+
+                            <div class="address-title-area">
+
+                                <div class="address-title-row">
+
+                                    <h2>
+                                        {{ address["label"] }}
+                                    </h2>
+
+
+                                    {% if address["is_default"] %}
+
+                                        <span class="address-default-badge">
+                                            ✓ Default
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <span class="address-delivery-label">
+                                    Delivery Address
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================
+                             ADDRESS INFORMATION
+                        ================================== -->
+
+                        <div class="address-details">
+
+                            <p>
+                                {{ address["line1"] }}
+                            </p>
+
+                            <p>
+                                {{ address["city"] }}
+                            </p>
+
+                            <p class="address-pincode">
+                                PIN: {{ address["pincode"] }}
+                            </p>
+
+
+                            <!-- =============================
+                                 PHONE NUMBER
+                            ============================== -->
+
+                            {% if address["phone"] %}
+
+                                <p class="address-phone">
+                                    <strong>Phone:</strong>
+                                    {{ address["phone"] }}
+                                </p>
+
+                            {% else %}
+
+                                <p class="address-phone address-phone-missing">
+                                    <strong>Phone:</strong>
+                                    Not added
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- =================================
+                             DEFAULT INFORMATION
+                        ================================== -->
+
+                        {% if address["is_default"] %}
+
+                            <div class="address-default-info">
+                                This address will be selected
+                                automatically during checkout.
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =================================
+                             ACTION BUTTONS
+                        ================================== -->
+
+                        <div class="address-actions">
+
+
+                            <!-- EDIT -->
+
+                            <a
+                                href="{{ url_for(
+                                    'shop.edit_address',
+                                    address_id=address['id']
+                                ) }}"
+                                class="address-edit-btn"
+                            >
+                                Edit
+                            </a>
+
+
+                            <!-- MAKE DEFAULT -->
+
+                            {% if not address["is_default"] %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'shop.set_default_address',
+                                        address_id=address['id']
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="address-default-btn"
+                                    >
+                                        Make Default
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+
+                            <!-- DELETE -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'shop.delete_address',
+                                    address_id=address['id']
+                                ) }}"
+                                onsubmit="return confirm(
+                                    'Are you sure you want to delete this address?'
+                                );"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="address-delete-btn"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 FOOTER ACTIONS
+            ============================================== -->
+
+            <div class="address-footer">
+
+                <a
+                    href="{{ url_for('shop.home') }}"
+                    class="address-secondary-link"
+                >
+                    ← Continue Shopping
+                </a>
+
+
+                <a
+                    href="{{ url_for('shop.checkout') }}"
+                    class="address-checkout-btn"
+                >
+                    Continue to Checkout →
+                </a>
+
+            </div>
+
+
+        {% else %}
+
+            <!-- =============================================
+                 EMPTY ADDRESS BOOK
+            ============================================== -->
+
+            <div class="address-empty">
+
+                <div class="address-empty-icon">
+                    📍
+                </div>
+
+                <span class="address-eyebrow">
+                    ADDRESS BOOK
+                </span>
+
+                <h2>
+                    No Saved Addresses
+                </h2>
+
+                <p>
+                    You haven't saved a delivery address yet.
+                    Add your first address so it can be selected
+                    during checkout.
+                </p>
+
+
+                <a
+                    href="{{ url_for('shop.add_address') }}"
+                    class="address-add-first-btn"
+                >
+                    + Add Your First Address
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

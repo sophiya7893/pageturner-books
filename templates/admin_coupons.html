@@ -1,0 +1,175 @@
+
+{% extends "base.html" %}
+
+{% block title %}Coupon Management | PageTurner Books{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin-coupons-returns.css') }}">
+
+<section class="coupon-form-page">
+
+    <div class="coupon-form-header">
+        <h1>Coupon Management</h1>
+        <p>Create and manage discount coupons for PageTurner Books.</p>
+    </div>
+
+    <!-- Create Coupon -->
+    <div class="coupon-form-card">
+
+        <form method="POST"
+              action="{{ url_for('shop.admin_coupons') }}"
+              class="coupon-form">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <div class="coupon-form-group">
+                <label for="code">Coupon Code *</label>
+                <input id="code" name="code" type="text"
+                       maxlength="40" placeholder="Example: WELCOME10"
+                       required>
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="discount_type">Discount Type *</label>
+                <select id="discount_type" name="discount_type" required>
+                    <option value="percentage">Percentage</option>
+                    <option value="fixed">Fixed amount (value in paise)</option>
+                </select>
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="discount_value">Discount Value *</label>
+                <input id="discount_value" name="discount_value"
+                       type="number" min="1" required>
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="expires_at">Expires At</label>
+                <input id="expires_at" name="expires_at"
+                       type="datetime-local">
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="usage_limit">Usage Limit</label>
+                <input id="usage_limit" name="usage_limit"
+                       type="number" min="1">
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="min_order_paise">Minimum Order (paise)</label>
+                <input id="min_order_paise" name="min_order_paise"
+                       type="number" min="0" value="0">
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="max_discount_paise">Maximum Discount (paise)</label>
+                <input id="max_discount_paise" name="max_discount_paise"
+                       type="number" min="1">
+            </div>
+
+            <div class="coupon-form-group">
+                <label for="category_id">Restrict to category (optional)</label>
+                <select id="category_id" name="category_id">
+                    <option value="">All categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category['id'] }}">{{ category['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="coupon-form-group">
+                <label><input type="checkbox" name="one_use_per_customer" value="1"> One use per customer</label>
+            </div>
+
+            <div class="coupon-form-actions">
+                <button type="submit" class="coupon-form-btn">
+                    Create Coupon
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Existing Coupons -->
+    <div class="coupon-form-header">
+        <h2>Existing Coupons</h2>
+    </div>
+
+    <div class="coupon-form-card">
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        <th>Expiry</th>
+                        <th>Limit</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for c in coupons %}
+                    <tr>
+                        <td>{{ c['code'] }}</td>
+                        <td>{{ c['discount_type'] }}</td>
+                        <td>{{ c['discount_value'] }}</td>
+                        <td>{{ c['end_date'] or c['expires_at'] or c['expiry_date'] or 'No expiry' }}</td>
+                        <td>{{ c['usage_limit'] or 'Unlimited' }}</td>
+                        <td>{{ 'Yes' if c['active'] else 'No' }}</td>
+
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('shop.admin_coupons') }}"
+                                  onsubmit="return confirm('Are you sure you want to delete this coupon?');">
+
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="coupon_id" value="{{ c['id'] }}">
+
+                                <button type="submit" class="btn-delete">
+                                    Delete
+                                </button>
+                            </form>
+
+                            {% if c['active'] %}
+                            <form method="POST" action="{{ url_for('shop.admin_coupons') }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="action" value="deactivate">
+                                <input type="hidden" name="coupon_id" value="{{ c['id'] }}">
+
+                                <button type="submit">
+                                    Deactivate
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="POST" action="{{ url_for('shop.admin_coupons') }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="action" value="activate">
+                                <input type="hidden" name="coupon_id" value="{{ c['id'] }}">
+
+                                <button type="submit">
+                                    Activate
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">No coupons yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

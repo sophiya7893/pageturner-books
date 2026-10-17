@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Track Order #{{ order.id }} | PageTurner Books{% endblock %}
+
+{% block content %}
+<section class="tracking-page">
+    <div class="tracking-container">
+
+        <div class="tracking-header">
+            <div>
+                <p class="tracking-label">PAGETURNER BOOKS</p>
+                <h1>Track Your Order</h1>
+                <p class="tracking-subtitle">
+                    Follow your order status and delivery progress.
+                </p>
+            </div>
+
+            <a href="{{ url_for('shop.orders') }}" class="tracking-back">
+                ← Back to Orders
+            </a>
+        </div>
+
+        <div class="tracking-card">
+            <div class="tracking-order-info">
+                <div>
+                    <span class="tracking-muted">Order Number</span>
+                    <h2>#{{ order.id }}</h2>
+                </div>
+
+                <div class="tracking-status">
+                    {{ order.status }}
+                </div>
+            </div>
+
+            <div class="tracking-divider"></div>
+
+            <h3>Delivery Progress</h3>
+            {% if order.status == 'Cancelled' %}<p class="tracking-status-cancelled">This order was cancelled.</p>{% endif %}
+
+            {% set status_order = [
+                'Placed', 'Packed', 'Shipped', 'Delivered'
+            ] %}
+
+            {% set current_status = order.status|string|trim %}
+            {% set current_index = status_order.index(current_status)
+                if current_status in status_order else -1 %}
+
+            <div class="tracking-steps">
+                {% for step in status_order %}
+                <div class="tracking-step
+                    {% if loop.index0 <= current_index %}completed{% endif %}">
+
+                    <div class="tracking-circle">
+                        {% if loop.index0 < current_index %}
+                            ✓
+                        {% elif loop.index0 == current_index %}
+                            ●
+                        {% else %}
+                            {{ loop.index }}
+                        {% endif %}
+                    </div>
+
+                    <span>{{ step }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="tracking-divider"></div>
+
+            <h3>Order Items</h3>
+
+            {% if items %}
+                <div class="tracking-items">
+                    {% for item in items %}
+                    <div class="tracking-item">
+                        <div class="tracking-book-icon">📚</div>
+
+                        <div class="tracking-book-details">
+                            <h4>{{ item.title or 'Book' }}</h4>
+                            <p>{{ item.author or 'Author unavailable' }}</p>
+                            <span>Quantity: {{ item.quantity }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="tracking-muted">No order items found.</p>
+            {% endif %}
+
+            <div class="tracking-divider"></div>
+
+            <h3>Tracking History</h3>
+
+            {% if history %}
+                <div class="tracking-history">
+                    {% for event in history %}
+                    <div class="tracking-event">
+                        <div class="tracking-event-dot"></div>
+
+                        <div>
+                            <h4>{{ event.status }}</h4>
+
+                            {% if event.note %}
+                                <p>{{ event.note }}</p>
+                            {% endif %}
+
+                            <span>
+                                {{ event.created_at or 'Date unavailable' }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="tracking-muted">
+                    No tracking updates are available yet.
+                </p>
+            {% endif %}
+
+            <div class="tracking-actions">
+                <a href="{{ url_for('shop.orders') }}"
+                   class="tracking-secondary-btn">
+                    ← Back to Orders
+                </a>
+
+                <a href="{{ url_for('shop.order_invoice',
+                                    order_id=order.id) }}"
+                   class="tracking-primary-btn">
+                    View Invoice
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
